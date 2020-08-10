@@ -109,7 +109,7 @@ namespace MSE2
             return false;
         }
 
-        private static Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
+        private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
 
         public static IEnumerable<LimbConfiguration> CachedInstallationDestinations ( ThingDef parentDef )
         {
@@ -142,7 +142,6 @@ namespace MSE2
             {
                 foreach ( var thing in thingDefs )
                 {
-                    CompIncludedChildParts comp = thing.TryGetComp<CompIncludedChildParts>();
                     if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
                         CachedInstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
                         && InstallationCompatibility( thingDefs.Except( thing ), limbs.Except( limb ) ) ) // all other things check out

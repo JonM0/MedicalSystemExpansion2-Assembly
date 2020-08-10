@@ -14,14 +14,14 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch]
     internal static class RecipeDef_PotentiallyMissingIngredients
     {
-        private static MethodBase TargetMethod ()
+        internal static MethodBase TargetMethod ()
         {
             // ty to Garthor#8252 and erdelf#0001 for help with this
             return typeof( RecipeDef ).GetNestedType( "<PotentiallyMissingIngredients>d__77", BindingFlags.NonPublic | BindingFlags.Instance ).GetMethod( "MoveNext", BindingFlags.NonPublic | BindingFlags.Instance );
         }
 
         [HarmonyTranspiler]
-        private static IEnumerable<CodeInstruction> MissingIfWrongTargetLimb ( IEnumerable<CodeInstruction> instructions )
+        internal static IEnumerable<CodeInstruction> MissingIfWrongTargetLimb ( IEnumerable<CodeInstruction> instructions )
         {
             List<CodeInstruction> instrList = instructions.ToList();
 
@@ -38,9 +38,6 @@ namespace MSE2.HarmonyPatches
             }
 
             instrList.InsertRange( indexAt, ExtraCheck().Append( new CodeInstruction( lastBranchIfFalse ) ) );
-
-            //int iiii = 0;
-            //Log.Message( string.Join( "\n", instrList.Select( i => (iiii++).ToString() + " " + i ) ) );
 
             return instrList;
         }
@@ -82,7 +79,7 @@ namespace MSE2.HarmonyPatches
             yield return new CodeInstruction( OpCodes.Callvirt, typeof( RecipeDef_PotentiallyMissingIngredients ).GetMethod( "HasNoOrCorrectTargetLimb", BindingFlags.NonPublic | BindingFlags.Static ) );
         }
 
-        private static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )
+        internal static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )
         {
             var recipeTarget = recipe.GetModExtension<RestrictTargetLimb>()?.targetLimb;
             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
@@ -90,8 +87,6 @@ namespace MSE2.HarmonyPatches
             if ( recipeTarget != null && thingComp != null )
             {
                 var thingTarget = thingComp?.TargetLimb;
-
-                //Log.Message( recipe.label + " " + recipeTarget?.UniqueName + " - " + thing.Label + " " + thingTarget?.UniqueName );
 
                 return recipeTarget == thingTarget;
             }

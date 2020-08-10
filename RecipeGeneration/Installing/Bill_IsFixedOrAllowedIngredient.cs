@@ -16,7 +16,7 @@ namespace MSE2.HarmonyPatches
     internal static class Bill_IsFixedOrAllowedIngredient
     {
         [HarmonyPostfix]
-        private static void CheckForTargetLimb ( ref Bill __instance, ref bool __result, Thing thing )
+        internal static void CheckForTargetLimb ( ref Bill __instance, ref bool __result, Thing thing )
         {
             var comp = thing.TryGetComp<CompIncludedChildParts>();
             var recipeTargetLimb = __instance.recipe?.GetModExtension<RestrictTargetLimb>()?.targetLimb;

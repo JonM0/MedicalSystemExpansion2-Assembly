@@ -63,7 +63,7 @@ namespace MSE2
             return allRecords.Contains( bodyPartRecord );
         }
 
-        private int id = -1;
+        private readonly int id = -1;
 
         public int CountSimilar ()
         {

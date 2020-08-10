@@ -41,7 +41,7 @@ namespace MSE2.HarmonyPatches
             // don't say it has some efficiency just because it is child of added part
 
             [HarmonyTranspiler]
-            private static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
+            internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
             {
                 var l = new List<CodeInstruction>( instructions );
 
