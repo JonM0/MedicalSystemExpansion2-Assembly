@@ -8,6 +8,8 @@ using Verse;
 using HarmonyLib;
 using RimWorld;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using System.Collections;
 
 namespace MSE2.HarmonyPatches
 {
@@ -16,8 +18,9 @@ namespace MSE2.HarmonyPatches
     {
         internal static MethodBase TargetMethod ()
         {
-            // ty to Garthor#8252 and erdelf#0001 for help with this
-            return typeof( RecipeDef ).GetNestedType( "<PotentiallyMissingIngredients>d__77", BindingFlags.NonPublic | BindingFlags.Instance ).GetMethod( "MoveNext", BindingFlags.NonPublic | BindingFlags.Instance );
+            // ty to LoonyLadle#7465, Garthor#8252 and erdelf#0001 for help with this
+            return AccessTools.FirstInner( typeof( RecipeDef ), t => t.HasAttribute<CompilerGeneratedAttribute>() && t.Name.Contains( nameof( RecipeDef.PotentiallyMissingIngredients ) ) )
+                .GetMethod( nameof( IEnumerator.MoveNext ), BindingFlags.NonPublic | BindingFlags.Instance );
         }
 
         [HarmonyTranspiler]
