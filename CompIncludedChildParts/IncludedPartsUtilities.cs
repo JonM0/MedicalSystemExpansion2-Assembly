@@ -64,7 +64,7 @@ namespace MSE2
 
         public static IEnumerable<RecipeDef> SurgeryToInstall ( ThingDef thing )
         {
-            return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.fixedIngredientFilter.Allows( thing ) );
+            return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.IsIngredient( thing ) );
         }
 
         public static bool HasSameStructure ( this BodyPartRecord a, BodyPartRecord b )

@@ -124,8 +124,9 @@
     <Compile Include="CompIncludedChildParts\CompIncludedChildParts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Actual\Recipe_InstallModule.cs" />
+    <Compile Include="RecipeGeneration\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
+    <Compile Include="RecipeGeneration\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
     <Compile Include="RecipeGeneration\Installing\RestrictTargetLimb.cs" />
-    <Compile Include="SpecialThingFilterWorker_TargetLimb.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

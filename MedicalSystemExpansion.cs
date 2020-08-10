@@ -43,7 +43,14 @@ namespace MSE2
                 foreach ( RecipeDef surgery in IncludedPartsUtilities.SurgeryToInstall( thingDef ).ToArray() )
                 {
                     tmplimbsItCanTargetList.Clear();
-                    tmplimbsItCanTargetList.AddRange( comp.installationDestinations.Where( l => surgery.appliedOnFixedBodyParts.Contains( l.PartDef ) && surgery.AllRecipeUsers.Any( ru => l.Bodies.Contains( ru.race.body ) ) ) );
+                    tmplimbsItCanTargetList.AddRange(
+                        comp.installationDestinations
+                        .Where(
+                            l =>
+                            surgery.appliedOnFixedBodyParts.Contains( l.PartDef )
+                            && surgery.AllRecipeUsers.Any( ru => l.Bodies.Contains( ru.race.body ) )
+                        )
+                    );
 
                     Log.Message( surgery.label + " can target(" + tmplimbsItCanTargetList.Count + "): " + string.Join( ", ", tmplimbsItCanTargetList.Select( l => l.UniqueName ) ) );
 
@@ -59,11 +66,13 @@ namespace MSE2
                         else
                         {
                             RecipeDef surgeryClone = (RecipeDef)typeof( RecipeDef ).GetMethod( "MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance ).Invoke( surgery, new object[0] );
+                            if ( surgeryClone == surgery ) Log.Error( "WTF" );
 
                             surgeryClone.defName = string.Copy( surgery.defName ) + count;
 
                             surgeryClone.label = string.Copy( surgery.defName ) + " " + count;
 
+                            surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
                             surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
                             surgeryClone.modExtensions.Add( new RestrictTargetLimb() { targetLimb = limb } );
 

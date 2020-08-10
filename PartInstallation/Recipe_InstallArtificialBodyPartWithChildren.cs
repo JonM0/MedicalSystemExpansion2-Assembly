@@ -7,7 +7,7 @@ namespace MSE2
 {
     // This class gets patched into Defs/RecipeDef[@Name="SurgeryInstallBodyPartArtificialBase"]/workerClass
 
-    internal class Recipe_InstallArtificialBodyPartWithChildren : Recipe_InstallArtificialBodyPart
+    public class Recipe_InstallArtificialBodyPartWithChildren : Recipe_InstallArtificialBodyPart
     {
         public override IEnumerable<BodyPartRecord> GetPartsToApplyOn ( Pawn pawn, RecipeDef recipe )
         {
@@ -17,8 +17,15 @@ namespace MSE2
                                                      where x.Part == record
                                                      where x.def == recipe.addsHediff
                                                      select x;
-                return // hediff not already present
-                    !alreadyPresent.Any()
+
+                var recipeTargetLimb = recipe.GetModExtension<RestrictTargetLimb>()?.targetLimb;
+
+                Log.Message( "parts to apply on " + recipe.defName + " limb: " + (recipeTargetLimb?.UniqueName) );
+
+                return
+                    (recipeTargetLimb == null || recipeTargetLimb.Contains( record ))
+                    // hediff not already present
+                    && !alreadyPresent.Any()
                     // has something to attach to
                     && (record.parent == null || pawn.health.hediffSet.GetNotMissingParts( BodyPartHeight.Undefined, BodyPartDepth.Undefined, null, null ).Contains( record.parent ))
                     // is compatible with parent
