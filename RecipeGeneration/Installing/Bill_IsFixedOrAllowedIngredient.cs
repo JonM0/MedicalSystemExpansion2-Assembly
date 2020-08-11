@@ -19,10 +19,10 @@ namespace MSE2.HarmonyPatches
         internal static void CheckForTargetLimb ( ref Bill __instance, ref bool __result, Thing thing )
         {
             var comp = thing.TryGetComp<CompIncludedChildParts>();
-            var recipeTargetLimb = __instance.recipe?.GetModExtension<RestrictTargetLimb>()?.targetLimb;
+            var recipeTargetLimb = __instance.recipe?.GetModExtension<RestrictTargetLimb>();
 
             __result = __result
-                && (comp == null || (comp.TargetLimb != null && recipeTargetLimb == comp.TargetLimb));
+                && (comp == null || recipeTargetLimb == null || recipeTargetLimb.IsValidThingComp( comp ));
         }
     }
 }

@@ -84,14 +84,12 @@ namespace MSE2.HarmonyPatches
 
         internal static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )
         {
-            var recipeTarget = recipe.GetModExtension<RestrictTargetLimb>()?.targetLimb;
+            var recipeTarget = recipe.GetModExtension<RestrictTargetLimb>();
             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
             if ( recipeTarget != null && thingComp != null )
             {
-                var thingTarget = thingComp?.TargetLimb;
-
-                return recipeTarget == thingTarget;
+                return recipeTarget.IsValidThingComp( thingComp );
             }
 
             return true;

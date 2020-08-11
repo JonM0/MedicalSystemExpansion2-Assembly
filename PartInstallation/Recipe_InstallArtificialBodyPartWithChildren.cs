@@ -18,12 +18,12 @@ namespace MSE2
                                                      where x.def == recipe.addsHediff
                                                      select x;
 
-                var recipeTargetLimb = recipe.GetModExtension<RestrictTargetLimb>()?.targetLimb;
+                var recipeTargetLimb = recipe.GetModExtension<RestrictTargetLimb>();
 
-                Log.Message( "parts to apply on " + recipe.defName + " limb: " + (recipeTargetLimb?.UniqueName) );
+                Log.Message( "parts to apply on " + recipe.defName + " limb: " + recipeTargetLimb );
 
                 return
-                    (recipeTargetLimb == null || recipeTargetLimb.Contains( record ))
+                    (recipeTargetLimb == null || recipeTargetLimb.IsValidPart( record ))
                     // hediff not already present
                     && !alreadyPresent.Any()
                     // has something to attach to

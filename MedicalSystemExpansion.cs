@@ -61,7 +61,7 @@ namespace MSE2
                         {
                             if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
 
-                            surgery.modExtensions.Add( new RestrictTargetLimb() { targetLimb = limb } );
+                            surgery.modExtensions.Add( new RestrictTargetLimb( limb ) );
                         }
                         else
                         {
@@ -74,7 +74,7 @@ namespace MSE2
 
                             surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
                             surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
-                            surgeryClone.modExtensions.Add( new RestrictTargetLimb() { targetLimb = limb } );
+                            surgeryClone.modExtensions.Add( new RestrictTargetLimb( limb ) );
 
                             typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
                             typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
