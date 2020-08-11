@@ -18,14 +18,9 @@ namespace MSE2
                                                      where x.def == recipe.addsHediff
                                                      select x;
 
-                var recipeTargetLimb = recipe.GetModExtension<RestrictTargetLimb>();
-
-                Log.Message( "parts to apply on " + recipe.defName + " limb: " + recipeTargetLimb );
-
                 return
-                    (recipeTargetLimb == null || recipeTargetLimb.IsValidPart( record ))
                     // hediff not already present
-                    && !alreadyPresent.Any()
+                    !alreadyPresent.Any()
                     // has something to attach to
                     && (record.parent == null || pawn.health.hediffSet.GetNotMissingParts( BodyPartHeight.Undefined, BodyPartDepth.Undefined, null, null ).Contains( record.parent ))
                     // is compatible with parent

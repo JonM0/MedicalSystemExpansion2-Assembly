@@ -70,7 +70,7 @@ namespace MSE2
 
                             surgeryClone.defName = string.Copy( surgery.defName ) + count;
 
-                            surgeryClone.label = string.Copy( surgery.defName ) + " " + count;
+                            surgeryClone.label = string.Copy( surgery.label ) + " " + count;
 
                             surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
                             surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
