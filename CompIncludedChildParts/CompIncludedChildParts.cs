@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -45,7 +46,7 @@ namespace MSE2
             BodyPartRecord limbPartExample = this.TargetLimb?.RecordExample;
             Scribe_BodyParts.Look( ref limbPartExample, "targetLimb" );
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
-                this.TargetLimb = LimbConfiguration.GenerateOrGetLimbConfigForBodyPartRecord( limbPartExample );
+                this.TargetLimb = LimbConfiguration.LimbConfigForBodyPartRecord( limbPartExample );
 
             if ( this.IncludedParts == null )
             {
@@ -58,10 +59,10 @@ namespace MSE2
         /// <summary>
         /// Resets the cache for MissingParts, MissingValue and inspectString
         /// </summary>
-        public void DirtyCache ()
+        private void DirtyCache ()
         {
-            this.cachedCompatibleLimbs = null;
-            this.cachedMissingParts = null;
+            this.cachedCompatibleLimbs.Item2 = false;
+            this.cachedMissingParts.Item2 = false;
             this.cachedTransformLabelString = null;
             this.cachedInspectString = null;
         }
@@ -87,16 +88,17 @@ namespace MSE2
 
         private List<Thing> tmpThingList = new List<Thing>();
 
-        // Included parts
+        #region Included parts
 
         private List<Thing> childPartsIncluded = new List<Thing>();
 
-        public List<Thing> IncludedParts
+        public IReadOnlyList<Thing> IncludedParts
         {
             get => this.childPartsIncluded;
             set
             {
-                this.childPartsIncluded = value;
+                this.childPartsIncluded.Clear();
+                this.childPartsIncluded.AddRange( value );
                 this.DirtyCache();
             }
         }
@@ -114,7 +116,7 @@ namespace MSE2
 
             (ThingDef, LimbConfiguration) target = this.MissingParts.FirstOrDefault( p => p.Item1 == part.def );
 
-            this.IncludedParts.Add( part );
+            this.childPartsIncluded.Add( part );
             this.DirtyCache();
 
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
@@ -138,7 +140,7 @@ namespace MSE2
                 return;
             }
 
-            this.IncludedParts.Remove( part );
+            this.childPartsIncluded.Remove( part );
             this.DirtyCache();
 
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
@@ -155,7 +157,9 @@ namespace MSE2
             this.RemoveAndSpawnPart( part, this.Position, this.Map );
         }
 
-        // Target Limb
+        #endregion Included parts
+
+        #region Target Limb
 
         private LimbConfiguration targetLimb;
 
@@ -226,72 +230,118 @@ namespace MSE2
             }
         }
 
-        // Standard parts
+        #endregion Target Limb
 
-        public List<ThingDef> StandardParts
+        #region Standard parts
+
+        public IReadOnlyList<ThingDef> StandardParts
         {
             get => this.Props?.standardChildren;
         }
 
-        // Missing Parts
+        #endregion Standard parts
 
-        private List<(ThingDef, LimbConfiguration)> cachedMissingParts;
+        #region Missing Parts
 
-        public IEnumerable<(ThingDef, LimbConfiguration)> MissingParts
+        private (List<(ThingDef, LimbConfiguration)>, bool) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
+
+        public IReadOnlyList<(ThingDef, LimbConfiguration)> MissingParts
         {
             get
             {
                 if ( this.TargetLimb == null )
                 {
-                    return Enumerable.Empty<(ThingDef, LimbConfiguration)>();
+                    return Array.Empty<(ThingDef, LimbConfiguration)>();
                 }
                 else
                 {
-                    if ( cachedMissingParts == null )
+                    if ( !cachedMissingParts.Item2 )
                     {
-                        cachedMissingParts = new List<(ThingDef, LimbConfiguration)>( this.Props.StandardPartsForLimb( this.TargetLimb ) );
+                        cachedMissingParts.Item1.Clear();
+                        cachedMissingParts.Item1.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
 
                         foreach ( var thing in this.IncludedParts )
                         {
                             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
-                            cachedMissingParts.Remove( cachedMissingParts.FirstOrDefault( c =>
+                            cachedMissingParts.Item1.Remove( cachedMissingParts.Item1.FirstOrDefault( c =>
                                  thing.def == c.Item1
                                  && (thingComp == null || thingComp.TargetLimb == c.Item2) ) );
                         }
+
+                        cachedMissingParts.Item2 = true;
                     }
 
-                    return cachedMissingParts;
+                    return cachedMissingParts.Item1;
                 }
             }
         }
 
-        // Compatible limbs
+        #endregion Missing Parts
 
-        private List<LimbConfiguration> cachedCompatibleLimbs;
+        #region Compatible limbs
 
-        public IEnumerable<LimbConfiguration> CompatibleLimbs
+        private (List<LimbConfiguration>, bool) cachedCompatibleLimbs = (new List<LimbConfiguration>(), false);
+
+        public IReadOnlyList<LimbConfiguration> CompatibleLimbs
         {
             get
             {
-                if ( this.cachedCompatibleLimbs == null )
+                if ( !this.cachedCompatibleLimbs.Item2 )
                 {
-                    this.cachedCompatibleLimbs = (from lc in this.Props.installationDestinations
-                                                  where this.IsCompatibleWith( lc )
-                                                  select lc
-                                                  ).ToList();
+                    this.cachedCompatibleLimbs.Item1.Clear();
+                    this.cachedCompatibleLimbs.Item1.AddRange( from lc in this.Props.installationDestinations
+                                                               where this.Props.EverInstallableOn( lc )
+                                                               where IncludedPartsUtilities.InstallationCompatibility( this.childPartsIncluded, lc.ChildLimbs )
+                                                               select lc );
+                    this.cachedCompatibleLimbs.Item2 = true;
                 }
-                return this.cachedCompatibleLimbs;
+                return this.cachedCompatibleLimbs.Item1;
             }
         }
 
-        private bool IsCompatibleWith ( LimbConfiguration limb )
+        #endregion Compatible limbs
+
+        #region Creation / Deletion
+
+        public void InitializeFromList ( List<Thing> available )
         {
-            return this.Props.EverInstallableOn( limb )
-                && IncludedPartsUtilities.InstallationCompatibility( this.childPartsIncluded, limb.ChildLimbs );
+            this.childPartsIncluded.Clear();
+            this.DirtyCache();
+
+            this.AddMissingFromList( available );
         }
 
-        // Creation / Deletion
+        public void AddMissingFromList ( List<Thing> available )
+        {
+            this.tmpThingList.Clear();
+            this.tmpThingList.AddRange( available );
+
+            // first add things that match both def and target
+            foreach ( var availableThing in available.ToArray() )
+            {
+                if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def && mp.Item2 == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetLimb ) )
+                {
+                    this.AddPart( availableThing );
+                    available.Remove( availableThing );
+                }
+            }
+
+            this.tmpThingList.Clear();
+            this.tmpThingList.AddRange( available );
+
+            // then just match thingdef
+            foreach ( var availableThing in available.ToArray() )
+            {
+                if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def ) )
+                {
+                    this.AddPart( availableThing );
+                    available.Remove( availableThing );
+                }
+            }
+
+            this.tmpThingList.Clear();
+        }
 
         public void InitializeForLimb ( LimbConfiguration limb )
         {
@@ -318,6 +368,8 @@ namespace MSE2
                 }
             }
         }
+
+        #endregion Creation / Deletion
 
         #endregion PartHandling
 
@@ -403,7 +455,7 @@ namespace MSE2
         /// Calls DirtyCache for all the ancestors of recursionEnd (excluded) up to the calling comp
         /// </summary>
         /// <returns>True if it actually found recursionEnd</returns>
-        public bool DirtyCacheDeep ( CompIncludedChildParts recursionEnd )
+        private bool DirtyCacheDeep ( CompIncludedChildParts recursionEnd )
         {
             if ( this == recursionEnd )
             {

@@ -94,7 +94,7 @@ namespace MSE2
             }
         }
 
-        public ThingDef parentDef;
+        private ThingDef parentDef;
 
         public List<LimbConfiguration> installationDestinations;
 

@@ -111,7 +111,7 @@ namespace MSE2
 
         private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
 
-        public static IEnumerable<LimbConfiguration> CachedInstallationDestinations ( ThingDef parentDef )
+        public static IReadOnlyList<LimbConfiguration> CachedInstallationDestinations ( ThingDef parentDef )
         {
             if ( cachedInstallationDestinations.TryGetValue( parentDef, out List<LimbConfiguration> val ) )
             {

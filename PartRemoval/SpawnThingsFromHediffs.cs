@@ -40,7 +40,7 @@ namespace MSE2.HarmonyPatches
             // stop if the part is missing
             if ( !pawn.health.hediffSet.GetNotMissingParts().Contains( part ) )
             {
-                yield break;
+                return Enumerable.Empty<Thing>();
             }
 
             /// Things that can be made from all subPart hediffs
@@ -59,68 +59,35 @@ namespace MSE2.HarmonyPatches
 
             // for every thing makeable from hediffs on this part: add subparts if possible then return it
             List<Thing> items = new List<Thing>();
-            foreach ( Hediff hediff in from x in pawn.health.hediffSet.hediffs
-                                       where x.Part == part
-                                       select x ) // for every hediff on the part
+            foreach ( ThingDef spawnableFromPart in from h in pawn.health.hediffSet.hediffs
+                                                    where h.def.spawnThingOnRemoved != null
+                                                    where h.Part == part
+                                                    select h.def.spawnThingOnRemoved ) // for every hediff on the part
             {
-                if ( hediff.def.spawnThingOnRemoved != null ) // if it spawns an item
+                Thing item = ThingMaker.MakeThing( spawnableFromPart );
+
+                // compose if possible
+                var comp = item.TryGetComp<CompIncludedChildParts>();
+                if ( comp != null )
                 {
-                    Thing item = ThingMaker.MakeThing( hediff.def.spawnThingOnRemoved );
-
-                    if ( item is ThingWithComps itemWithComps ) // compose if possible
-                    {
-                        AddSubparts( itemWithComps, subThings );
-                    }
-
-                    items.Add( item );
+                    comp.TargetLimb = LimbConfiguration.LimbConfigForBodyPartRecord( part );
+                    comp.InitializeFromList( subThings );
                 }
+
+                items.Add( item );
             }
 
             // merge siblings
-            for ( int i = items.Count - 1; i >= 0; i-- )
+            foreach ( var item in items.ToArray() )
             {
-                if ( items[i] is ThingWithComps )
-                    AddSubparts( items[i] as ThingWithComps, items, false );
+                if ( items.Contains( item ) )
+                {
+                    item.TryGetComp<CompIncludedChildParts>()?.AddMissingFromList( items );
+                }
             }
 
             // return all
-            foreach ( Thing item in items.Concat( subThings ) )
-            {
-                yield return item;
-            }
-
-            yield break;
-        }
-
-        /// <summary>
-        /// From the list of available Things, add the compatible subparts to the item
-        /// </summary>
-        /// <param name="item">The item to add the subparts to</param>
-        /// <param name="available">The available things to add</param>
-        /// <param name="reset">Should it reset the list of subparts in the item</param>
-        public static void AddSubparts ( ThingWithComps item, List<Thing> available, bool reset = true )
-        {
-            CompIncludedChildParts comp = item.TryGetComp<CompIncludedChildParts>();
-
-            if ( comp != null )
-            {
-                if ( reset )
-                {
-                    comp.IncludedParts.Clear();
-                }
-
-                foreach ( ThingDef compatible in comp.StandardParts )
-                {
-                    // TODO can prob simplify it
-                    Thing match = available.Find( x => x.def == compatible );
-
-                    if ( match != null )
-                    {
-                        available.Remove( match );
-                        comp.AddPart( match );
-                    }
-                }
-            }
+            return items.Concat( subThings );
         }
     }
 }

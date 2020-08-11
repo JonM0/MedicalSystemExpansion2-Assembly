@@ -113,7 +113,7 @@ namespace MSE2
                 else
                 {
                     return from bpr in this.RecordExample.parts
-                           select GenerateOrGetLimbConfigForBodyPartRecord( bpr );
+                           select LimbConfigForBodyPartRecord( bpr );
                 }
             }
         }
@@ -121,7 +121,7 @@ namespace MSE2
         protected static Dictionary<BodyPartRecord, LimbConfiguration> recordToLimb = new Dictionary<BodyPartRecord, LimbConfiguration>();
         protected static List<LimbConfiguration> allLimbDefs = new List<LimbConfiguration>();
 
-        public static LimbConfiguration GenerateOrGetLimbConfigForBodyPartRecord ( BodyPartRecord bodyPartRecord )
+        public static LimbConfiguration LimbConfigForBodyPartRecord ( BodyPartRecord bodyPartRecord )
         {
             if ( recordToLimb.TryGetValue( bodyPartRecord, out LimbConfiguration outVal ) )
             {
@@ -137,7 +137,7 @@ namespace MSE2
         {
             return from bpr in body.AllParts
                    where bpr.def == partDef
-                   let lc = GenerateOrGetLimbConfigForBodyPartRecord( bpr )
+                   let lc = LimbConfigForBodyPartRecord( bpr )
                    group lc by lc into g
                    select g.Key;
         }
