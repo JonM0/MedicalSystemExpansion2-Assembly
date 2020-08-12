@@ -14,10 +14,13 @@ using System;
 
 namespace MSE2
 {
+    //[EarlyInit]
     public class MedicalSystemExpansion : ModBase
     {
         public override void DefsLoaded ()
         {
+            Log.Message( "Defs loaded" );
+
             base.DefsLoaded();
 
             IncludedPartsUtilities.CacheAllStandardParents();
@@ -33,68 +36,14 @@ namespace MSE2
             }
 
             // duplicate ambiguous installation surgeries
-            List<LimbConfiguration> tmplimbsItCanTargetList = new List<LimbConfiguration>();
-
-            foreach ( (ThingDef thingDef, CompProperties_IncludedChildParts comp) in
-                DefDatabase<ThingDef>.AllDefs
-                .Select( t => (t, t.GetCompProperties<CompProperties_IncludedChildParts>()) )
-                .Where( c => c.Item2 != null ) )
+            foreach ( RecipeDef def in LimbRecipeDefGenerator.ExtraLimbSurgeryRecipeDefs() )
             {
-                foreach ( RecipeDef surgery in IncludedPartsUtilities.SurgeryToInstall( thingDef ).ToArray() )
-                {
-                    tmplimbsItCanTargetList.Clear();
-                    tmplimbsItCanTargetList.AddRange(
-                        comp.installationDestinations
-                        .Where(
-                            l =>
-                            surgery.appliedOnFixedBodyParts.Contains( l.PartDef )
-                            && surgery.AllRecipeUsers.Any( ru => l.Bodies.Contains( ru.race.body ) )
-                        )
-                    );
-
-                    Log.Message( surgery.label + " can target(" + tmplimbsItCanTargetList.Count + "): " + string.Join( ", ", tmplimbsItCanTargetList.Select( l => l.UniqueName ) ) );
-
-                    int count = 0;
-                    foreach ( var limb in tmplimbsItCanTargetList )
-                    {
-                        if ( count == 0 )
-                        {
-                            if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
-
-                            surgery.modExtensions.Add( new RestrictTargetLimb( limb ) );
-                        }
-                        else
-                        {
-                            RecipeDef surgeryClone = (RecipeDef)typeof( RecipeDef ).GetMethod( "MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance ).Invoke( surgery, new object[0] );
-                            if ( surgeryClone == surgery ) Log.Error( "WTF" );
-
-                            surgeryClone.defName = string.Copy( surgery.defName ) + count;
-
-                            surgeryClone.label = string.Copy( surgery.label ) + " " + count;
-
-                            surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
-                            surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
-                            surgeryClone.modExtensions.Add( new RestrictTargetLimb( limb ) );
-
-                            typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-                            typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-                            typeof( RecipeDef ).GetField( "ingredientValueGetterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-
-                            surgeryClone.shortHash = 0;
-
-                            surgeryClone.ResolveReferences();
-                            DefGenerator.AddImpliedDef( surgeryClone );
-                            HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( surgeryClone, typeof( RecipeDef ) );
-                        }
-                        count++;
-                    }
-
-                    if ( count > 1 )
-                    {
-                        surgery.label += " 0";
-                    }
-                }
+                def.ResolveReferences();
+                DefGenerator.AddImpliedDef<RecipeDef>( def );
+                HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
             }
+
+            DefDatabase<RecipeDef>.ErrorCheckAllDefs();
         }
 
         public override string ModIdentifier => "MSE2";

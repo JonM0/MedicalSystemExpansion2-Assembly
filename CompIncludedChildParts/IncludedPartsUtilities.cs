@@ -75,11 +75,11 @@ namespace MSE2
             }
             else
             {
-                return a.def == b.def && EnumerableEqualsUnsorted( a.parts, b.parts, HasSameStructure );
+                return a.def == b.def && EnumerableEqualsOutOfOrder( a.parts, b.parts, HasSameStructure );
             }
         }
 
-        public static bool EnumerableEqualsUnsorted<A, B> ( IEnumerable<A> aEnu, IEnumerable<B> bEnu, Func<A, B, bool> equalityComparer )
+        public static bool EnumerableEqualsOutOfOrder<A, B> ( IEnumerable<A> aEnu, IEnumerable<B> bEnu, Func<A, B, bool> equalityComparer )
             where A : class
             where B : class
         {
@@ -100,7 +100,7 @@ namespace MSE2
             {
                 foreach ( B b in bEnu )
                 {
-                    if ( equalityComparer( a, b ) && EnumerableEqualsUnsorted( aEnu.Except( a ), bEnu.Except( b ), equalityComparer ) )
+                    if ( equalityComparer( a, b ) && EnumerableEqualsOutOfOrder( aEnu.Except( a ), bEnu.Except( b ), equalityComparer ) )
                     {
                         return true;
                     }

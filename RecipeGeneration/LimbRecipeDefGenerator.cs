@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,75 @@ namespace MSE2
 {
     public static class LimbRecipeDefGenerator
     {
+        public static IEnumerable<RecipeDef> ExtraLimbSurgeryRecipeDefs ()
+        {
+            List<LimbConfiguration> tmplimbsItCanTargetList = new List<LimbConfiguration>();
+
+            // iterate over thingDefs with child parts
+            foreach ( (ThingDef thingDef, CompProperties_IncludedChildParts comp) in
+                DefDatabase<ThingDef>.AllDefs
+                .Select( t => (t, t.GetCompProperties<CompProperties_IncludedChildParts>()) )
+                .Where( c => c.Item2 != null ) )
+            {
+                // iterate over the surgeries to install them
+                foreach ( RecipeDef surgery in IncludedPartsUtilities.SurgeryToInstall( thingDef ).ToArray() )
+                {
+                    // take the limbs that the thing can be installed on that this recipe targets
+                    tmplimbsItCanTargetList.Clear();
+                    tmplimbsItCanTargetList.AddRange(
+                        comp.installationDestinations
+                        .Where(
+                            l =>
+                            surgery.appliedOnFixedBodyParts.Contains( l.PartDef )
+                            && surgery.AllRecipeUsers.Any( ru => l.Bodies.Contains( ru.race.body ) )
+                        )
+                    );
+
+                    Log.Message( surgery.label + " can target(" + tmplimbsItCanTargetList.Count + "): " + string.Join( ", ", tmplimbsItCanTargetList.Select( l => l.UniqueName ) ) );
+
+                    int count = 0;
+                    foreach ( var limb in tmplimbsItCanTargetList )
+                    {
+                        if ( count == 0 )
+                        {
+                            // put the first limb on the preexisting surgery
+                            if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
+
+                            surgery.modExtensions.Add( new RestrictTargetLimb( limb ) );
+                        }
+                        else
+                        {
+                            // clone the surgery for the other limbs
+                            RecipeDef surgeryClone = (RecipeDef)typeof( RecipeDef ).GetMethod( "MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance ).Invoke( surgery, new object[0] );
+                            if ( surgeryClone == surgery ) Log.Error( "WTF" );
+
+                            surgeryClone.defName = string.Copy( surgery.defName ) + count;
+
+                            surgeryClone.label = string.Copy( surgery.label )/* + " " + count*/;
+
+                            surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
+                            surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
+                            surgeryClone.modExtensions.Add( new RestrictTargetLimb( limb ) );
+
+                            typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
+                            typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
+                            typeof( RecipeDef ).GetField( "ingredientValueGetterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
+
+                            surgeryClone.shortHash = 0;
+
+                            yield return surgeryClone;
+                        }
+                        count++;
+                    }
+
+                    //if ( count > 1 )
+                    //{
+                    //    surgery.label += " 0";
+                    //}
+                }
+            }
+        }
+
         public static IEnumerable<RecipeDef> ImpliedLimbRecipeDefs ()
         {
             return from ThingDef thingDef in DefDatabase<ThingDef>.AllDefs
