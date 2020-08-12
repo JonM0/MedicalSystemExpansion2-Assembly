@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Verse;
+using RimWorld;
+using HarmonyLib;
+
+namespace MSE2.HarmonyPatches
+{
+    [HarmonyPatch( typeof( ThingDef ) )]
+    [HarmonyPatch( nameof( ThingDef.AllRecipes ), MethodType.Getter )]
+    internal static class SortThingDefAllRecipes
+    {
+        [HarmonyPrefix]
+        internal static bool CheckIfDirty ( List<RecipeDef> ___allRecipesCached, ref bool __state )
+        {
+            __state = ___allRecipesCached == null;
+
+            return true;
+        }
+
+        [HarmonyPostfix]
+        internal static void SortList ( List<RecipeDef> __result, bool __state )
+        {
+            if ( __state )
+            {
+                var resCopy = __result.ToArray();
+
+                __result.Clear();
+
+                __result.AddRange(
+                    from r in resCopy
+                    group r by r.addsHediff into rg
+                    from sr in rg
+                    select sr );
+            }
+        }
+    }
+}
