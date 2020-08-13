@@ -44,7 +44,7 @@ namespace MSE2
 
         public override string ToString ()
         {
-            return targetLimb.Label;
+            return "TargetLimb=" + targetLimb?.UniqueName;
         }
     }
 }
