@@ -115,7 +115,6 @@
     <Compile Include="MedicalSystemExpansion.cs" />
     <Compile Include="MSE_HediffDefOf.cs" />
     <Compile Include="RecipeGeneration\Crafting\AddSubpartsAfterCreation.cs" />
-    <Compile Include="RecipeGeneration\LimbProsthesisCreation.cs" />
     <Compile Include="RecipeGeneration\LimbRecipeDefGenerator.cs" />
     <Compile Include="Modules\Actual\Hediff_ModuleAdded.cs" />
     <Compile Include="Modules\Slots\Hediff_ModuleSlot.cs" />
@@ -127,7 +126,7 @@
     <Compile Include="RecipeGeneration\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
     <Compile Include="RecipeGeneration\Installing\MedicalRecipesUtility_GetFixedPartsToApplyOn.cs" />
     <Compile Include="RecipeGeneration\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
-    <Compile Include="RecipeGeneration\Installing\RestrictTargetLimb.cs" />
+    <Compile Include="RecipeGeneration\TargetLimb.cs" />
     <Compile Include="SortThingDefAllRecipes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

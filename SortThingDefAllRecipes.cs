@@ -34,8 +34,10 @@ namespace MSE2.HarmonyPatches
                 __result.AddRange(
                     from r in resCopy
                     group r by r.addsHediff into rg
-                    from sr in rg
-                    select sr );
+                    from r in rg
+                    group r by r.ProducedThingDef into rg
+                    from r in rg
+                    select r );
             }
         }
     }

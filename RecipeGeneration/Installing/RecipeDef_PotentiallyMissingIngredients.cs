@@ -16,6 +16,8 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch]
     internal static class RecipeDef_PotentiallyMissingIngredients
     {
+        // this hides the option to install a part when it exists but is incompatible
+
         internal static MethodBase TargetMethod ()
         {
             // ty to LoonyLadle#7465, Garthor#8252 and erdelf#0001 for help with this
@@ -84,7 +86,7 @@ namespace MSE2.HarmonyPatches
 
         internal static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )
         {
-            var recipeTarget = recipe.GetModExtension<RestrictTargetLimb>();
+            var recipeTarget = recipe.GetModExtension<TargetLimb>();
             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
             if ( recipeTarget != null && thingComp != null )

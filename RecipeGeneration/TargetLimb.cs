@@ -9,26 +9,32 @@ using RimWorld;
 
 namespace MSE2
 {
-    public class RestrictTargetLimb : DefModExtension
+    public class TargetLimb : DefModExtension
     {
-        private LimbConfiguration targetLimb;
+        public readonly LimbConfiguration targetLimb;
 
-        public RestrictTargetLimb ( LimbConfiguration targetLimb )
+        public TargetLimb ( LimbConfiguration targetLimb )
         {
             this.targetLimb = targetLimb;
         }
 
         public override IEnumerable<string> ConfigErrors ()
         {
+            foreach ( string error in base.ConfigErrors() ) yield return error;
+
             if ( targetLimb == null )
             {
-                yield return "targetLimb cannot be null";
+                yield return "targetLimb is null";
+            }
+            else if ( targetLimb.RecordExample == null )
+            {
+                yield return "targetLimb contains no records";
             }
         }
 
         public bool IsValidThingComp ( CompIncludedChildParts comp )
         {
-            return this.targetLimb == comp.TargetLimb;
+            return comp.CompatibleLimbs.Contains( this.targetLimb );
         }
 
         public bool IsValidPart ( BodyPartRecord bodyPartRecord )

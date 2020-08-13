@@ -21,9 +21,9 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         public static void AddSubparts ( ref Thing __result, RecipeDef recipeDef )
         {
-            if ( recipeDef.HasModExtension<LimbProsthesisCreation>() && __result.TryGetComp<CompIncludedChildParts>() != null )
+            if ( recipeDef.HasModExtension<TargetLimb>() && __result.TryGetComp<CompIncludedChildParts>() != null )
             {
-                __result.TryGetComp<CompIncludedChildParts>().InitializeForLimb( recipeDef.GetModExtension<LimbProsthesisCreation>().targetLimb );
+                __result.TryGetComp<CompIncludedChildParts>().InitializeForLimb( recipeDef.GetModExtension<TargetLimb>().targetLimb );
             }
         }
     }

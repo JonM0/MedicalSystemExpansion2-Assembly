@@ -47,7 +47,7 @@ namespace MSE2
                             // put the first limb on the preexisting surgery
                             if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
 
-                            surgery.modExtensions.Add( new RestrictTargetLimb( limb ) );
+                            surgery.modExtensions.Add( new TargetLimb( limb ) );
                         }
                         else
                         {
@@ -60,8 +60,8 @@ namespace MSE2
                             surgeryClone.label = string.Copy( surgery.label )/* + " " + count*/;
 
                             surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
-                            surgeryClone.modExtensions.Remove( surgery.GetModExtension<RestrictTargetLimb>() );
-                            surgeryClone.modExtensions.Add( new RestrictTargetLimb( limb ) );
+                            surgeryClone.modExtensions.Remove( surgery.GetModExtension<TargetLimb>() );
+                            surgeryClone.modExtensions.Add( new TargetLimb( limb ) );
 
                             typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
                             typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
@@ -204,7 +204,7 @@ namespace MSE2
                 (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForLimb( def, limb );
 
                 if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
-                recipeDef.modExtensions.Add( new LimbProsthesisCreation() { targetLimb = limb } );
+                recipeDef.modExtensions.Add( new TargetLimb( limb ) );
 
                 yield return recipeDef;
 

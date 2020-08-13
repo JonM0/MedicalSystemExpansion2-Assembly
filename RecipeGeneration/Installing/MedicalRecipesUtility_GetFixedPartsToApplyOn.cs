@@ -14,10 +14,12 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch( nameof( MedicalRecipesUtility.GetFixedPartsToApplyOn ) )]
     internal static class MedicalRecipesUtility_GetFixedPartsToApplyOn
     {
+        // this makes GetFixedPartsToApplyOn aware of the limb the recipe is meant for, excluding the incompatible BodyPartRecords
+
         [HarmonyPostfix]
         internal static void RemoveWrongTargetLimb ( ref IEnumerable<BodyPartRecord> __result, RecipeDef recipe )
         {
-            var recipeTargetLimb = recipe.GetModExtension<RestrictTargetLimb>();
+            var recipeTargetLimb = recipe.GetModExtension<TargetLimb>();
 
             if ( recipeTargetLimb != null )
             {
