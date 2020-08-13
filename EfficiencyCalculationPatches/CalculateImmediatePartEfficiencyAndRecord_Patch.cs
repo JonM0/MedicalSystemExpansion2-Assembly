@@ -9,7 +9,7 @@ namespace MSE2.HarmonyPatches
     internal class CalculateImmediatePartEfficiencyAndRecord_Patch
     {
         [HarmonyPatch( typeof( PawnCapacityUtility ) )]
-        [HarmonyPatch( "CalculateImmediatePartEfficiencyAndRecord" )]
+        [HarmonyPatch( nameof(PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord) )]
         internal class Patch
         {
             // short circuit to return 0 efficency if the part is missing

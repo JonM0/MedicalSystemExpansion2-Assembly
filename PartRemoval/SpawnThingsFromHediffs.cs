@@ -10,7 +10,7 @@ namespace MSE2.HarmonyPatches
     public class MedicalRecipesUtility_SpawnThingsFromHediffs_Patch
     {
         [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
-        [HarmonyPatch( "SpawnThingsFromHediffs" )]
+        [HarmonyPatch( nameof( MedicalRecipesUtility.SpawnThingsFromHediffs ) )]
         internal class SpawnThingsFromHediffs
         {
             [HarmonyPrefix]

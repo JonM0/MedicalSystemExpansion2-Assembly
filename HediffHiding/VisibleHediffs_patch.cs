@@ -27,8 +27,6 @@ namespace MSE2.HarmonyPatches
                 __result = from h in __result
                            where
                             !(h is Hediff_AddedPart)
-                            //|| h.Part.parent == null
-                            //|| !pawn.health.hediffSet.HasDirectlyAddedPartFor( h.Part.parent )
                             || !h.IsParentStandard()
                             || pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible ).Except( h ).Any()
                            select h;

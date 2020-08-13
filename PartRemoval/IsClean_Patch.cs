@@ -8,7 +8,7 @@ namespace MSE2.HarmonyPatches
     // makes it so parts with implants are considered clean
 
     [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
-    [HarmonyPatch( "IsClean" )]
+    [HarmonyPatch( nameof( MedicalRecipesUtility.IsClean ) )]
     public static class IsClean_Patch
     {
         [HarmonyPostfix]

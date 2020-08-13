@@ -6,7 +6,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( Hediff_AddedPart ) )]
-    [HarmonyPatch( "PostAdd" )]
+    [HarmonyPatch( nameof( Hediff_AddedPart.PostAdd ) )]
     internal class AddedPart_PostAdd
     {
         // swap calls to base.postAdd and restorepart

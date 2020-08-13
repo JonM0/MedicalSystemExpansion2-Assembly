@@ -7,7 +7,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( PawnCapacityUtility ) )]
-    [HarmonyPatch( "CalculatePartEfficiency" )]
+    [HarmonyPatch( nameof( PawnCapacityUtility.CalculatePartEfficiency ) )]
     internal class CalculatePartEfficiency_Patch
     {
         // remove the copying of the efficiency of a parent added part

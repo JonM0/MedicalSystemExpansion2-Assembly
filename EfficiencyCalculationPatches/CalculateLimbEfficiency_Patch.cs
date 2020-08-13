@@ -8,7 +8,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( PawnCapacityUtility ) )]
-    [HarmonyPatch( "CalculateLimbEfficiency" )]
+    [HarmonyPatch( nameof( PawnCapacityUtility.CalculateLimbEfficiency ) )]
     internal class CalculateLimbEfficiency_Patch
     {
         // replace

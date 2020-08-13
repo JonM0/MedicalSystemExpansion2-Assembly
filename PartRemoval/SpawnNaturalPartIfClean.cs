@@ -9,7 +9,7 @@ namespace MSE2.HarmonyPatches
     public class MedicalRecipesUtility_SpawnNaturalPartIfClean_Patch
     {
         [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
-        [HarmonyPatch( "SpawnNaturalPartIfClean" )]
+        [HarmonyPatch( nameof( MedicalRecipesUtility.SpawnNaturalPartIfClean ) )]
         internal class SpawnNaturalPartIfClean
         {
             [HarmonyPostfix]

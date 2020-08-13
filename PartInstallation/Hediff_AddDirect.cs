@@ -6,7 +6,7 @@ namespace MSE2.HarmonyPatches
     public class Hediff_AddDirect
     {
         [HarmonyPatch( typeof( HediffSet ) )]
-        [HarmonyPatch( "AddDirect" )]
+        [HarmonyPatch( nameof( HediffSet.AddDirect ) )]
         internal class AddDirect
         {
             // Added error for when trying to add hediff to part that should be ignored
