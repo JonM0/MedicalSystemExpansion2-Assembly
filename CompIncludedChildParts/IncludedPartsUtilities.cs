@@ -100,7 +100,7 @@ namespace MSE2
             {
                 foreach ( B b in bEnu )
                 {
-                    if ( equalityComparer( a, b ) && EnumerableEqualsOutOfOrder( aEnu.Except( a ), bEnu.Except( b ), equalityComparer ) )
+                    if ( equalityComparer( a, b ) && EnumerableEqualsOutOfOrder( aEnu.ExceptFirst( a ), bEnu.ExceptFirst( b ), equalityComparer ) )
                     {
                         return true;
                     }
@@ -134,17 +134,35 @@ namespace MSE2
             }
         }
 
-        public static bool InstallationCompatibility ( IEnumerable<Thing> thingDefs, IEnumerable<LimbConfiguration> limbs )
+        public static IEnumerable<T> ExceptFirst<T> ( this IEnumerable<T> lhs, T rhs ) where T : class
+        {
+            bool removed = false;
+            foreach ( T t in lhs )
+            {
+                if ( !removed && t == rhs )
+                {
+                    removed = true;
+                }
+                else
+                {
+                    yield return t;
+                }
+            }
+        }
+
+        public static bool InstallationCompatibility ( IEnumerable<Thing> things, IEnumerable<LimbConfiguration> limbs )
         {
             //Log.Message( "compat: " + thingDefs.Count() + " " + bodyPartRecords.Count() );
 
             foreach ( var limb in limbs )
             {
-                foreach ( var thing in thingDefs )
+                foreach ( var thing in things )
                 {
+                    var thingComp = thing.TryGetComp<CompIncludedChildParts>();
+
                     if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
                         CachedInstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
-                        && InstallationCompatibility( thingDefs.Except( thing ), limbs.Except( limb ) ) ) // all other things check out
+                        && InstallationCompatibility( things.ExceptFirst( thing ), limbs.ExceptFirst( limb ) ) ) // all other things check out
                     {
                         return true;
                     }
