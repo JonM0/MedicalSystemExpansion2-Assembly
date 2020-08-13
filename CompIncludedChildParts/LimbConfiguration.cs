@@ -75,7 +75,7 @@ namespace MSE2
         {
             get
             {
-                return string.Join( "", this.Bodies ) + "_" + this.PartDef.defName + "_" + id;
+                return /*string.Join( "", this.Bodies ) + "_" +*/ this.PartDef.defName + "_" + id;
             }
         }
 
