@@ -114,21 +114,28 @@ namespace MSE2
                 return;
             }
 
-            (ThingDef, LimbConfiguration) target = this.MissingParts.FirstOrDefault( p => p.Item1 == part.def );
-
-            this.childPartsIncluded.Add( part );
-            this.DirtyCache();
-
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
-            if ( partComp != null )
-            {
-                partComp.TargetLimb = target.Item2;
-                partComp.holderComp = this;
-            }
 
-            if ( part.Spawned )
+            (ThingDef, LimbConfiguration) target =
+                this.MissingParts.FirstOrFallback( p => p.Item1 == part.def && (partComp == null || partComp.TargetLimb == p.Item2),
+                this.MissingParts.FirstOrDefault( p => p.Item1 == part.def ) );
+
+            // part is actually missing
+            if ( target.Item1 != null )
             {
-                part.DeSpawn();
+                this.childPartsIncluded.Add( part );
+                this.DirtyCache();
+
+                if ( partComp != null )
+                {
+                    partComp.TargetLimb = target.Item2;
+                    partComp.holderComp = this;
+                }
+
+                if ( part.Spawned )
+                {
+                    part.DeSpawn();
+                }
             }
         }
 
@@ -345,6 +352,9 @@ namespace MSE2
 
         public void InitializeForLimb ( LimbConfiguration limb )
         {
+            this.childPartsIncluded.Clear();
+            this.DirtyCache();
+
             this.TargetLimb = limb;
 
             foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.Props.StandardPartsForLimb( limb ) )
