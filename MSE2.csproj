@@ -89,8 +89,8 @@
     <Compile Include="CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
     <Compile Include="CompIncludedChildParts\Command_AddExistingSubpart.cs" />
     <Compile Include="CompIncludedChildParts\IncludedPartsUtilities.cs" />
-    <Compile Include="CompIncludedChildParts\LimbConfiguration.cs" />
-    <Compile Include="CompIncludedChildParts\MSE_cachedStandardParents.cs" />
+    <Compile Include="LimbAwareness\LimbConfiguration.cs" />
+    <Compile Include="HediffHiding\MSE_cachedStandardParents.cs" />
     <Compile Include="CompIncludedChildParts\StatPart_IncludedSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
     <Compile Include="DebugTools\GlobalProthesisFix.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="EfficiencyCalculationPatches\IgnoreSubParts.cs" />
     <Compile Include="EfficiencyCalculationPatches\IgnoreSubPartsUtilities.cs" />
     <Compile Include="HediffHiding\VisibleHediffs_patch.cs" />
-    <Compile Include="LimbLabeller.cs" />
+    <Compile Include="LimbAwareness\LimbLabeller.cs" />
     <Compile Include="Modules\Actual\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
     <Compile Include="Modules\HediffComp_ModuleHolder.cs" />
@@ -115,8 +115,8 @@
     <Compile Include="PartRemoval\SpawnThingsFromHediffs.cs" />
     <Compile Include="MedicalSystemExpansion.cs" />
     <Compile Include="MSE_HediffDefOf.cs" />
-    <Compile Include="RecipeGeneration\Crafting\AddSubpartsAfterCreation.cs" />
-    <Compile Include="RecipeGeneration\LimbRecipeDefGenerator.cs" />
+    <Compile Include="LimbAwareness\Crafting\AddSubpartsAfterCreation.cs" />
+    <Compile Include="LimbAwareness\LimbRecipeDefGenerator.cs" />
     <Compile Include="Modules\Actual\Hediff_ModuleAdded.cs" />
     <Compile Include="Modules\Slots\Hediff_ModuleSlot.cs" />
     <Compile Include="PartInstallation\Recipe_InstallArtificialBodyPartWithChildren.cs" />
@@ -124,11 +124,11 @@
     <Compile Include="CompIncludedChildParts\CompIncludedChildParts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Actual\Recipe_InstallModule.cs" />
-    <Compile Include="RecipeGeneration\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
-    <Compile Include="RecipeGeneration\Installing\MedicalRecipesUtility_GetFixedPartsToApplyOn.cs" />
-    <Compile Include="RecipeGeneration\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
-    <Compile Include="RecipeGeneration\TargetLimb.cs" />
-    <Compile Include="SortThingDefAllRecipes.cs" />
+    <Compile Include="LimbAwareness\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
+    <Compile Include="LimbAwareness\Installing\MedicalRecipesUtility_GetFixedPartsToApplyOn.cs" />
+    <Compile Include="LimbAwareness\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
+    <Compile Include="LimbAwareness\TargetLimb.cs" />
+    <Compile Include="LimbAwareness\SortThingDefAllRecipes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
