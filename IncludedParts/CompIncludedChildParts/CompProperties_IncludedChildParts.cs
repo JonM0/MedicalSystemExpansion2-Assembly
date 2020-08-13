@@ -22,7 +22,7 @@ namespace MSE2
 
             installationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
 
-            limbLabeller = new LimbLabeller( installationDestinations, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+            limbLabeller = new LimbLabeler( installationDestinations, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
                                                                         from u in s.AllRecipeUsers
                                                                         select u.race.body).Contains );
         }
@@ -106,7 +106,7 @@ namespace MSE2
 
         private ThingDef parentDef;
 
-        private LimbLabeller limbLabeller;
+        private LimbLabeler limbLabeller;
 
         public List<LimbConfiguration> installationDestinations;
 

@@ -9,25 +9,23 @@ using RimWorld;
 
 namespace MSE2
 {
-    internal class LimbLabeller
+    internal class LimbLabeler
     {
-        private IEnumerable<LimbConfiguration> limbPool;
+        private readonly IEnumerable<LimbConfiguration> limbPool;
 
-        private Predicate<BodyDef> bodyRestrictions;
+        private readonly Predicate<BodyDef> bodyRestrictions;
 
         private HashSet<BodyDef> cachedAllBodies;
 
         private ISet<BodyDef> AllBodies => cachedAllBodies
             ?? (cachedAllBodies = new HashSet<BodyDef>( limbPool.SelectMany( l => l.Bodies ).Where( bodyRestrictions.Invoke ) ));
 
-        private HashSet<BodyDef> cachedCommonBodies;
+        //private HashSet<BodyDef> cachedCommonBodies;
 
-        private ISet<BodyDef> CommonBodies => cachedCommonBodies ??
-            (cachedCommonBodies = new HashSet<BodyDef>( AllBodies.Where( b => limbPool.All( l => l.Bodies.Contains( b ) ) ) ));
+        //private ISet<BodyDef> CommonBodies => cachedCommonBodies ??
+        //    (cachedCommonBodies = new HashSet<BodyDef>( AllBodies.Where( b => limbPool.All( l => l.Bodies.Contains( b ) ) ) ));
 
-        private bool AllTargetSameBodies => AllBodies.All( CommonBodies.Contains );
-
-        public LimbLabeller ( IEnumerable<LimbConfiguration> limbPool, Predicate<BodyDef> bodyRestrictions )
+        public LimbLabeler ( IEnumerable<LimbConfiguration> limbPool, Predicate<BodyDef> bodyRestrictions )
         {
             this.limbPool = limbPool;
             this.bodyRestrictions = bodyRestrictions;

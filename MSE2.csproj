@@ -101,7 +101,7 @@
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubParts.cs" />
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubPartsUtilities.cs" />
     <Compile Include="IncludedParts\HediffHiding\VisibleHediffs_patch.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\LimbLabeller.cs" />
+    <Compile Include="IncludedParts\LimbAwareness\LimbLabeler.cs" />
     <Compile Include="Modules\Actual\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
     <Compile Include="Modules\HediffComp_ModuleHolder.cs" />
