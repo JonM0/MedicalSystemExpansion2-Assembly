@@ -84,6 +84,11 @@ namespace MSE2
             yield break;
         }
 
+        public override bool AllowStackWith ( Thing other )
+        {
+            return false;
+        }
+
         #region PartHandling
 
         private List<Thing> tmpThingList = new List<Thing>();
@@ -180,7 +185,7 @@ namespace MSE2
             {
                 if ( value != null && !this.Props.EverInstallableOn( value ) )
                 {
-                    Log.Error( string.Format( "Tried to set invalid target limb ({0}) on {1}", value.Label, this.parent.Label ) );
+                    Log.Error( string.Format( "Tried to set invalid target limb ({0}) on {1}", value.UniqueName, this.parent.Label ) );
                 }
 
                 this.targetLimb = value;
@@ -189,6 +194,8 @@ namespace MSE2
                 this.DirtyCache();
             }
         }
+
+        public string TargetLimbLabel => this.Props.LabelForLimb( this.TargetLimb );
 
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
@@ -223,7 +230,7 @@ namespace MSE2
                             // this will either never happen, or can be checked in standardpartsforlimb
                             if ( !limb.ChildLimbs.EnumerableNullOrEmpty() )
                             {
-                                Log.Error( string.Format( "[MSE2] Included thing {0} has no CompIncludedChildParts, but was assigned {1}, which has {2} childlimbs.", candidate.def.defName, limb.Label, limb.ChildLimbs.Count() ) );
+                                Log.Error( string.Format( "[MSE2] Included thing {0} has no CompIncludedChildParts, but was assigned {1}, which has {2} childlimbs.", candidate.def.defName, limb.UniqueName, limb.ChildLimbs.Count() ) );
                             }
                         }
                     }
@@ -428,7 +435,7 @@ namespace MSE2
 
                     if ( this.TargetLimb != null )
                     {
-                        this.cachedInspectString += "\nTarget: " + this.targetLimb.Label;
+                        this.cachedInspectString += "\nTarget: " + this.TargetLimbLabel;
                         if ( this.AllMissingParts.Any() )
                         {
                             this.cachedInspectString += " (" + this.AllMissingParts.Count() + " missing parts)"; // maybe optimize

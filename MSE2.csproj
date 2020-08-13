@@ -101,6 +101,7 @@
     <Compile Include="EfficiencyCalculationPatches\IgnoreSubParts.cs" />
     <Compile Include="EfficiencyCalculationPatches\IgnoreSubPartsUtilities.cs" />
     <Compile Include="HediffHiding\VisibleHediffs_patch.cs" />
+    <Compile Include="LimbLabeller.cs" />
     <Compile Include="Modules\Actual\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
     <Compile Include="Modules\HediffComp_ModuleHolder.cs" />

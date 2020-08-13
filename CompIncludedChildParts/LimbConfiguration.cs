@@ -12,6 +12,7 @@ namespace MSE2
     public class LimbConfiguration
     {
         protected HashSet<BodyPartRecord> allRecords = new HashSet<BodyPartRecord>();
+        public IReadOnlyCollection<BodyPartRecord> AllRecords => allRecords;
 
         protected LimbConfiguration ()
         {
@@ -70,20 +71,11 @@ namespace MSE2
             return allLimbDefs.Where( l => l.PartDef == this.PartDef ).Count() - 1;
         }
 
-        //TODO maybe cache the string joins on these 2
         public string UniqueName
         {
             get
             {
-                return /*string.Join( "", this.Bodies ) + "_" +*/ this.PartDef.defName + "_" + id;
-            }
-        }
-
-        public string Label
-        {
-            get
-            {
-                return string.Join( ", ", this.Bodies );
+                return this.PartDef.defName + "_" + id;
             }
         }
 

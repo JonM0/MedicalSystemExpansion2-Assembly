@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
@@ -20,6 +21,10 @@ namespace MSE2
             this.parentDef = parentDef;
 
             installationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
+
+            limbLabeller = new LimbLabeller( installationDestinations, new HashSet<BodyDef>( from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+                                                                                             from u in s.AllRecipeUsers
+                                                                                             select u.race.body ) );
         }
 
         public override IEnumerable<string> ConfigErrors ( ThingDef parentDef )
@@ -94,7 +99,14 @@ namespace MSE2
             }
         }
 
+        public string LabelForLimb(LimbConfiguration limb)
+        {
+            return limbLabeller.GetLabelForLimb( limb );
+        }
+
         private ThingDef parentDef;
+
+        private LimbLabeller limbLabeller;
 
         public List<LimbConfiguration> installationDestinations;
 
