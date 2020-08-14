@@ -11,7 +11,7 @@ namespace MSE2
     {
         private class Command_AddExistingSubpart : Command
         {
-            public CompIncludedChildParts comp;
+            public readonly CompIncludedChildParts comp;
 
             public Command_AddExistingSubpart ( CompIncludedChildParts comp )
             {

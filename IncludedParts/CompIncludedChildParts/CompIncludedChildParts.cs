@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -423,7 +424,7 @@ namespace MSE2
 
         // Inspect string
 
-        protected String cachedInspectString = null;
+        protected string cachedInspectString = null;
 
         public override string CompInspectStringExtra ()
         {
@@ -431,16 +432,20 @@ namespace MSE2
             {
                 if ( this.cachedInspectString == null )
                 {
-                    this.cachedInspectString = "CompIncludedChildParts_InspectString".Translate( this.IncludedParts.Count );
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    stringBuilder.Append( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
 
                     if ( this.TargetLimb != null )
                     {
-                        this.cachedInspectString += "\nTarget: " + this.TargetLimbLabel;
+                        stringBuilder.AppendLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
                         if ( this.AllMissingParts.Any() )
                         {
-                            this.cachedInspectString += " (" + this.AllMissingParts.Count() + " missing parts)"; // maybe optimize
+                            stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize
                         }
                     }
+
+                    this.cachedInspectString = stringBuilder.ToString();
                 }
 
                 return this.cachedInspectString;

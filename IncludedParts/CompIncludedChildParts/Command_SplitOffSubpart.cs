@@ -9,7 +9,7 @@ namespace MSE2
     {
         private class Command_SplitOffSubpart : Command
         {
-            public CompIncludedChildParts comp;
+            public readonly CompIncludedChildParts comp;
 
             public Command_SplitOffSubpart ( CompIncludedChildParts comp )
             {

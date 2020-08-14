@@ -9,7 +9,7 @@ namespace MSE2
     {
         private class Command_SetTargetLimb : Command
         {
-            public CompIncludedChildParts comp;
+            public readonly CompIncludedChildParts comp;
 
             public Command_SetTargetLimb ( CompIncludedChildParts comp )
             {

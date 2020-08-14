@@ -170,7 +170,7 @@ namespace MSE2
                 RecipeDef recipeDef = new RecipeDef();
 
                 recipeDef.defName = "Make_" + def.defName + "_" + limb.UniqueName;
-                recipeDef.label = "Make " + def.label + " for " + def.GetCompProperties<CompProperties_IncludedChildParts>().LabelForLimb( limb );
+                recipeDef.label = "RecipeMakeForLimb".Translate( def.label, def.GetCompProperties<CompProperties_IncludedChildParts>().LabelForLimb( limb ) );
                 recipeDef.jobString = "RecipeMakeJobString".Translate( def.label );
                 recipeDef.modContentPack = def.modContentPack;
                 recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
