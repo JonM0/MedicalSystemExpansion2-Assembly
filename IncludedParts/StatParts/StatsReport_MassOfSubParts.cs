@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -8,15 +9,38 @@ namespace MSE2
     {
         // This stat part impacts mass adding the mass of included subparts
 
+        protected float MassOfChildParts ( CompIncludedChildParts comp )
+        {
+            var list = comp.IncludedParts;
+            float tot = 0;
+
+            for ( int i = 0; i < list.Count; i++ )
+            {
+                tot += list[i].GetStatValue( StatDefOf.Mass );
+            }
+
+            return tot;
+        }
+
         public override string ExplanationPart ( StatRequest req )
         {
             if ( req.HasThing )
             {
                 var comp = req.Thing.TryGetComp<CompIncludedChildParts>();
 
-                if ( comp != null && comp.ValueOfChildParts != 0f )
+                if ( comp != null )
                 {
-                    return "StatsReport_MassOfSubParts".Translate( comp.MassOfChildParts.ToStringMassOffset() );
+                    var list = comp.IncludedParts;
+                    var builder = new StringBuilder();
+
+                    for ( int i = 0; i < list.Count; i++ )
+                    {
+                        var part = list[i];
+
+                        builder.AppendLine( "StatsReport_MassOfSubParts".Translate( part.Label, part.GetStatValue( StatDefOf.Mass ).ToStringMassOffset() ) );
+                    }
+
+                    return builder.ToString();
                 }
             }
 
@@ -31,7 +55,7 @@ namespace MSE2
 
                 if ( comp != null )
                 {
-                    val += comp.MassOfChildParts;
+                    val += MassOfChildParts( comp );
                 }
             }
         }

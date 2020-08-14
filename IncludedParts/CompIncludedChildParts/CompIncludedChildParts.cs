@@ -499,18 +499,6 @@ namespace MSE2
             return false;
         }
 
-        // From children
-        public float ValueOfChildParts
-        {
-            get =>
-                this.IncludedParts.Select( p => p.MarketValue ).Aggregate( 0f, ( a, b ) => a + b );
-        }
-        public float MassOfChildParts
-        {
-            get =>
-                this.IncludedParts.Select( p => p.GetStatValue(StatDefOf.Mass) ).Aggregate( 0f, ( a, b ) => a + b );
-        }
-
         /// <summary>
         /// Recursively searches for IncludedParts in all of the sub-parts
         /// </summary>
