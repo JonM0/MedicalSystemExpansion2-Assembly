@@ -4,7 +4,7 @@ using Verse;
 
 namespace MSE2
 {
-    internal class StatPart_IncludedSubParts : StatPart
+    internal class StatsReport_ValueOfSubParts : StatPart
     {
         // This stat part impacts market value adding the value of included subparts
 
@@ -16,7 +16,7 @@ namespace MSE2
 
                 if ( comp != null && comp.ValueOfChildParts != 0f )
                 {
-                    return "StatsReport_IncludedSubParts".Translate( comp.ValueOfChildParts.ToStringMoneyOffset() );
+                    return "StatsReport_ValueOfSubParts".Translate( comp.ValueOfChildParts.ToStringMoneyOffset() );
                 }
             }
 

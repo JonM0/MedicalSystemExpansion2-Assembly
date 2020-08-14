@@ -91,7 +91,7 @@
     <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\StatPart_IncludedSubParts.cs" />
+    <Compile Include="IncludedParts\StatParts\StatsReport_ValueOfSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
     <Compile Include="DebugTools\GlobalProthesisFix.cs" />
     <Compile Include="IncludedParts\EfficiencyCalculation\CalculateImmediatePartEfficiencyAndRecord_Patch.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubPartsUtilities.cs" />
     <Compile Include="IncludedParts\HediffHiding\VisibleHediffs_patch.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbLabeler.cs" />
+    <Compile Include="IncludedParts\StatParts\StatsReport_MassOfSubParts.cs" />
     <Compile Include="Modules\Actual\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
     <Compile Include="Modules\HediffComp_ModuleHolder.cs" />
