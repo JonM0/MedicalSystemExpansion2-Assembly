@@ -64,12 +64,12 @@ namespace MSE2
             }
 
             List<BodyPartDef> ignoredParts = new List<BodyPartDef>(
-                DefDatabase<HediffDef>.AllDefs.First( h => h.spawnThingOnRemoved == this.parentDef ).GetModExtension<IgnoreSubParts>()?.ignoredSubParts
+                DefDatabase<HediffDef>.AllDefs.FirstOrDefault( h => h.spawnThingOnRemoved == this.parentDef )?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts
                 ?? Enumerable.Empty<BodyPartDef>() );
 
             foreach ( var lc in limb.ChildLimbs.Where( p => !ignoredParts.Contains( p.PartDef ) ) )
             {
-                var thingDef = standardChildren.Where( td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ) ).FirstOrDefault();
+                var thingDef = standardChildren.FirstOrDefault(td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ));
                 if ( thingDef != null )
                 {
                     yield return (thingDef, lc);
@@ -110,7 +110,7 @@ namespace MSE2
 
         public List<LimbConfiguration> installationDestinations;
 
-        public List<ThingDef> standardChildren = new List<ThingDef>();
+        public List<ThingDef> standardChildren;
 
         public List<ThingDef> alwaysInclude;
     }

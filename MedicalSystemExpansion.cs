@@ -19,8 +19,6 @@ namespace MSE2
     {
         public override void DefsLoaded ()
         {
-            Log.Message( "Defs loaded" );
-
             base.DefsLoaded();
 
             IncludedPartsUtilities.CacheAllStandardParents();

@@ -24,8 +24,8 @@ namespace MSE2
             (recipeDef, bodyPartRecord) =
                 (from r in DefDatabase<RecipeDef>.AllDefs
                  where r.IsSurgery
-                 where r.IsIngredient( thingDef )
-                 where r.Worker is Recipe_Surgery
+                 && r.IsIngredient( thingDef )
+                 && r.Worker is Recipe_Surgery
                  from p in r.Worker.GetPartsToApplyOn( pawn, r ) // out of all the possible places to install this on the pawn
                  where predicate == null || predicate.Invoke( p ) // choose using the predicate
                  select (r, p))

@@ -438,7 +438,7 @@ namespace MSE2
 
                     if ( this.TargetLimb != null )
                     {
-                        stringBuilder.AppendLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
+                        stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
                         if ( this.AllMissingParts.Any() )
                         {
                             stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize

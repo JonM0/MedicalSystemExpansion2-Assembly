@@ -14,7 +14,7 @@ namespace MSE2
             this.moduleHolderComp =
                 (from c in this.pawn.health.hediffSet.GetAllComps()
                  where c is HediffComp_ModuleHolder
-                 where c.parent.Part == this.Part
+                 && c.parent.Part == this.Part
                  let mh = (HediffComp_ModuleHolder)c
                  where mh.currentModules < mh.Props.maxModules
                  select mh)

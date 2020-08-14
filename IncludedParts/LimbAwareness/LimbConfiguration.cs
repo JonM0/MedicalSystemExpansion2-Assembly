@@ -41,7 +41,7 @@ namespace MSE2
         protected bool HasCompatibleStructure ( BodyPartRecord bodyPartRecord )
         {
             return allRecords.EnumerableNullOrEmpty() ||
-            bodyPartRecord.HasSameStructure( allRecords.First() );
+            bodyPartRecord.HasSameStructure( allRecords.FirstOrDefault() );
         }
 
         protected void TryAddRecord ( BodyPartRecord recordToAdd )
@@ -68,7 +68,12 @@ namespace MSE2
 
         public int CountSimilar ()
         {
-            return allLimbDefs.Where( l => l.PartDef == this.PartDef ).Count() - 1;
+            int res = 0;
+            for ( int i = 0; i < allLimbDefs.Count; i++ )
+            {
+                if ( allLimbDefs[i].PartDef == this.PartDef ) res++;
+            }
+            return res;
         }
 
         public string UniqueName
@@ -88,7 +93,7 @@ namespace MSE2
         {
             get
             {
-                BodyPartRecord example = this.allRecords.First();
+                BodyPartRecord example = this.allRecords.FirstOrDefault();
                 return example.AllChildParts().Prepend( example ).Select( r => r.def );
             }
         }
