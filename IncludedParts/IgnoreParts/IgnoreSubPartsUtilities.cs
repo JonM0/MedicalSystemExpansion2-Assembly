@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
 using Verse;
 
 namespace MSE2
@@ -63,6 +63,8 @@ namespace MSE2
         {
             List<string> brokenMods = new List<string>();
 
+            StringBuilder unpatchedDefs = new StringBuilder();
+
             foreach ( RecipeDef recipeDef in
                 from r in DefDatabase<RecipeDef>.AllDefs
                 where r != null
@@ -107,8 +109,13 @@ namespace MSE2
                     // log only for humanlike
                     if ( recipeDef.AllRecipeUsers.Any( td => td.race.Humanlike ) )
                     {
-                        if ( Prefs.LogVerbose )
-                            Log.Message( "[MSE2] Part <" + recipeDef.addsHediff.defName + "> from \"" + (recipeDef.modContentPack?.Name ?? "???") + "\", has no standard subparts. Automatically ignoring: " + string.Join( ", ", modExt.ignoredSubParts.Select( p => p.label ) ) + "." );
+                        unpatchedDefs.AppendLine(
+                            string.Format( "<{0}> from {1}: {2}",
+                                recipeDef.addsHediff.defName,
+                                recipeDef.modContentPack?.Name ?? "???",
+                                string.Join( ", ", modExt.ignoredSubParts.Select( p => p.label ) )
+                                )
+                            );
 
                         if ( !brokenMods.Contains( recipeDef.modContentPack?.Name ) )
                             brokenMods.Add( recipeDef.modContentPack?.Name );
@@ -118,7 +125,7 @@ namespace MSE2
 
             if ( brokenMods.Count > 0 )
             {
-                Log.Warning( "[MSE2] Some prostheses that have not been patched were detected in mods: " + string.Join( ", ", brokenMods ) + ". They will default to vanilla behaviour." );
+                Log.Warning( string.Format( "[MSE2] Some prostheses that have not been patched were detected in mods: {0}. They will default to vanilla behaviour.\n\n{1}", string.Join( ", ", brokenMods ), unpatchedDefs ) );
             }
         }
     }
