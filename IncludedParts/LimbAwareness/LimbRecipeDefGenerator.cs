@@ -123,7 +123,7 @@ namespace MSE2
             List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
             foreach ( var partCount in allParts )
             {
-                work += partCount.thingDef.recipeMaker.workAmount * partCount.count;
+                work += (partCount.thingDef.statBases.Find( s => s.stat == StatDefOf.WorkToMake )?.value ?? partCount.thingDef.recipeMaker.workAmount) * partCount.count;
 
                 if ( partCount.thingDef.costList != null )
                 {

@@ -56,6 +56,11 @@ namespace MSE2
             }
         }
 
+        public override bool TryMergeWith ( Hediff other )
+        {
+            return false;
+        }
+
         private HediffWithComps moduleHolderDiff = null;
         private HediffComp_ModuleHolder moduleHolderComp = null;
     }
