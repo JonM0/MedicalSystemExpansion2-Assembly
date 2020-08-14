@@ -37,7 +37,7 @@ namespace MSE2
                         )
                     );
 
-                    Log.Message( surgery.label + " can target(" + tmplimbsItCanTargetList.Count + "): " + string.Join( ", ", tmplimbsItCanTargetList.Select( l => l.UniqueName ) ) );
+                    //Log.Message( surgery.label + " can target(" + tmplimbsItCanTargetList.Count + "): " + string.Join( ", ", tmplimbsItCanTargetList.Select( l => l.UniqueName ) ) );
 
                     int count = 0;
                     foreach ( var limb in tmplimbsItCanTargetList )
