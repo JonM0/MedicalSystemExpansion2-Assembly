@@ -18,7 +18,7 @@ namespace MSE2.HarmonyPatches
         {
             // determine all instructions belonging to the first for
 
-            Label l = (Label)instructions.First( ( CodeInstruction i ) => i.opcode == OpCodes.Br_S ).operand; // target of the first branch in the first for loop
+            Label l = (Label)instructions.FirstOrDefault( ( CodeInstruction i ) => i.opcode == OpCodes.Br_S ).operand; // target of the first branch in the first for loop
 
             int firstBranchJump = instructions.FirstIndexOf( ( CodeInstruction i ) => i.labels.Contains( l ) ); // the location of that instruction
             firstBranchJump += 3; // the for ends 3 instructions later

@@ -98,7 +98,7 @@ namespace MSE2
 
         private List<Thing> childPartsIncluded = new List<Thing>();
 
-        public IReadOnlyList<Thing> IncludedParts
+        public List<Thing> IncludedParts
         {
             get => this.childPartsIncluded;
             set
@@ -122,11 +122,12 @@ namespace MSE2
 
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
 
-            (ThingDef, LimbConfiguration) target =
-                this.MissingParts.FirstOrFallback( p => p.Item1 == part.def && (partComp == null || partComp.TargetLimb == p.Item2),
-                this.MissingParts.FirstOrDefault( p => p.Item1 == part.def ) );
+            // prioritize matches of both def and target part
+            (ThingDef, LimbConfiguration) target = this.MissingParts.Find( p => p.Item1 == part.def && (partComp == null || partComp.TargetLimb == p.Item2) );
+            // fallback to just matching the def
+            if ( target.Item1 == null ) target = this.MissingParts.Find( p => p.Item1 == part.def );
 
-            // part is actually missing
+            // found a match (part is actually missing)
             if ( target.Item1 != null )
             {
                 this.childPartsIncluded.Add( part );
@@ -215,7 +216,7 @@ namespace MSE2
                 // update compatible parts
                 foreach ( (ThingDef thingDef, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
                 {
-                    Thing candidate = tmpThingList.FirstOrDefault( t => t.def == thingDef );
+                    Thing candidate = tmpThingList.Find( t => t.def == thingDef );
                     if ( candidate != null )
                     {
                         tmpThingList.Remove( candidate );
@@ -260,35 +261,31 @@ namespace MSE2
 
         private (List<(ThingDef, LimbConfiguration)>, bool) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
 
-        public IReadOnlyList<(ThingDef, LimbConfiguration)> MissingParts
+        public List<(ThingDef, LimbConfiguration)> MissingParts
         {
             get
             {
-                if ( this.TargetLimb == null )
+                if ( !cachedMissingParts.Item2 )
                 {
-                    return Array.Empty<(ThingDef, LimbConfiguration)>();
-                }
-                else
-                {
-                    if ( !cachedMissingParts.Item2 )
+                    cachedMissingParts.Item1.Clear();
+
+                    if ( this.TargetLimb != null )
                     {
-                        cachedMissingParts.Item1.Clear();
                         cachedMissingParts.Item1.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
 
                         foreach ( var thing in this.IncludedParts )
                         {
                             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
-                            cachedMissingParts.Item1.Remove( cachedMissingParts.Item1.FirstOrDefault( c =>
+                            cachedMissingParts.Item1.Remove( cachedMissingParts.Item1.Find( c =>
                                  thing.def == c.Item1
                                  && (thingComp == null || thingComp.TargetLimb == c.Item2) ) );
                         }
-
-                        cachedMissingParts.Item2 = true;
                     }
-
-                    return cachedMissingParts.Item1;
+                    cachedMissingParts.Item2 = true;
                 }
+
+                return cachedMissingParts.Item1;
             }
         }
 

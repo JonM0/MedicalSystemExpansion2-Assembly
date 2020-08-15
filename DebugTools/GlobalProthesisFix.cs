@@ -53,7 +53,7 @@ namespace MSE2.DebugTools
             {
                 if ( hediff.Part.parts.Any( p => !pawn.health.hediffSet.HasDirectlyAddedPartFor( p ) && !pawn.health.hediffSet.PartShouldBeIgnored( p ) ) )
                 {
-                    RecipeDef recipeDef = DefDatabase<RecipeDef>.AllDefs.FirstOrDefault( r => r.IsSurgery && r.addsHediff == hediff.def );
+                    RecipeDef recipeDef = DefDatabase<RecipeDef>.AllDefsListForReading.Find( r => r.IsSurgery && r.addsHediff == hediff.def );
 
                     if ( recipeDef != null )
                     {

@@ -64,12 +64,12 @@ namespace MSE2
             }
 
             List<BodyPartDef> ignoredParts = new List<BodyPartDef>(
-                DefDatabase<HediffDef>.AllDefs.FirstOrDefault( h => h.spawnThingOnRemoved == this.parentDef )?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts
+                DefDatabase<HediffDef>.AllDefsListForReading.Find( h => h.spawnThingOnRemoved == this.parentDef )?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts
                 ?? Enumerable.Empty<BodyPartDef>() );
 
             foreach ( var lc in limb.ChildLimbs.Where( p => !ignoredParts.Contains( p.PartDef ) ) )
             {
-                var thingDef = standardChildren.FirstOrDefault(td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ));
+                var thingDef = standardChildren.Find(td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ));
                 if ( thingDef != null )
                 {
                     yield return (thingDef, lc);

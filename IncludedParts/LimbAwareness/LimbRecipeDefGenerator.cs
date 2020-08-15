@@ -94,7 +94,7 @@ namespace MSE2
         public static RecipeDef CraftingRecipeForThing ( ThingDef thingDef )
         {
             string targetName = "Make_" + thingDef.defName;
-            return DefDatabase<RecipeDef>.AllDefs.FirstOrDefault( r => r.defName == targetName );
+            return DefDatabase<RecipeDef>.AllDefsListForReading.Find( r => r.defName == targetName );
         }
 
         public static (List<IngredientCount>, float) AllIngredientsWorkForLimb ( ThingDef thingDef, LimbConfiguration limb )
