@@ -34,7 +34,7 @@ namespace MSE2
 
         public bool IsValidThingComp ( CompIncludedChildParts comp )
         {
-            return comp.CompatibleLimbs.Contains( this.targetLimb );
+            return comp.AllAlwaysIncludedPartsPresent && comp.CompatibleLimbs.Contains( this.targetLimb );
         }
 
         public bool IsValidPart ( BodyPartRecord bodyPartRecord )

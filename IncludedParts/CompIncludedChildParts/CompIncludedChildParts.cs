@@ -289,6 +289,8 @@ namespace MSE2
             }
         }
 
+        public bool AllAlwaysIncludedPartsPresent => this.Props.alwaysInclude?.TrueForAll( p => this.IncludedParts.Find( t => t.def == p ) != null ) ?? true;
+
         #endregion Missing Parts
 
         #region Compatible limbs
