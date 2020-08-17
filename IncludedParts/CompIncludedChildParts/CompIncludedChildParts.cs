@@ -114,7 +114,7 @@ namespace MSE2
 
         public void AddPart ( Thing part )
         {
-            if ( !this.StandardParts.Contains( part.def ) )
+            if ( !this.StandardParts.Contains( part.def ) && !this.Props.alwaysInclude.Contains( part.def ) )
             {
                 Log.Error( part.Label + " is not a valid subpart for " + this.parent.Label );
                 return;
@@ -197,7 +197,7 @@ namespace MSE2
             }
         }
 
-        public string TargetLimbLabel => this.Props.LabelForLimb( this.TargetLimb );
+        public string TargetLimbLabel => this.Props.LabelComparisonForLimb( this.TargetLimb );
 
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
@@ -250,7 +250,7 @@ namespace MSE2
 
         #region Standard parts
 
-        public IReadOnlyList<ThingDef> StandardParts
+        public List<ThingDef> StandardParts
         {
             get => this.Props?.standardChildren;
         }
@@ -295,7 +295,7 @@ namespace MSE2
 
         private (List<LimbConfiguration>, bool) cachedCompatibleLimbs = (new List<LimbConfiguration>(), false);
 
-        public IReadOnlyList<LimbConfiguration> CompatibleLimbs
+        public List<LimbConfiguration> CompatibleLimbs
         {
             get
             {

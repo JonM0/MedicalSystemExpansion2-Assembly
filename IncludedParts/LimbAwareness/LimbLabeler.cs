@@ -11,7 +11,7 @@ namespace MSE2
 {
     internal class LimbLabeler
     {
-        private readonly IEnumerable<LimbConfiguration> limbPool;
+        private readonly List<LimbConfiguration> limbPool;
 
         private readonly Predicate<BodyDef> bodyRestrictions;
 
@@ -20,12 +20,7 @@ namespace MSE2
         private ISet<BodyDef> AllBodies => cachedAllBodies
             ?? (cachedAllBodies = new HashSet<BodyDef>( limbPool.SelectMany( l => l.Bodies ).Where( bodyRestrictions.Invoke ) ));
 
-        //private HashSet<BodyDef> cachedCommonBodies;
-
-        //private ISet<BodyDef> CommonBodies => cachedCommonBodies ??
-        //    (cachedCommonBodies = new HashSet<BodyDef>( AllBodies.Where( b => limbPool.All( l => l.Bodies.Contains( b ) ) ) ));
-
-        public LimbLabeler ( IEnumerable<LimbConfiguration> limbPool, Predicate<BodyDef> bodyRestrictions )
+        public LimbLabeler ( List<LimbConfiguration> limbPool, Predicate<BodyDef> bodyRestrictions )
         {
             this.limbPool = limbPool;
             this.bodyRestrictions = bodyRestrictions;
@@ -38,14 +33,14 @@ namespace MSE2
                 return null;
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
+            builder.Clear();
 
             foreach ( var body in limb.Bodies.Where( AllBodies.Contains ) )
             {
                 // if is the only limb from this body
                 if ( !limbPool.Except( limb ).Any( l => l.Bodies.Contains( body ) ) )
                 {
-                    stringBuilder.AppendWithSeparator( body.label, "; " );
+                    builder.AppendWithSeparator( body.label, "; " );
                 }
                 else
                 {
@@ -55,11 +50,49 @@ namespace MSE2
 
                     string records = string.Join( ", ", recordUniqueNames );
 
-                    stringBuilder.AppendWithSeparator( records + " " + body.label + " " + limb.PartDef.LabelShort, "; " );
+                    builder.AppendWithSeparator( string.Format( "{0} {1} {2}", records, body.label, limb.PartDef.LabelShort ), "; " );
                 }
             }
 
-            return stringBuilder.ToString();
+            return builder.ToString();
         }
+
+        private List<(BodyPartDef, int)> LimbDifference ( LimbConfiguration limb )
+        {
+            var difference = new List<(BodyPartDef, int)>();
+
+            for ( int i = 0; i < limb.AllSegments.Count; i++ )
+            {
+                var item = limb.AllSegments[i];
+
+                if ( !limbPool.TrueForAll( l => l.AllSegments.Contains( item ) ) )
+                {
+                    difference.Add( item );
+                }
+            }
+
+            return difference;
+        }
+
+        public string GetComparisonForLimb ( LimbConfiguration limb )
+        {
+            if ( limb == null ) return null;
+
+            var diffLimbs = LimbDifference( limb );
+            builder.Clear();
+
+            for ( int i = 0; i < diffLimbs.Count; i++ )
+            {
+                var dl = diffLimbs[i];
+
+                builder.AppendWithComma( dl.Item2.ToStringCached() );
+                builder.Append( " " );
+                builder.Append( dl.Item1.label );
+            }
+
+            return builder.ToString();
+        }
+
+        private static readonly StringBuilder builder = new StringBuilder();
     }
 }

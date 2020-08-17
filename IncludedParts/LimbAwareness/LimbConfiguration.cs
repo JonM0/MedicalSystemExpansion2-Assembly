@@ -14,12 +14,7 @@ namespace MSE2
         protected HashSet<BodyPartRecord> allRecords = new HashSet<BodyPartRecord>();
         public IReadOnlyCollection<BodyPartRecord> AllRecords => allRecords;
 
-        protected LimbConfiguration ()
-        {
-            allLimbDefs.Add( this );
-        }
-
-        protected LimbConfiguration ( BodyPartRecord bodyPartRecord ) : this()
+        protected LimbConfiguration ( BodyPartRecord bodyPartRecord )
         {
             this.TryAddRecord( bodyPartRecord );
 
@@ -34,8 +29,13 @@ namespace MSE2
             }
 
             id = this.CountSimilar();
+            allLimbDefs.Add( this );
 
-            //Log.Message( "limb config created with " + this.allRecords.Count + " compatible records: " + string.Join( ", ", this.allRecords.Select( bpr => bpr.Label + "(" + bpr.body.defName + ")" ) ) );
+            this.lazyAllSegments = new Lazy<List<(BodyPartDef, int)>>(
+                () => new List<(BodyPartDef, int)>(
+                    from p in bodyPartRecord.AllChildParts().Prepend( bodyPartRecord )
+                    group p by p.def into pc
+                    select (pc.Key, pc.Count()) ) );
         }
 
         protected bool HasCompatibleStructure ( BodyPartRecord bodyPartRecord )
@@ -89,12 +89,13 @@ namespace MSE2
             get => this.allRecords.FirstOrDefault();
         }
 
-        public IEnumerable<BodyPartDef> AllSegments
+        public readonly Lazy<List<(BodyPartDef, int)>> lazyAllSegments;
+
+        public List<(BodyPartDef, int)> AllSegments
         {
             get
             {
-                BodyPartRecord example = this.allRecords.FirstOrDefault();
-                return example.AllChildParts().Prepend( example ).Select( r => r.def );
+                return lazyAllSegments.Value;
             }
         }
 

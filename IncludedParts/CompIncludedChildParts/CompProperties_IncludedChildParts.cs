@@ -23,8 +23,8 @@ namespace MSE2
             installationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
 
             limbLabeller = new LimbLabeler( installationDestinations, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                                        from u in s.AllRecipeUsers
-                                                                        select u.race.body).Contains );
+                                                                       from u in s.AllRecipeUsers
+                                                                       select u.race.body).Contains );
         }
 
         public override IEnumerable<string> ConfigErrors ( ThingDef parentDef )
@@ -57,19 +57,22 @@ namespace MSE2
 
         public IEnumerable<(ThingDef, LimbConfiguration)> StandardPartsForLimb ( LimbConfiguration limb )
         {
+            if ( limb == null ) yield break;
+
             if ( !this.EverInstallableOn( limb ) )
             {
                 Log.Error( "[MSE2] Tried to get standard parts of " + parentDef.defName + " for an incompatible part record (" + limb + ")" );
                 yield break;
             }
 
+            // standard limb parts
             List<BodyPartDef> ignoredParts = new List<BodyPartDef>(
                 DefDatabase<HediffDef>.AllDefsListForReading.Find( h => h.spawnThingOnRemoved == this.parentDef )?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts
                 ?? Enumerable.Empty<BodyPartDef>() );
 
             foreach ( var lc in limb.ChildLimbs.Where( p => !ignoredParts.Contains( p.PartDef ) ) )
             {
-                var thingDef = standardChildren.Find(td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ));
+                var thingDef = standardChildren.Find( td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ) );
                 if ( thingDef != null )
                 {
                     yield return (thingDef, lc);
@@ -77,6 +80,15 @@ namespace MSE2
                 else
                 {
                     Log.Error( "[MSE2] Could not find a standard child of " + parentDef.defName + " compatible with body part record " + lc );
+                }
+            }
+
+            // always included parts
+            if ( this.alwaysInclude != null )
+            {
+                for ( int i = 0; i < this.alwaysInclude.Count; i++ )
+                {
+                    yield return (this.alwaysInclude[i], null);
                 }
             }
         }
@@ -99,10 +111,16 @@ namespace MSE2
             }
         }
 
-        public string LabelForLimb ( LimbConfiguration limb )
+        public string LabelComparisonForLimb ( LimbConfiguration limb )
+        {
+            return limbLabeller.GetComparisonForLimb( limb );
+        }
+
+        public string LabelNameForLimb(LimbConfiguration limb)
         {
             return limbLabeller.GetLabelForLimb( limb );
         }
+
 
         private ThingDef parentDef;
 
