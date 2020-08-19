@@ -116,11 +116,10 @@ namespace MSE2
             return limbLabeller.GetComparisonForLimb( limb );
         }
 
-        public string LabelNameForLimb(LimbConfiguration limb)
+        public string LabelNameForLimb ( LimbConfiguration limb )
         {
             return limbLabeller.GetLabelForLimb( limb );
         }
-
 
         private ThingDef parentDef;
 
