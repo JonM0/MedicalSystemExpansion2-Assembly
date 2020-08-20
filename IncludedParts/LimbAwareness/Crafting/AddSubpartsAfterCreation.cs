@@ -13,6 +13,8 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch]
     internal class AddSubpartsAfterCreation
     {
+        // initialize for limb on newly crafted prostheses using the limb specified in the modextension of the recipedef
+
         private static MethodBase TargetMethod ()
         {
             return typeof( GenRecipe ).GetMethod( "PostProcessProduct", BindingFlags.NonPublic | BindingFlags.Static );

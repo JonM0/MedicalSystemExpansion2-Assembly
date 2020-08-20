@@ -112,6 +112,26 @@ namespace MSE2
         public IEnumerable<CompIncludedChildParts> IncludedPartComps =>
             this.IncludedParts.Select( p => p.TryGetComp<CompIncludedChildParts>() ).Where( c => c != null );
 
+        private IEnumerable<(Thing, LimbConfiguration)> IncludedPartsLimbs
+        {
+            get
+            {
+                tmpThingList.Clear();
+                tmpThingList.AddRange( this.IncludedParts );
+
+                foreach ( (ThingDef def, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
+                {
+                    var thing = tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
+
+                    if ( thing != null )
+                    {
+                        tmpThingList.Remove( thing );
+                        yield return (thing, limb);
+                    }
+                }
+            }
+        }
+
         public void AddPart ( Thing part )
         {
             if ( !this.StandardParts.Contains( part.def ) && !this.Props.alwaysInclude.Contains( part.def ) )
@@ -214,7 +234,7 @@ namespace MSE2
                 tmpThingList.AddRange( this.IncludedParts );
 
                 // update compatible parts
-                foreach ( (ThingDef thingDef, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
+                foreach ( (ThingDef thingDef, LimbConfiguration limb) in this.StandardPartsForTargetLimb() )
                 {
                     Thing candidate = tmpThingList.Find( t => t.def == thingDef );
                     if ( candidate != null )
@@ -230,7 +250,7 @@ namespace MSE2
                         else
                         {
                             // this will either never happen, or can be checked in standardpartsforlimb
-                            if ( !limb.ChildLimbs.EnumerableNullOrEmpty() )
+                            if ( limb != null && !limb.ChildLimbs.EnumerableNullOrEmpty() )
                             {
                                 Log.Error( string.Format( "[MSE2] Included thing {0} has no CompIncludedChildParts, but was assigned {1}, which has {2} childlimbs.", candidate.def.defName, limb.UniqueName, limb.ChildLimbs.Count() ) );
                             }
@@ -244,6 +264,11 @@ namespace MSE2
                     this.RemoveAndSpawnPart( thing );
                 }
             }
+        }
+
+        public IEnumerable<(ThingDef, LimbConfiguration)> StandardPartsForTargetLimb ()
+        {
+            return this.Props.StandardPartsForLimb( this.targetLimb );
         }
 
         #endregion Target Limb
@@ -359,16 +384,104 @@ namespace MSE2
 
         public void InitializeForLimb ( LimbConfiguration limb )
         {
+            this.TargetLimb = limb;
+
             this.childPartsIncluded.Clear();
             this.DirtyCache();
 
-            this.TargetLimb = limb;
-
-            foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.Props.StandardPartsForLimb( limb ) )
+            foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
             {
                 Thing child = ThingMaker.MakeThing( childDef );
                 child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
                 this.AddPart( child );
+            }
+        }
+
+        public void InitializeFromSimilar ( CompIncludedChildParts other )
+        {
+            LimbConfiguration otherTarget = other.TargetLimb;
+
+            // null target
+            if ( otherTarget == null )
+            {
+                this.TargetLimb = null;
+                return;
+            }
+
+            // same target if possible
+            if ( this.Props.EverInstallableOn( otherTarget ) )
+            {
+                this.TargetLimb = otherTarget;
+
+                // initialize for that target
+                var otherMissing = other.MissingParts;
+                var otherIncluded = other.IncludedPartsLimbs.ToList();
+
+                this.childPartsIncluded.Clear();
+                this.DirtyCache();
+
+                foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
+                {
+                    // add if not missing
+                    if ( !otherMissing.Remove( i => i.Item2 == bpr ) )
+                    {
+                        Thing child = ThingMaker.MakeThing( childDef );
+
+                        // if it is a limb segment, try to initialize based on similar or limb
+                        if ( bpr != null )
+                        {
+                            var childComp = child.TryGetComp<CompIncludedChildParts>();
+
+                            // initialize the child comp
+                            if ( childComp != null )
+                            {
+                                // find corresponding
+                                var otherChild = otherIncluded.Find( i => i.Item2 == bpr );
+                                otherIncluded.Remove( otherChild );
+                                var otherComp = otherChild.Item1?.TryGetComp<CompIncludedChildParts>();
+
+                                if ( otherComp != null )
+                                {
+                                    childComp.InitializeFromSimilar( otherComp );
+                                }
+                                else
+                                {
+                                    childComp.InitializeForLimb( bpr );
+                                }
+                            }
+                        }
+
+                        this.AddPart( child );
+                    }
+                }
+                return;
+            }
+
+            // target is parent of other
+            LimbConfiguration goodTarget = this.Props.installationDestinations.Find( l => l.ChildLimbs.Contains( otherTarget ) );
+            if ( goodTarget != null )
+            {
+                this.childPartsIncluded.Clear();
+                this.DirtyCache();
+
+                this.TargetLimb = goodTarget;
+
+                foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
+                {
+                    Thing child = ThingMaker.MakeThing( childDef );
+
+                    // try to initialize from other on correct child, else just initialize for bpr
+                    if ( bpr == otherTarget )
+                    {
+                        child.TryGetComp<CompIncludedChildParts>()?.InitializeFromSimilar( other );
+                    }
+                    else
+                    {
+                        child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
+                    }
+
+                    this.AddPart( child );
+                }
             }
         }
 
@@ -377,12 +490,9 @@ namespace MSE2
             base.PostDestroy( mode, previousMap );
 
             // destroy included child items (idk if it does anything as they aren't spawned)
-            if ( this.IncludedParts != null )
+            foreach ( Thing childPart in this.IncludedParts )
             {
-                foreach ( Thing childPart in this.IncludedParts )
-                {
-                    childPart.Destroy( DestroyMode.Vanish );
-                }
+                childPart.Destroy( DestroyMode.Vanish );
             }
         }
 

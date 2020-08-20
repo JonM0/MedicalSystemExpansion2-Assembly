@@ -84,11 +84,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets.cs" />
+    <Compile Include="GenCollections.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SetTargetLimb.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_AddExistingSubpart.cs" />
     <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
+    <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
     <Compile Include="IncludedParts\StatParts\StatsReport_ValueOfSubParts.cs" />
