@@ -92,8 +92,11 @@
     <Compile Include="IncludedParts\FixBulkCraftingValue.cs" />
     <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
+    <Compile Include="IncludedParts\LimbAwareness\DebugOutputsPatches\LimbValueFix.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
+    <Compile Include="IncludedParts\PawnGeneration\CorrectHediffCostOnGenerationLambda.cs" />
+    <Compile Include="IncludedParts\PawnGeneration\CorrectHediffCostOnGeneration.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisComplete.cs" />
     <Compile Include="IncludedParts\StatParts\StatsReport_ValueOfSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
@@ -136,5 +139,6 @@
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

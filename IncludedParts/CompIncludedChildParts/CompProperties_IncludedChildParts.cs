@@ -121,6 +121,30 @@ namespace MSE2
             return limbLabeller.GetLabelForLimb( limb );
         }
 
+        public float AverageMarketValueForPawn(Pawn pawn)
+        {
+            float value = 0;
+            int count = 0;
+
+            for ( int i = 0; i < installationDestinations.Count; i++ )
+            {
+                var limb = installationDestinations[i];
+                if(limb.Bodies.Contains(pawn.RaceProps.body))
+                {
+                    count++;
+                    value += this.parentDef.BaseMarketValue;
+
+                    foreach ( var part in AllPartsForLimb(limb) )
+                    {
+                        value += part.BaseMarketValue;
+                    }
+                }
+            }
+
+            return count == 0 ? 0 : value / count;
+
+        }
+
         private ThingDef parentDef;
 
         private LimbLabeler limbLabeller;
