@@ -117,14 +117,18 @@ namespace MSE2
             List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
             foreach ( var partCount in allParts )
             {
-                work += (partCount.thingDef.statBases.Find( s => s.stat == StatDefOf.WorkToMake )?.value ?? partCount.thingDef.recipeMaker.workAmount) * partCount.count;
+                var recipeProductCount = partCount.thingDef.recipeMaker.productCount;
 
+                // add up work
+                work += partCount.thingDef.GetStatValueAbstract( StatDefOf.WorkToMake ) * partCount.count / recipeProductCount;
+
+                // add up parts
                 if ( partCount.thingDef.costList != null )
                 {
                     foreach ( var intIngredientCount in partCount.thingDef.costList )
                     {
                         // add it's ingredients, adjusted by how many are crafted and rounded up
-                        intermediateIngredients.Add( new ThingDefCountClass( intIngredientCount.thingDef, (intIngredientCount.count * partCount.count - 1) / partCount.thingDef.recipeMaker.productCount + 1 ) );
+                        intermediateIngredients.Add( new ThingDefCountClass( intIngredientCount.thingDef, (intIngredientCount.count * partCount.count - 1) / recipeProductCount + 1 ) );
                     }
                 }
                 else
