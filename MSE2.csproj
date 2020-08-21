@@ -93,6 +93,7 @@
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
+    <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisComplete.cs" />
     <Compile Include="IncludedParts\StatParts\StatsReport_ValueOfSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
     <Compile Include="DebugTools\GlobalProthesisFix.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="IncludedParts\LimbAwareness\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
+    <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

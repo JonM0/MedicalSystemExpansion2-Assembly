@@ -314,6 +314,8 @@ namespace MSE2
             }
         }
 
+        public bool IsComplete => this.MissingParts.Count == 0 && this.IncludedPartComps.All( c => c.IsComplete );
+
         public bool AllAlwaysIncludedPartsPresent => this.Props.alwaysInclude?.TrueForAll( p => this.IncludedParts.Find( t => t.def == p ) != null ) ?? true;
 
         #endregion Missing Parts
