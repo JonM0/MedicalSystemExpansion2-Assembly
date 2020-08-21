@@ -89,6 +89,7 @@
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_AddExistingSubpart.cs" />
+    <Compile Include="IncludedParts\FixBulkCraftingValue.cs" />
     <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
