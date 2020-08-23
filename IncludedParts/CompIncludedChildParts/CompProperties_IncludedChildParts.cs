@@ -37,6 +37,12 @@ namespace MSE2
                 yield return "ParentDefs do not match (should never happen wtf, did you manually call this function or ResolveReferences?)";
             }
 
+            // warning for stack size
+            if ( parentDef.stackLimit != 1 )
+            {
+                yield return "def must have stack limit of 1 to work properly";
+            }
+
             // warning for never installable
             if ( installationDestinations.NullOrEmpty() )
             {
@@ -121,7 +127,19 @@ namespace MSE2
             return limbLabeller.GetLabelForLimb( limb );
         }
 
-        public float AverageMarketValueForPawn(Pawn pawn)
+        private float MarketValueForConfiguration ( LimbConfiguration limb )
+        {
+            float value = this.parentDef.BaseMarketValue;
+
+            foreach ( var part in AllPartsForLimb( limb ) )
+            {
+                value += part.BaseMarketValue;
+            }
+
+            return value;
+        }
+
+        public float AverageMarketValueForPawn ( Pawn pawn )
         {
             float value = 0;
             int count = 0;
@@ -129,20 +147,36 @@ namespace MSE2
             for ( int i = 0; i < installationDestinations.Count; i++ )
             {
                 var limb = installationDestinations[i];
-                if(limb.Bodies.Contains(pawn.RaceProps.body))
+                if ( limb.Bodies.Contains( pawn.RaceProps.body ) )
                 {
                     count++;
-                    value += this.parentDef.BaseMarketValue;
-
-                    foreach ( var part in AllPartsForLimb(limb) )
-                    {
-                        value += part.BaseMarketValue;
-                    }
+                    value += this.MarketValueForConfiguration( limb );
                 }
             }
 
             return count == 0 ? 0 : value / count;
+        }
 
+        private float cachedAverageValue = -1;
+
+        public float AverageValue
+        {
+            get
+            {
+                if ( cachedAverageValue == -1f )
+                {
+                    if ( installationDestinations == null )
+                    {
+                        Log.Error( "Tried to calculate min value before valid limbs were set. ThingDef: " + this.parentDef.defName );
+                    }
+                    else
+                    {
+                        cachedAverageValue = installationDestinations.Select( MarketValueForConfiguration ).Average();
+                    }
+                }
+
+                return cachedAverageValue;
+            }
         }
 
         private ThingDef parentDef;

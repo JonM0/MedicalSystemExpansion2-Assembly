@@ -97,6 +97,9 @@
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
     <Compile Include="IncludedParts\PawnGeneration\CorrectHediffCostOnGenerationLambda.cs" />
     <Compile Include="IncludedParts\PawnGeneration\CorrectHediffCostOnGeneration.cs" />
+    <Compile Include="IncludedParts\RewardGeneration\TSPWQMakeThing.cs" />
+    <Compile Include="IncludedParts\RewardGeneration\TSPWQGetValue.cs" />
+    <Compile Include="IncludedParts\StockGeneration\RandomInitializeOnStockGeneration.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisComplete.cs" />
     <Compile Include="IncludedParts\StatParts\StatsReport_ValueOfSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
