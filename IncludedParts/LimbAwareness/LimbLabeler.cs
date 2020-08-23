@@ -83,14 +83,31 @@ namespace MSE2
 
             for ( int i = 0; i < diffLimbs.Count; i++ )
             {
-                var dl = diffLimbs[i];
+                (BodyPartDef part, int count) = diffLimbs[i];
 
-                builder.AppendWithComma( dl.Item2.ToStringCached() );
-                builder.Append( " " );
-                builder.Append( dl.Item1.label );
+                if ( count > 0 )
+                {
+                    if ( count > 1 )
+                    {
+                        builder.AppendWithComma( count.ToStringCached() );
+                        builder.Append( " " );
+                        builder.Append( Find.ActiveLanguageWorker.Pluralize( part.label ) );
+                    }
+                    else
+                    {
+                        builder.AppendWithComma( Find.ActiveLanguageWorker.WithIndefiniteArticlePostProcessed( part.label ) );
+                    }
+                }
             }
 
-            return builder.ToString();
+            if ( builder.Length == 0 )
+            {
+                return "LimbComplete".Translate();
+            }
+            else
+            {
+                return builder.ToString();
+            }
         }
 
         private static readonly StringBuilder builder = new StringBuilder();

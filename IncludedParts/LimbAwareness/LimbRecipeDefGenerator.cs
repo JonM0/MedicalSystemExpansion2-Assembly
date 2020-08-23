@@ -167,9 +167,18 @@ namespace MSE2
                 RecipeMakerProperties recipeMaker = def.recipeMaker;
                 RecipeDef recipeDef = new RecipeDef();
 
+                string limbComparison = def.GetCompProperties<CompProperties_IncludedChildParts>().LabelComparisonForLimb( limb );
+
                 recipeDef.defName = "Make_" + def.defName + "_" + limb.UniqueName;
-                recipeDef.label = "RecipeMakeForLimb".Translate( def.label, def.GetCompProperties<CompProperties_IncludedChildParts>().LabelComparisonForLimb( limb ) );
-                recipeDef.jobString = "RecipeMakeJobString".Translate( def.label );
+                if ( limbComparison == "LimbComplete".Translate() )
+                {
+                    recipeDef.label = "RecipeMakeForLimbNoComparison".Translate( def.label );
+                }
+                else
+                {
+                    recipeDef.label = "RecipeMakeForLimb".Translate( def.label, limbComparison );
+                }
+                recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( def.label, limbComparison );
                 recipeDef.modContentPack = def.modContentPack;
                 recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
                 recipeDef.efficiencyStat = recipeMaker.efficiencyStat;
@@ -195,7 +204,7 @@ namespace MSE2
                     }
                     return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
                 } ).ToArray<string>();
-                recipeDef.description = "RecipeMakeDescription".Translate( items.ToCommaList( true ) );
+                recipeDef.description = "RecipeMakeForLimbDescription".Translate( items.ToCommaList( true ), limbComparison );
                 recipeDef.descriptionHyperlinks = (from p in recipeDef.products
                                                    select new DefHyperlink( p.thingDef )).ToList<DefHyperlink>();
 
@@ -207,6 +216,11 @@ namespace MSE2
                 yield return recipeDef;
 
                 tot++;
+            }
+
+            if ( tot > 0 )
+            {
+                DefDatabase<RecipeDef>.GetNamed( "Make_" + def.defName ).label = "RecipeMakeSegment".Translate( def.label );
             }
 
             //Log.Message( "Created " + tot + " recipes for " + def.defName );
