@@ -65,7 +65,7 @@ namespace MSE2
 
             StringBuilder unpatchedDefs = new StringBuilder();
 
-            foreach ( RecipeDef recipeDef in
+            foreach ( (RecipeDef recipeDef, IgnoreSubParts oldME) in
                 from r in DefDatabase<RecipeDef>.AllDefs
                 where r != null
                 where r.IsSurgery
@@ -81,11 +81,13 @@ namespace MSE2
                     r.addsHediff?.hediffClass != null
                     // of type addedpart
                     && typeof( Hediff_AddedPart ).IsAssignableFrom( r.addsHediff.hediffClass )
+                let me = r.addsHediff.GetModExtension<IgnoreSubParts>()
+                where
                     // that does not already ignore parts
-                    && !r.addsHediff.HasModExtension<IgnoreSubParts>()
-                select r )
+                    me == null || me.ignoreAll
+                select (r, me) )
             {
-                var modExt = new IgnoreSubParts();
+                var modExt = oldME ?? new IgnoreSubParts();
 
                 // add all the subparts this prosthesis could have
                 if ( recipeDef.appliedOnFixedBodyParts != null )
@@ -97,8 +99,8 @@ namespace MSE2
                         modExt.ignoredSubParts.AddRange( partDef.AllChildPartDefs( recipeDef.AllRecipeUsers.Select( ru => ru.race.body ) ) );
                     }
 
-                // found any
-                if ( !modExt.ignoredSubParts.NullOrEmpty() )
+                // found any and it wasnt already present
+                if ( !modExt.ignoredSubParts.NullOrEmpty() && oldME == null )
                 {
                     // add the modextension
                     if ( recipeDef.addsHediff.modExtensions == null )
@@ -107,10 +109,10 @@ namespace MSE2
                     recipeDef.addsHediff.modExtensions.Add( modExt );
 
                     // log only for humanlike
-                    if ( recipeDef.AllRecipeUsers.Any( td => td.race.Humanlike ) )
+                    //if ( recipeDef.AllRecipeUsers.Any( td => td.race.Humanlike ) )
                     {
                         unpatchedDefs.AppendLine(
-                            string.Format( "<{0}> from {1}: {2}",
+                            string.Format( "<{0}> from \"{1}\": {2}",
                                 recipeDef.addsHediff.defName,
                                 recipeDef.modContentPack?.Name ?? "???",
                                 string.Join( ", ", modExt.ignoredSubParts.Select( p => p.label ) )
