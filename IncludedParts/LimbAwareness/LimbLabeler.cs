@@ -13,6 +13,8 @@ namespace MSE2
     {
         private readonly List<LimbConfiguration> limbPool;
 
+        private readonly List<BodyPartDef> ignoredParts;
+
         private readonly Predicate<BodyDef> bodyRestrictions;
 
         private HashSet<BodyDef> cachedAllBodies;
@@ -20,10 +22,16 @@ namespace MSE2
         private ISet<BodyDef> AllBodies => cachedAllBodies
             ?? (cachedAllBodies = new HashSet<BodyDef>( limbPool.SelectMany( l => l.Bodies ).Where( bodyRestrictions.Invoke ) ));
 
-        public LimbLabeler ( List<LimbConfiguration> limbPool, Predicate<BodyDef> bodyRestrictions )
+        public LimbLabeler ( List<LimbConfiguration> limbPool, List<BodyPartDef> ignoredParts, Predicate<BodyDef> bodyRestrictions )
         {
             this.limbPool = limbPool;
+            this.ignoredParts = ignoredParts;
             this.bodyRestrictions = bodyRestrictions;
+        }
+
+        private bool PartShouldBeIgnored ( BodyPartDef bodyPartDef )
+        {
+            return ignoredParts != null && ignoredParts.Contains( bodyPartDef );
         }
 
         public string GetLabelForLimb ( LimbConfiguration limb )
@@ -85,17 +93,17 @@ namespace MSE2
             {
                 (BodyPartDef part, int count) = diffLimbs[i];
 
-                if ( count > 0 )
+                if ( !PartShouldBeIgnored( part ) && count > 0 )
                 {
+                    builder.AppendWithComma( count.ToStringCached() );
+                    builder.Append( " " );
                     if ( count > 1 )
                     {
-                        builder.AppendWithComma( count.ToStringCached() );
-                        builder.Append( " " );
                         builder.Append( Find.ActiveLanguageWorker.Pluralize( part.label ) );
                     }
                     else
                     {
-                        builder.AppendWithComma( Find.ActiveLanguageWorker.WithIndefiniteArticlePostProcessed( part.label ) );
+                        builder.Append( part.label );
                     }
                 }
             }

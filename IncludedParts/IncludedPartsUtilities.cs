@@ -127,7 +127,8 @@ namespace MSE2
                      where b.AllParts.Any( bpr => bpr.def == bpd )
                      from lc in LimbConfiguration.LimbConfigsMatchingBodyAndPart( b, bpd )
                      select lc)
-                    .ToList();
+                     .Distinct()
+                     .ToList();
 
                 cachedInstallationDestinations.Add( parentDef, newVal );
                 return newVal;

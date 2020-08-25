@@ -22,9 +22,13 @@ namespace MSE2
 
             installationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
 
-            limbLabeller = new LimbLabeler( installationDestinations, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                                       from u in s.AllRecipeUsers
-                                                                       select u.race.body).Contains );
+            this.ignoredSubparts = DefDatabase<HediffDef>.AllDefsListForReading
+                .Find( h => h.spawnThingOnRemoved == this.parentDef )
+                ?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
+
+            limbLabeller = new LimbLabeler( installationDestinations, ignoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+                                                                                        from u in s.AllRecipeUsers
+                                                                                        select u.race.body).Contains );
         }
 
         public override IEnumerable<string> ConfigErrors ( ThingDef parentDef )
@@ -71,12 +75,7 @@ namespace MSE2
                 yield break;
             }
 
-            // standard limb parts
-            List<BodyPartDef> ignoredParts = new List<BodyPartDef>(
-                DefDatabase<HediffDef>.AllDefsListForReading.Find( h => h.spawnThingOnRemoved == this.parentDef )?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts
-                ?? Enumerable.Empty<BodyPartDef>() );
-
-            foreach ( var lc in limb.ChildLimbs.Where( p => !ignoredParts.Contains( p.PartDef ) ) )
+            foreach ( var lc in ignoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !ignoredSubparts.Contains( p.PartDef ) ) )
             {
                 var thingDef = standardChildren.Find( td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ) );
                 if ( thingDef != null )
@@ -182,6 +181,8 @@ namespace MSE2
         private ThingDef parentDef;
 
         private LimbLabeler limbLabeller;
+
+        public List<BodyPartDef> ignoredSubparts;
 
         public List<LimbConfiguration> installationDestinations;
 

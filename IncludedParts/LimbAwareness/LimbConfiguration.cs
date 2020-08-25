@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
+using RimWorld;
+
 namespace MSE2
 {
     public class LimbConfiguration
@@ -89,7 +91,7 @@ namespace MSE2
             get => this.allRecords.FirstOrDefault();
         }
 
-        public readonly Lazy<List<(BodyPartDef, int)>> lazyAllSegments;
+        private readonly Lazy<List<(BodyPartDef, int)>> lazyAllSegments;
 
         public List<(BodyPartDef, int)> AllSegments
         {
@@ -110,8 +112,7 @@ namespace MSE2
                 }
                 else
                 {
-                    return from bpr in this.RecordExample.parts
-                           select LimbConfigForBodyPartRecord( bpr );
+                    return this.RecordExample.parts.Select( LimbConfigForBodyPartRecord );
                 }
             }
         }
@@ -147,6 +148,11 @@ namespace MSE2
                 Log.Error( "[MSE2] Tried to use limbs before the BodyDef database was loaded." );
                 return;
             }
+        }
+
+        public override string ToString ()
+        {
+            return string.Format( "{0} ( parts: {1}; def: {2}; races: {3} )", this.UniqueName, this.allRecords.Count, this.PartDef.defName, string.Join( ", ", this.Bodies ) ) ;
         }
     }
 }
