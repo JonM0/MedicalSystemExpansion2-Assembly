@@ -31,7 +31,7 @@ namespace MSE2.HarmonyPatches
             List<CodeInstruction> instrList = instructions.ToList();
 
             // where to insert the check
-            int indexAt = InsertionIndex( instructions );
+            int indexAt = InsertionIndex( instrList );
 
             // how to branch out after the check
             CodeInstruction lastBranchIfFalse = instrList.ElementAt( indexAt - 1 );
@@ -47,27 +47,25 @@ namespace MSE2.HarmonyPatches
             return instrList;
         }
 
-        private static int InsertionIndex ( IEnumerable<CodeInstruction> instructions )
+        private static int InsertionIndex ( List<CodeInstruction> instructions )
         {
-            int index = 0;
             bool lastInstLoadedFalse = false;
 
-            foreach ( var instruction in instructions )
+            for ( int i = 0; i < instructions.Count; i++ )
             {
+                var instruction = instructions[i];
+
                 // if last pushed a false and current pops it into the flag
                 if ( lastInstLoadedFalse && instruction.opcode == OpCodes.Stloc_3 )
                 {
                     // return index before pushing the false
-                    return index - 1;
+                    return i - 1;
                 }
 
                 lastInstLoadedFalse = instruction.opcode == OpCodes.Ldc_I4_1;
-
-                index++;
             }
 
-            Log.Error( "MSE2 MissingIfWrongTargetLimb failed to find an insertion index" );
-            return index;
+            throw new ApplicationException( "MSE2 MissingIfWrongTargetLimb failed to find an insertion index" );
         }
 
         /// <summary>

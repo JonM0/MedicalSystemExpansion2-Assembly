@@ -20,11 +20,13 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void CheckForTargetLimb ( ref Bill __instance, ref bool __result, Thing thing )
         {
-            var comp = thing.TryGetComp<CompIncludedChildParts>();
-            var recipeTargetLimb = __instance.recipe?.GetModExtension<TargetLimb>();
+            if ( __result )
+            {
+                var comp = thing.TryGetComp<CompIncludedChildParts>();
+                var recipeTargetLimb = __instance.recipe?.GetModExtension<TargetLimb>();
 
-            __result = __result
-                && (comp == null || recipeTargetLimb == null || recipeTargetLimb.IsValidThingComp( comp ));
+                __result = comp == null || recipeTargetLimb == null || recipeTargetLimb.IsValidThingComp( comp );
+            }
         }
     }
 }

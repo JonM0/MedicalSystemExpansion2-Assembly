@@ -84,7 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets.cs" />
-    <Compile Include="GenCollections.cs" />
+    <Compile Include="GenList.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SetTargetLimb.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
