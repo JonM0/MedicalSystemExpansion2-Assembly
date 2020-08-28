@@ -92,7 +92,7 @@ namespace MSE2
 
         #region PartHandling
 
-        private List<Thing> tmpThingList = new List<Thing>();
+        private readonly List<Thing> tmpThingList = new List<Thing>();
 
         #region Included parts
 
@@ -332,7 +332,11 @@ namespace MSE2
                 {
                     this.cachedCompatibleLimbs.Item1.Clear();
                     this.cachedCompatibleLimbs.Item1.AddRange( from lc in this.Props.installationDestinations
-                                                               where IncludedPartsUtilities.InstallationCompatibility( this.childPartsIncluded, lc.ChildLimbs )
+                                                               where IncludedPartsUtilities.InstallationCompatibility(
+                                                                   this.childPartsIncluded,
+                                                                   this.Props.ignoredSubparts == null ?
+                                                                   lc.ChildLimbs :
+                                                                   lc.ChildLimbs.Where( l => !this.Props.ignoredSubparts.Contains( l.PartDef ) ) )
                                                                select lc );
                     this.cachedCompatibleLimbs.Item2 = true;
                 }

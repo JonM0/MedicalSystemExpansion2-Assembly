@@ -95,7 +95,7 @@ namespace MSE2
             return difference;
         }
 
-        private string[] cachedLimbComparisons;
+        private readonly string[] cachedLimbComparisons;
 
         private string GetComparisonForLimb_Int ( LimbConfiguration limb )
         {
