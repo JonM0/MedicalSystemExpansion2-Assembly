@@ -43,16 +43,12 @@ namespace MSE2
             // Deep save the included Things
             Scribe_Collections.Look( ref this.childPartsIncluded, "childPartsIncluded", LookMode.Deep );
 
-            // Save an example of record in the limbTarget
-            BodyPartRecord limbPartExample = this.TargetLimb?.RecordExample;
-            Scribe_BodyParts.Look( ref limbPartExample, "targetLimb" );
-            if ( Scribe.mode == LoadSaveMode.LoadingVars )
-                this.TargetLimb = LimbConfiguration.LimbConfigForBodyPartRecord( limbPartExample );
+            Scribe_LimbConfiguration.Look( ref this.targetLimb, "targetLimb" );
 
             if ( this.IncludedParts == null )
             {
                 this.IncludedParts = new List<Thing>();
-                Log.Warning( "[MSE2] Included parts null while serializing or deserializing data." );
+                Log.Warning( "[MSE2] Included parts was null while serializing or deserializing data." );
                 //InitializeIncludedParts();
             }
         }
