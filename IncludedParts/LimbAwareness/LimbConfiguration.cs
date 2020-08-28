@@ -14,7 +14,11 @@ namespace MSE2
         protected HashSet<BodyPartRecord> allRecords = new HashSet<BodyPartRecord>();
         public IReadOnlyCollection<BodyPartRecord> AllRecords => allRecords;
 
-        protected LimbConfiguration ( BodyPartRecord bodyPartRecord )
+        protected LimbConfiguration ()
+        {
+        }
+
+        private LimbConfiguration ( BodyPartRecord bodyPartRecord )
         {
             this.TryAddRecord( bodyPartRecord );
 
@@ -29,22 +33,16 @@ namespace MSE2
             }
 
             id = this.CountSimilar();
-            allLimbDefs.Add( this );
-
-            this.lazyAllSegments = new Lazy<List<(BodyPartDef, int)>>(
-                () => new List<(BodyPartDef, int)>(
-                    from p in bodyPartRecord.AllChildParts().Prepend( bodyPartRecord )
-                    group p by p.def into pc
-                    select (pc.Key, pc.Count()) ) );
+            allLimbConfigs.Add( this );
         }
 
-        protected bool HasCompatibleStructure ( BodyPartRecord bodyPartRecord )
+        private bool HasCompatibleStructure ( BodyPartRecord bodyPartRecord )
         {
             return allRecords.EnumerableNullOrEmpty() ||
             bodyPartRecord.HasSameStructure( allRecords.FirstOrDefault() );
         }
 
-        protected void TryAddRecord ( BodyPartRecord recordToAdd )
+        private void TryAddRecord ( BodyPartRecord recordToAdd )
         {
             if ( this.HasCompatibleStructure( recordToAdd ) )
             {
@@ -55,49 +53,44 @@ namespace MSE2
             }
         }
 
-        public BodyPartDef PartDef => this.allRecords.FirstOrDefault()?.def;
+        public BodyPartDef PartDef => 
+            this.allRecords.FirstOrDefault()?.def;
 
-        public IEnumerable<BodyDef> Bodies => this.allRecords.Select( r => r.body ).Distinct();
+        public IEnumerable<BodyDef> Bodies => 
+            this.allRecords.Select( r => r.body ).Distinct();
 
         public bool Contains ( BodyPartRecord bodyPartRecord )
         {
             return allRecords.Contains( bodyPartRecord );
         }
 
-        private readonly int id = -1;
+        public readonly int id = -1;
 
         public int CountSimilar ()
         {
             int res = 0;
-            for ( int i = 0; i < allLimbDefs.Count; i++ )
+            for ( int i = 0; i < allLimbConfigs.Count; i++ )
             {
-                if ( allLimbDefs[i].PartDef == this.PartDef ) res++;
+                if ( allLimbConfigs[i].PartDef == this.PartDef ) res++;
             }
             return res;
         }
 
-        public string UniqueName
-        {
-            get
-            {
-                return this.PartDef.defName + "_" + id;
-            }
-        }
+        public /*virtual*/ string UniqueName =>
+            this.PartDef.defName + "_" + id;
 
-        public BodyPartRecord RecordExample
-        {
-            get => this.allRecords.FirstOrDefault();
-        }
+        public BodyPartRecord RecordExample =>
+            this.allRecords.FirstOrDefault();
 
-        private readonly Lazy<List<(BodyPartDef, int)>> lazyAllSegments;
+        protected /*virtual*/ IEnumerable<(BodyPartDef, int)> CalculateAllSegments =>
+            from p in this.RecordExample.AllChildParts().Prepend( this.RecordExample )
+            group p by p.def into pc
+            select (pc.Key, pc.Count());
 
-        public List<(BodyPartDef, int)> AllSegments
-        {
-            get
-            {
-                return lazyAllSegments.Value;
-            }
-        }
+        private List<(BodyPartDef, int)> cachedAllSegments;
+
+        public List<(BodyPartDef, int)> AllSegments =>
+            cachedAllSegments ?? (cachedAllSegments = this.CalculateAllSegments.ToList());
 
         public IEnumerable<LimbConfiguration> ChildLimbs
         {
@@ -116,7 +109,7 @@ namespace MSE2
         }
 
         protected static Dictionary<BodyPartRecord, LimbConfiguration> recordToLimb = new Dictionary<BodyPartRecord, LimbConfiguration>();
-        protected static List<LimbConfiguration> allLimbDefs = new List<LimbConfiguration>();
+        protected static List<LimbConfiguration> allLimbConfigs = new List<LimbConfiguration>();
 
         public static LimbConfiguration LimbConfigForBodyPartRecord ( BodyPartRecord bodyPartRecord )
         {
