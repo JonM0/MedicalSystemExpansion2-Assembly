@@ -159,8 +159,6 @@ namespace MSE2
             {
                 foreach ( var thing in things )
                 {
-                    var thingComp = thing.TryGetComp<CompIncludedChildParts>();
-
                     if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
                         CachedInstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
                         && InstallationCompatibility( things.ExceptFirst( thing ), limbs.ExceptFirst( limb ) ) ) // all other things check out
