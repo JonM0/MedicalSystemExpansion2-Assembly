@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Verse;
 using RimWorld;
+using System.Collections;
 
 namespace MSE2
 {
@@ -27,6 +28,12 @@ namespace MSE2
             this.limbPool = limbPool;
             this.ignoredParts = ignoredParts;
             this.bodyRestrictions = bodyRestrictions;
+
+            this.cachedLimbComparisons = new string[limbPool.Count];
+            for ( int i = 0; i < limbPool.Count; i++ )
+            {
+                cachedLimbComparisons[i] = this.GetComparisonForLimb_Int( limbPool[i] );
+            }
         }
 
         private bool PartShouldBeIgnored ( BodyPartDef bodyPartDef )
@@ -34,35 +41,41 @@ namespace MSE2
             return ignoredParts != null && ignoredParts.Contains( bodyPartDef );
         }
 
-        public string GetLabelForLimb ( LimbConfiguration limb )
+        public List<string> GetRacesForLimb ( LimbConfiguration limb )
         {
             if ( limb == null )
             {
                 return null;
             }
 
-            builder.Clear();
+            var outList = new List<string>();
 
-            foreach ( var body in limb.Bodies.Where( AllBodies.Contains ) )
+            var pawns = DefDatabase<ThingDef>.AllDefsListForReading;
+            for ( int i = 0; i < pawns.Count; i++ )
             {
-                // if is the only limb from this body
-                if ( !limbPool.Except( limb ).Any( l => l.Bodies.Contains( body ) ) )
+                var pawnDef = pawns[i];
+                var body = pawnDef.race?.body;
+                if ( body != null && limb.Bodies.Contains( body ) && AllBodies.Contains( body ) )
                 {
-                    builder.AppendWithSeparator( body.label, "; " );
-                }
-                else
-                {
-                    var recordUniqueNames = from bpr in limb.AllRecords
-                                            where bpr.body == body
-                                            select bpr.Label.Replace( bpr.LabelShort, "" ).Trim();
+                    // if is the only limb from this body
+                    if ( !limbPool.Except( limb ).Any( l => l.Bodies.Contains( body ) ) )
+                    {
+                        outList.AddDistinct( pawnDef.label );
+                    }
+                    else
+                    {
+                        var recordUniqueNames = from bpr in limb.AllRecords
+                                                where bpr.body == body
+                                                select bpr.Label.Replace( bpr.LabelShort, "" ).Trim();
 
-                    string records = string.Join( ", ", recordUniqueNames );
+                        string records = string.Join( ", ", recordUniqueNames );
 
-                    builder.AppendWithSeparator( string.Format( "{0} {1} {2}", records, body.label, limb.PartDef.LabelShort ), "; " );
+                        outList.AddDistinct( string.Format( "{0} ({1} {2})", pawnDef.label, records, limb.PartDef.LabelShort ) );
+                    }
                 }
             }
 
-            return builder.ToString();
+            return outList;
         }
 
         private List<(BodyPartDef, int)> LimbDifference ( LimbConfiguration limb )
@@ -82,7 +95,9 @@ namespace MSE2
             return difference;
         }
 
-        public string GetComparisonForLimb ( LimbConfiguration limb )
+        private string[] cachedLimbComparisons;
+
+        private string GetComparisonForLimb_Int ( LimbConfiguration limb )
         {
             if ( limb == null ) return null;
 
@@ -116,6 +131,43 @@ namespace MSE2
             {
                 return builder.ToString();
             }
+        }
+
+        public string GetComparisonForLimb ( LimbConfiguration limb )
+        {
+            int i = limbPool.IndexOf( limb );
+
+            if ( i != -1 )
+            {
+                return cachedLimbComparisons[i];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public string GetCompatibilityReport ( Predicate<LimbConfiguration> isCompatible )
+        {
+            builder.Clear();
+
+            for ( int i = 0; i < limbPool.Count; i++ )
+            {
+                builder.AppendFormat( "{0} {1}: {2}",
+                    cachedLimbComparisons[i],
+                    "LimbVersion".Translate(),
+                    isCompatible( limbPool[i] ) ? "LimbCompatible".TranslateSimple() : "LimbIncompatible".TranslateSimple() ).AppendLine();
+
+                var labels = GetRacesForLimb( limbPool[i] );
+                for ( int l = 0; l < labels.Count; l++ )
+                {
+                    builder.AppendFormat( " - {0}", labels[l] ).AppendLine();
+                }
+
+                builder.AppendLine();
+            }
+
+            return builder.ToString();
         }
 
         private static readonly StringBuilder builder = new StringBuilder();

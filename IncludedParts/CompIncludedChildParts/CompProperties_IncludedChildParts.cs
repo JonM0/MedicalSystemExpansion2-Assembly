@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -121,9 +122,9 @@ namespace MSE2
             return limbLabeller.GetComparisonForLimb( limb );
         }
 
-        public string LabelNameForLimb ( LimbConfiguration limb )
+        public string GetCompatibilityReportDescription ( Predicate<LimbConfiguration> isCompatible )
         {
-            return limbLabeller.GetLabelForLimb( limb );
+            return limbLabeller.GetCompatibilityReport( isCompatible );
         }
 
         private float MarketValueForConfiguration ( LimbConfiguration limb )

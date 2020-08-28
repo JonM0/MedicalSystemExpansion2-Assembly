@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-using RimWorld;
-
 namespace MSE2
 {
     public class LimbConfiguration
@@ -152,7 +150,7 @@ namespace MSE2
 
         public override string ToString ()
         {
-            return string.Format( "{0} ( parts: {1}; def: {2}; races: {3} )", this.UniqueName, this.allRecords.Count, this.PartDef.defName, string.Join( ", ", this.Bodies ) ) ;
+            return string.Format( "{0} ( parts: {1}; def: {2}; races: {3} )", this.UniqueName, this.allRecords.Count, this.PartDef.defName, string.Join( ", ", this.Bodies ) );
         }
     }
 }

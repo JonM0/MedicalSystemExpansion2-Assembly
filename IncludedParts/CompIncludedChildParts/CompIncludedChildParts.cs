@@ -332,7 +332,6 @@ namespace MSE2
                 {
                     this.cachedCompatibleLimbs.Item1.Clear();
                     this.cachedCompatibleLimbs.Item1.AddRange( from lc in this.Props.installationDestinations
-                                                               where this.Props.EverInstallableOn( lc )
                                                                where IncludedPartsUtilities.InstallationCompatibility( this.childPartsIncluded, lc.ChildLimbs )
                                                                select lc );
                     this.cachedCompatibleLimbs.Item2 = true;
@@ -565,19 +564,27 @@ namespace MSE2
         }
 
         // Stat entries
+        private StatDrawEntry IncluededPartsStat => new StatDrawEntry(
+            StatCategoryDefOf.Basics,
+            "CompIncludedChildParts_StatIncludedParts_Label".Translate(),
+            this.IncludedParts.Count.ToString(),
+            "CompIncludedChildParts_StatIncludedParts_Description".Translate(),
+            2501,
+            null,
+            this.IncludedParts.Select( p => new Dialog_InfoCard.Hyperlink( p ) ),
+            false );
+
+        private StatDrawEntry CompatibilityStat => new StatDrawEntry(
+            StatCategoryDefOf.Basics,
+            "CompIncludedChildParts_StatCompatibility_Label".Translate(),
+            "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleLimbs.Count, this.Props.installationDestinations.Count ),
+            this.Props.GetCompatibilityReportDescription( this.CompatibleLimbs.Contains ),
+            2500 );
 
         public override IEnumerable<StatDrawEntry> SpecialDisplayStats ()
         {
-            // Included parts
-            yield return new StatDrawEntry(
-                StatCategoryDefOf.Basics,
-                "CompIncludedChildParts_StatIncludedParts_Label".Translate(),
-                this.IncludedParts.Count.ToString(),
-                "CompIncludedChildParts_StatIncludedParts_Description".Translate(),
-                2500,
-                null,
-                this.IncludedParts.Select( p => new Dialog_InfoCard.Hyperlink( p ) ),
-                false );
+            yield return IncluededPartsStat;
+            yield return CompatibilityStat;
         }
 
         #endregion StatsDisplay
