@@ -103,9 +103,11 @@ namespace MSE2.HarmonyPatches
                 functionalPercentage = 0f;
                 __result = 0f;
             }
-
-            functionalPercentage = (float)functionalLimbs / (float)totLimbs;
-            __result = totLimbEff / (float)totLimbs;
+            else
+            {
+                functionalPercentage = (float)functionalLimbs / (float)totLimbs;
+                __result = totLimbEff / (float)totLimbs;
+            }
 
             return false;
         }
