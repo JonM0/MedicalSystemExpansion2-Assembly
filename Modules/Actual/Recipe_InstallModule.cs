@@ -16,7 +16,6 @@ namespace MSE2
                     from slot in pawn.health.hediffSet.GetHediffs<Hediff_ModuleSlot>()
                     where rbpd == slot.Part.def
                     select slot.Part
-                where !pawn.health.hediffSet.GetHediffs<Hediff_ModuleAdded>().Any( m => m.Part == bodyPart && m.def == recipe.addsHediff )   // part doesn't have the module i'm trying to add
                 select bodyPart;
         }
 
@@ -26,10 +25,6 @@ namespace MSE2
 
             if ( billDoer != null )
             {
-                if ( base.CheckSurgeryFail( billDoer, pawn, ingredients, part, bill ) )
-                {
-                    return;
-                }
                 TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[]
                 {
                     billDoer,

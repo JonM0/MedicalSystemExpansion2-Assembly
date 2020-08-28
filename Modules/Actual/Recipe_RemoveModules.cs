@@ -20,10 +20,6 @@ namespace MSE2
 
             if ( billDoer != null )
             {
-                if ( base.CheckSurgeryFail( billDoer, pawn, ingredients, part, bill ) )
-                {
-                    return;
-                }
                 TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[]
                 {
                     billDoer,
