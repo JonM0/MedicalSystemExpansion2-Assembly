@@ -25,7 +25,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void SortList ( List<RecipeDef> __result, bool __state )
         {
-            if ( __state )
+            if ( __state && __result.Count > 0 )
             {
                 var resCopy = __result.ToArray();
 
