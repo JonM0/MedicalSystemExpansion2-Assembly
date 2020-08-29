@@ -11,12 +11,10 @@ namespace MSE2
         {
             return
                 // in the parts that the recipe can be applied to and that the pawn has a slot in
-                from BodyPartRecord bodyPart in
-                    from rbpd in recipe.appliedOnFixedBodyParts
-                    from slot in pawn.health.hediffSet.GetHediffs<Hediff_ModuleSlot>()
-                    where rbpd == slot.Part.def
-                    select slot.Part
-                select bodyPart;
+                (from slot in pawn.health.hediffSet.GetHediffs<Hediff_ModuleSlot>()
+                 where recipe.appliedOnFixedBodyParts == null || recipe.appliedOnFixedBodyParts.Contains( slot.Part.def )
+                 select slot.Part)
+                .Distinct();
         }
 
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
