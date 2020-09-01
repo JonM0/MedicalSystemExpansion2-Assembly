@@ -36,25 +36,39 @@ namespace MSE2
 
         // Save / Load
 
+        private void PostLoadInitialization ()
+        {
+            // init the list if it comes up null (loading a map created without MSE2)
+            if ( this.IncludedParts == null )
+            {
+                this.IncludedParts = new List<Thing>();
+                Log.Warning( "[MSE2] Included parts was null during loading." );
+            }
+
+            // set the holder comp of the included parts
+            for ( int i = 0; i < this.IncludedParts.Count; i++ )
+            {
+                var comp = this.IncludedParts[i].TryGetComp<CompIncludedChildParts>();
+                if ( comp != null )
+                {
+                    comp.holderComp = this;
+                }
+            }
+        }
+
         public override void PostExposeData ()
         {
             base.PostExposeData();
 
             // Deep save the included Things
             Scribe_Collections.Look( ref this.childPartsIncluded, "childPartsIncluded", LookMode.Deep );
-
             Scribe_LimbConfiguration.Look( ref this.targetLimb, "targetLimb" );
 
-            if ( this.IncludedParts == null )
-            {
-                this.IncludedParts = new List<Thing>();
-                Log.Warning( "[MSE2] Included parts was null while serializing or deserializing data." );
-                //InitializeIncludedParts();
-            }
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit ) this.PostLoadInitialization();
         }
 
         /// <summary>
-        /// Resets the cache for MissingParts, MissingValue and inspectString
+        /// Resets the cache for MissingParts, MissingValue and strings
         /// </summary>
         private void DirtyCache ()
         {
@@ -100,7 +114,7 @@ namespace MSE2
             set
             {
                 this.childPartsIncluded.Clear();
-                this.childPartsIncluded.AddRange( value );
+                if ( value != null ) this.childPartsIncluded.AddRange( value );
                 this.DirtyCache();
             }
         }
