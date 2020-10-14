@@ -46,8 +46,7 @@ namespace MSE2
                             : lthing.Label.CapitalizeFirst(),
                         () => // click action
                         {
-                            lcomp.RemoveAndSpawnPart( lthing, comp.parent.Position, comp.parent.Map );
-                            comp.DirtyCacheDeep( lcomp );
+                            lcomp.RemoveAndSpawnPart( lthing );
                         },
                         // icon
                         lthing.def ) );

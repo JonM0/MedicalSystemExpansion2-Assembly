@@ -49,7 +49,6 @@ namespace MSE2
                         () => // click action
                         {
                             compDestination.AddPart( thingCandidate );
-                            this.comp.DirtyCacheDeep( compDestination );
                         },
                         // icon
                         thingCandidate.def,

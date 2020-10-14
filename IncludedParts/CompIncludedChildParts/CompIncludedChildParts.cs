@@ -76,6 +76,8 @@ namespace MSE2
             this.cachedMissingParts.Item2 = false;
             this.cachedTransformLabelString = null;
             this.cachedInspectString = null;
+
+            this.holderComp?.DirtyCache();
         }
 
         // gizmos for merging and splitting
@@ -180,7 +182,7 @@ namespace MSE2
         {
             if ( !this.IncludedParts.Contains( part ) )
             {
-                Log.Error( "Tried to remove " + part.Label + " from " + this.parent.Label + " while it wasn't actually included." );
+                Log.Error( "[MSE2] Tried to remove " + part.Label + " from " + this.parent.Label + " while it wasn't actually included." );
                 return;
             }
 
@@ -604,32 +606,6 @@ namespace MSE2
         #endregion StatsDisplay
 
         #region RecursiveData
-
-        /// <summary>
-        /// Calls DirtyCache for all the ancestors of recursionEnd (excluded) up to the calling comp
-        /// </summary>
-        /// <returns>True if it actually found recursionEnd</returns>
-        private bool DirtyCacheDeep ( CompIncludedChildParts recursionEnd )
-        {
-            if ( this == recursionEnd )
-            {
-                // base case (no DirtyCache!)
-                return true;
-            }
-            foreach ( var comp in from i in this.IncludedParts
-                                  let comp = i.TryGetComp<CompIncludedChildParts>()
-                                  where comp != null
-                                  select comp )
-            {
-                // Depth-First-Search, call DirtyCache descending the call stack
-                if ( comp.DirtyCacheDeep( recursionEnd ) )
-                {
-                    this.DirtyCache();
-                    return true;
-                }
-            }
-            return false;
-        }
 
         /// <summary>
         /// Recursively searches for IncludedParts in all of the sub-parts
