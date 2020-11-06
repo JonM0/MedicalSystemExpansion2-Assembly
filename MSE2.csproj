@@ -97,7 +97,6 @@
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Scribe_LimbConfiguration.cs" />
-    <Compile Include="IncludedParts\PreventImpliedDefWhenSegmentUncraftable.cs" />
     <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGenerationLambda.cs" />
     <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGeneration.cs" />
     <Compile Include="IncludedParts\Stats\RewardGeneration\TSPWQMakeThing.cs" />
