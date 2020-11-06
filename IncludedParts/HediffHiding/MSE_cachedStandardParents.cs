@@ -18,7 +18,7 @@ namespace MSE2
         {
             foreach ( var ce in base.ConfigErrors() ) yield return ce;
 
-            if ( standardParents.NullOrEmpty() ) yield return "standardParents null or empty";
+            if ( standardParents.NullOrEmpty() ) yield return "[MSE2] standardParents null or empty";
         }
 
         public void Add ( HediffDef parent )
