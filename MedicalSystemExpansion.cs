@@ -14,7 +14,8 @@ using System;
 
 namespace MSE2
 {
-    //[EarlyInit]
+    [EarlyInit]
+    [StaticConstructorOnStartup]
     public class MedicalSystemExpansion : ModBase
     {
         public override void DefsLoaded ()

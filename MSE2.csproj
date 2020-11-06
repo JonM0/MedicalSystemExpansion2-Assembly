@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets.cs" />
+    <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
     <Compile Include="GenList.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SetTargetLimb.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
     <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Scribe_LimbConfiguration.cs" />
+    <Compile Include="IncludedParts\PreventImpliedDefWhenSegmentUncraftable.cs" />
     <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGenerationLambda.cs" />
     <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGeneration.cs" />
     <Compile Include="IncludedParts\Stats\RewardGeneration\TSPWQMakeThing.cs" />
@@ -142,6 +144,9 @@
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
+    <Compile Include="RecipeFixer\FixRecipesPatch.cs" />
+    <Compile Include="RecipeFixer\PartsIncludedInCost.cs" />
+    <Compile Include="RecipeFixer\RecipeFixingUtilities.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
