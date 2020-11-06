@@ -72,8 +72,8 @@ namespace MSE2
         /// </summary>
         private void DirtyCache ()
         {
-            this.cachedCompatibleLimbs.Item2 = false;
-            this.cachedMissingParts.Item2 = false;
+            this.cachedCompatibleLimbs.valid = false;
+            this.cachedMissingParts.valid = false;
             this.cachedTransformLabelString = null;
             this.cachedInspectString = null;
 
@@ -296,33 +296,33 @@ namespace MSE2
 
         #region Missing Parts
 
-        private (List<(ThingDef, LimbConfiguration)>, bool) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
+        private (List<(ThingDef, LimbConfiguration)> list, bool valid) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
 
         public List<(ThingDef, LimbConfiguration)> MissingParts
         {
             get
             {
-                if ( !cachedMissingParts.Item2 )
+                if ( !cachedMissingParts.valid )
                 {
-                    cachedMissingParts.Item1.Clear();
+                    cachedMissingParts.list.Clear();
 
                     if ( this.TargetLimb != null )
                     {
-                        cachedMissingParts.Item1.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
+                        cachedMissingParts.list.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
 
                         foreach ( var thing in this.IncludedParts )
                         {
                             var thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
-                            cachedMissingParts.Item1.Remove( cachedMissingParts.Item1.Find( c =>
+                            cachedMissingParts.list.Remove( cachedMissingParts.list.Find( c =>
                                  thing.def == c.Item1
                                  && (thingComp == null || thingComp.TargetLimb == c.Item2) ) );
                         }
                     }
-                    cachedMissingParts.Item2 = true;
+                    cachedMissingParts.valid = true;
                 }
 
-                return cachedMissingParts.Item1;
+                return cachedMissingParts.list;
             }
         }
 
@@ -334,25 +334,25 @@ namespace MSE2
 
         #region Compatible limbs
 
-        private (List<LimbConfiguration>, bool) cachedCompatibleLimbs = (new List<LimbConfiguration>(), false);
+        private (List<LimbConfiguration> list, bool valid) cachedCompatibleLimbs = (new List<LimbConfiguration>(), false);
 
         public List<LimbConfiguration> CompatibleLimbs
         {
             get
             {
-                if ( !this.cachedCompatibleLimbs.Item2 )
+                if ( !this.cachedCompatibleLimbs.valid )
                 {
-                    this.cachedCompatibleLimbs.Item1.Clear();
-                    this.cachedCompatibleLimbs.Item1.AddRange( from lc in this.Props.installationDestinations
-                                                               where IncludedPartsUtilities.InstallationCompatibility(
-                                                                   this.childPartsIncluded,
-                                                                   this.Props.ignoredSubparts == null ?
-                                                                   lc.ChildLimbs :
-                                                                   lc.ChildLimbs.Where( l => !this.Props.ignoredSubparts.Contains( l.PartDef ) ) )
-                                                               select lc );
-                    this.cachedCompatibleLimbs.Item2 = true;
+                    this.cachedCompatibleLimbs.list.Clear();
+                    this.cachedCompatibleLimbs.list.AddRange( from lc in this.Props.InstallationDestinations
+                                                              where IncludedPartsUtilities.InstallationCompatibility(
+                                                                  this.childPartsIncluded,
+                                                                  this.Props.IgnoredSubparts == null ?
+                                                                  lc.ChildLimbs :
+                                                                  lc.ChildLimbs.Where( l => !this.Props.IgnoredSubparts.Contains( l.PartDef ) ) )
+                                                              select lc );
+                    this.cachedCompatibleLimbs.valid = true;
                 }
-                return this.cachedCompatibleLimbs.Item1;
+                return this.cachedCompatibleLimbs.list;
             }
         }
 
@@ -475,7 +475,7 @@ namespace MSE2
             }
 
             // target is parent of other
-            LimbConfiguration goodTarget = this.Props.installationDestinations.Find( l => l.ChildLimbs.Contains( otherTarget ) );
+            LimbConfiguration goodTarget = this.Props.InstallationDestinations.Find( l => l.ChildLimbs.Contains( otherTarget ) );
             if ( goodTarget != null )
             {
                 this.childPartsIncluded.Clear();
@@ -593,7 +593,7 @@ namespace MSE2
         private StatDrawEntry CompatibilityStat => new StatDrawEntry(
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatCompatibility_Label".Translate(),
-            "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleLimbs.Count, this.Props.installationDestinations.Count ),
+            "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleLimbs.Count, this.Props.InstallationDestinations.Count ),
             this.Props.GetCompatibilityReportDescription( this.CompatibleLimbs.Contains ),
             2500 );
 

@@ -28,7 +28,7 @@ namespace MSE2
                 base.ProcessInput( ev );
                 List<FloatMenuOption> options = new List<FloatMenuOption>();
 
-                foreach ( LimbConfiguration possibleTarget in this.comp.Props.installationDestinations.Where( t => t != comp.TargetLimb ) )
+                foreach ( LimbConfiguration possibleTarget in this.comp.Props.InstallationDestinations.Where( t => t != comp.TargetLimb ) )
                 {
                     options.Add( new FloatMenuOption(
                         comp.Props.LabelComparisonForLimb( possibleTarget ).CapitalizeFirst(),
