@@ -24,11 +24,11 @@ namespace MSE2
 
             if ( targetLimb == null )
             {
-                yield return "targetLimb is null";
+                yield return "[MSE2] targetLimb is null";
             }
             else if ( targetLimb.RecordExample == null )
             {
-                yield return "targetLimb contains no records";
+                yield return "[MSE2] targetLimb contains no records";
             }
         }
 
