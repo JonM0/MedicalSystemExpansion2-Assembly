@@ -21,13 +21,7 @@ namespace MSE2
 
             this.parentDef = parentDef;
 
-            installationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
-
-            this.ignoredSubparts = DefDatabase<HediffDef>.AllDefsListForReading
-                .Find( h => h.spawnThingOnRemoved == this.parentDef )
-                ?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
-
-            limbLabeller = new LimbLabeler( installationDestinations, ignoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+            limbLabeller = new LimbLabeler( InstallationDestinations, IgnoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
                                                                                         from u in s.AllRecipeUsers
                                                                                         select u.race.body).Contains );
         }
@@ -39,31 +33,31 @@ namespace MSE2
 
             if ( this.parentDef != parentDef )
             {
-                yield return "ParentDefs do not match (should never happen wtf, did you manually call this function or ResolveReferences?)";
+                yield return "[MSE2] ParentDefs do not match (should never happen wtf, did you manually call ConfigErrors or ResolveReferences?)";
             }
 
             // warning for stack size
             if ( parentDef.stackLimit != 1 )
             {
-                yield return "def must have stack limit of 1 to work properly";
+                yield return "[MSE2] def must have stack limit of 1 to work properly";
             }
 
             // warning for never installable
-            if ( installationDestinations.NullOrEmpty() )
+            if ( InstallationDestinations.NullOrEmpty() )
             {
-                yield return parentDef.defName + " will never be installable anywhere";
+                yield return "[MSE2] will never be installable anywhere";
             }
 
             // warning for empy comp
             if ( standardChildren.NullOrEmpty() )
             {
-                yield return "CompIncludedChildParts on " + parentDef.defName + " has no children";
+                yield return "[MSE2] CompProperties_IncludedChildParts has no children";
             }
         }
 
         public bool EverInstallableOn ( LimbConfiguration limb )
         {
-            return installationDestinations.Contains( limb );
+            return InstallationDestinations.Contains( limb );
         }
 
         public IEnumerable<(ThingDef, LimbConfiguration)> StandardPartsForLimb ( LimbConfiguration limb )
@@ -76,16 +70,22 @@ namespace MSE2
                 yield break;
             }
 
-            foreach ( var lc in ignoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !ignoredSubparts.Contains( p.PartDef ) ) )
+            foreach ( var lc in IgnoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !IgnoredSubparts.Contains( p.PartDef ) ) )
             {
-                var thingDef = standardChildren.Find( td => IncludedPartsUtilities.CachedInstallationDestinations( td ).Contains( lc ) );
+                // first standard child that can be installed on lc
+                var thingDef = standardChildren
+                    .Find( td =>
+                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.CachedInstallationDestinations( td ))
+                        .Contains( lc )
+                        );
                 if ( thingDef != null )
                 {
                     yield return (thingDef, lc);
                 }
                 else
                 {
-                    Log.Error( "[MSE2] Could not find a standard child of " + parentDef.defName + " compatible with body part record " + lc );
+                    Log.Error( "[MSE2] Could not find a standard child of " + parentDef.defName + " compatible with body part record " + lc +
+                        "\nIgnored parts: " + (IgnoredSubparts?.Select( p => p.defName ).ToCommaList() ?? "none") );
                 }
             }
 
@@ -144,9 +144,9 @@ namespace MSE2
             float value = 0;
             int count = 0;
 
-            for ( int i = 0; i < installationDestinations.Count; i++ )
+            for ( int i = 0; i < InstallationDestinations.Count; i++ )
             {
-                var limb = installationDestinations[i];
+                var limb = InstallationDestinations[i];
                 if ( limb.Bodies.Contains( pawn.RaceProps.body ) )
                 {
                     count++;
@@ -157,6 +157,7 @@ namespace MSE2
             return count == 0 ? 0 : value / count;
         }
 
+        [Unsaved]
         private float cachedAverageValue = -1;
 
         public float AverageValue
@@ -165,13 +166,13 @@ namespace MSE2
             {
                 if ( cachedAverageValue == -1f )
                 {
-                    if ( installationDestinations == null )
+                    if ( InstallationDestinations == null )
                     {
                         Log.Error( "Tried to calculate min value before valid limbs were set. ThingDef: " + this.parentDef.defName );
                     }
                     else
                     {
-                        cachedAverageValue = installationDestinations.Select( MarketValueForConfiguration ).Average();
+                        cachedAverageValue = InstallationDestinations.Select( MarketValueForConfiguration ).Average();
                     }
                 }
 
@@ -179,16 +180,65 @@ namespace MSE2
             }
         }
 
+        [Unsaved]
         private ThingDef parentDef;
 
+        [Unsaved]
         private LimbLabeler limbLabeller;
 
-        public List<BodyPartDef> ignoredSubparts;
+        [Unsaved]
+        private (bool valid, List<BodyPartDef> list) cachedIgnoredSubparts = (false, null);
 
-        public List<LimbConfiguration> installationDestinations;
+        public List<BodyPartDef> IgnoredSubparts
+        {
+            get
+            {
+                if ( !cachedIgnoredSubparts.valid )
+                {
+                    if ( DefDatabase<HediffDef>.AllDefsListForReading.NullOrEmpty() )
+                    {
+                        throw new ApplicationException( "[MSE2] Tried to find IgnoredSubparts before DefDatabase was loaded." );
+                    }
+                    cachedIgnoredSubparts.list = DefDatabase<HediffDef>.AllDefsListForReading
+                                                    .Find( h => h.spawnThingOnRemoved == this.parentDef )
+                                                    ?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
+
+                    cachedIgnoredSubparts.valid = true;
+                }
+                return cachedIgnoredSubparts.list;
+            }
+        }
+
+        [Unsaved]
+        public List<LimbConfiguration> cachedInstallationDestinations;
+
+        public List<LimbConfiguration> InstallationDestinations
+        {
+            get
+            {
+                if ( cachedInstallationDestinations == null )
+                {
+                    cachedInstallationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( parentDef ).ToList();
+                }
+                return cachedInstallationDestinations;
+            }
+        }
+
+        public enum CLType
+        {
+            Segment,
+            Upgrade,
+            FirstLimb,
+        }
+
+        public bool CanCraftSegment => costListType == CLType.Segment;
+
+        // xml def fields
 
         public List<ThingDef> standardChildren;
 
         public List<ThingDef> alwaysInclude;
+
+        public CLType costListType = CLType.Segment;
     }
 }
