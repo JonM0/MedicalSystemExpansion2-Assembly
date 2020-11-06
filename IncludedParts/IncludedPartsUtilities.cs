@@ -64,6 +64,11 @@ namespace MSE2
 
         public static IEnumerable<RecipeDef> SurgeryToInstall ( ThingDef thing )
         {
+            if ( DefDatabase<RecipeDef>.AllDefsListForReading.NullOrEmpty() )
+            {
+                throw new ApplicationException( "[MSE2] Tried to find SurgeryToInstall before DefDatabase was loaded. ThingDef: " + thing.defName );
+            }
+
             return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.IsIngredient( thing ) );
         }
 
@@ -119,7 +124,7 @@ namespace MSE2
             }
             else
             {
-                List<LimbConfiguration> newVal =
+                var allFromSurgeries =
                     (from s in SurgeryToInstall( parentDef )
                      from u in s.AllRecipeUsers
                      let b = u.race.body
@@ -127,8 +132,10 @@ namespace MSE2
                      where b.AllParts.Any( bpr => bpr.def == bpd )
                      from lc in LimbConfiguration.LimbConfigsMatchingBodyAndPart( b, bpd )
                      select lc)
-                     .Distinct()
-                     .ToList();
+                     .Distinct();
+
+                var newVal = /*parentDef.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinationsFilter( allFromSurgeries ).ToList()
+                    ?? */allFromSurgeries.ToList();
 
                 cachedInstallationDestinations.Add( parentDef, newVal );
                 return newVal;
@@ -174,5 +181,10 @@ namespace MSE2
         //{
         //    return CachedInstallationDestinations( thingDef ).Any( bd_bpd => bd_bpd.Item1 == bodyPartRecord.body && bd_bpd.Item2 == bodyPartRecord.def );
         //}
+
+        public static bool CanCraftSegment ( this ThingDef thingDef )
+        {
+            return thingDef.GetCompProperties<CompProperties_IncludedChildParts>()?.CanCraftSegment ?? true;
+        }
     }
 }
