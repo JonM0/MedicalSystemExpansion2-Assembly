@@ -123,14 +123,14 @@ namespace MSE2
                 }
             }
 
-            if ( builder.Length == 0 )
-            {
-                return "LimbComplete".Translate();
-            }
-            else
-            {
+            //if ( builder.Length == 0 )
+            //{
+            //    return "LimbComplete".Translate();
+            //}
+            //else
+            //{
                 return builder.ToString();
-            }
+            //}
         }
 
         public string GetComparisonForLimb ( LimbConfiguration limb )
