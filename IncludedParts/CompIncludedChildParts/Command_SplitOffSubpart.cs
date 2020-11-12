@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -23,13 +25,7 @@ namespace MSE2
                 this.defaultDesc = "CommandSplitOffSubpart_Description".Translate();
             }
 
-            public override bool Visible
-            {
-                get
-                {
-                    return this.comp.AllIncludedParts.Any();
-                }
-            }
+            public override bool Visible => this.comp.AllIncludedParts.Any();
 
             public override void ProcessInput ( Event ev )
             {
@@ -37,7 +33,7 @@ namespace MSE2
 
                 List<FloatMenuOption> list = new List<FloatMenuOption>();
 
-                foreach ( (Thing lthing, CompIncludedChildParts lcomp) in comp.AllIncludedParts )
+                foreach ( (Thing lthing, CompIncludedChildParts lcomp) in this.comp.AllIncludedParts )
                 {
                     list.Add( new FloatMenuOption(
                         // name

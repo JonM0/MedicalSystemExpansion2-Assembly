@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
 using HarmonyLib;
+
 using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -17,7 +19,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void RandInit ( Thing __result )
         {
-            var comp = __result.TryGetComp<CompIncludedChildParts>();
+            CompIncludedChildParts comp = __result.TryGetComp<CompIncludedChildParts>();
 
             if ( comp != null )
             {

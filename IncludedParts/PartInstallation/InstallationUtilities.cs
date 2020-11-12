@@ -1,7 +1,9 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2
@@ -10,7 +12,7 @@ namespace MSE2
     {
         public static bool HasRestrictionsForPart ( this RecipeDef recipe, BodyPartRecord part, HediffSet hediffSet )
         {
-            var modExt = recipe.GetModExtension<InstallationRestrictions>();
+            InstallationRestrictions modExt = recipe.GetModExtension<InstallationRestrictions>();
 
             return modExt != null && part.parent != null && !modExt.CompatibleWithPart( part.parent, hediffSet );
         }

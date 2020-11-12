@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
-using System.Reflection;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -23,17 +25,17 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void AddSubpartValue ( ref float __result, RecipeDef d )
         {
-            var target = d.GetModExtension<TargetLimb>()?.targetLimb;
+            LimbConfiguration target = d.GetModExtension<TargetLimb>()?.targetLimb;
 
             if ( target != null )
             {
                 foreach ( ThingDefCountClass thingDefCountClass in d.products )
                 {
-                    var compProp = thingDefCountClass.thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
+                    CompProperties_IncludedChildParts compProp = thingDefCountClass.thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
 
                     if ( thingDefCountClass.count == 1 && compProp != null )
                     {
-                        foreach ( var includedPart in compProp.AllPartsForLimb( target ) )
+                        foreach ( ThingDef includedPart in compProp.AllPartsForLimb( target ) )
                         {
                             __result += includedPart.GetStatValueAbstract( StatDefOf.MarketValue );
                         }

@@ -1,7 +1,10 @@
-﻿using HarmonyLib;
-using RimWorld;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+
+using HarmonyLib;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2.HarmonyPatches

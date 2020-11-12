@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -23,7 +25,7 @@ namespace MSE2.HarmonyPatches
 
             if ( ingredientToUpgrade != null )
             {
-                var products = __result.ToList();
+                List<Thing> products = __result.ToList();
 
                 Thing productToInitialize = products.Find( t => t.TryGetComp<CompIncludedChildParts>() != null );
                 if ( productToInitialize != null )

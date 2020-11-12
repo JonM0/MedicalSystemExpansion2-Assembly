@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
-using System.Reflection;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -18,7 +20,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void InitAverage ( Thing __result )
         {
-            var comp = __result.TryGetComp<CompIncludedChildParts>();
+            CompIncludedChildParts comp = __result.TryGetComp<CompIncludedChildParts>();
 
             if ( comp != null )
             {

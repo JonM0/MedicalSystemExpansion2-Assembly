@@ -1,7 +1,9 @@
-﻿using HarmonyLib;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+
+using HarmonyLib;
+
 using Verse;
 
 namespace MSE2.HarmonyPatches
@@ -9,7 +11,7 @@ namespace MSE2.HarmonyPatches
     internal class CalculateImmediatePartEfficiencyAndRecord_Patch
     {
         [HarmonyPatch( typeof( PawnCapacityUtility ) )]
-        [HarmonyPatch( nameof(PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord) )]
+        [HarmonyPatch( nameof( PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord ) )]
         internal class Patch
         {
             // short circuit to return 0 efficency if the part is missing
@@ -27,7 +29,7 @@ namespace MSE2.HarmonyPatches
                     {
                         if ( part.parent == null || diffSet.GetNotMissingParts().Contains( part.parent ) )
                         {
-                            var imp = new PawnCapacityUtility.CapacityImpactorBodyPartHealth { bodyPart = part };
+                            PawnCapacityUtility.CapacityImpactorBodyPartHealth imp = new PawnCapacityUtility.CapacityImpactorBodyPartHealth { bodyPart = part };
 
                             impactors.Add( imp );
                         }
@@ -43,7 +45,7 @@ namespace MSE2.HarmonyPatches
             [HarmonyTranspiler]
             internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
             {
-                var l = new List<CodeInstruction>( instructions );
+                List<CodeInstruction> l = new List<CodeInstruction>( instructions );
 
                 return instructions.Skip( l.FindLastIndex( ( CodeInstruction i ) => i.opcode == OpCodes.Ldarg_0 ) ); // skip instructions before last loadarg0
             }

@@ -16,12 +16,12 @@ namespace MSE2
                                                where h.Part == part
                                                where this.whitelist.Contains( h.def )
                                                select h).Any())
-                && !(this.whitelist == null && onlyOnNatural && hediffSet.HasDirectlyAddedPartFor( part ));
+                && !(this.whitelist == null && this.onlyOnNatural && hediffSet.HasDirectlyAddedPartFor( part ));
         }
 
         public override IEnumerable<string> ConfigErrors ()
         {
-            foreach ( var e in base.ConfigErrors() ) yield return e;
+            foreach ( string e in base.ConfigErrors() ) yield return e;
 
             if ( this.whitelist == null && this.onlyOnNatural == false )
                 yield return "[MSE] all InstallationRestrictions are null";

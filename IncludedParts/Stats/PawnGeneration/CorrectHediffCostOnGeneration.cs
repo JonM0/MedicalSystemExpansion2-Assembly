@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
-using System.Reflection.Emit;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -20,7 +22,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyTranspiler]
         internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
-            foreach ( var instruction in instructions )
+            foreach ( CodeInstruction instruction in instructions )
             {
                 if ( instruction.Calls( AccessTools.PropertyGetter( typeof( ThingDef ), nameof( ThingDef.BaseMarketValue ) ) ) )
                 {

@@ -29,17 +29,17 @@ namespace MSE2
             get
             {
                 // try to cache it
-                if ( moduleHolderComp == null )
+                if ( this.moduleHolderComp == null )
                 {
-                    moduleHolderComp = moduleHolderDiff?.TryGetComp<HediffComp_ModuleHolder>();
+                    this.moduleHolderComp = this.moduleHolderDiff?.TryGetComp<HediffComp_ModuleHolder>();
                     // if still null call error
-                    if ( moduleHolderComp == null )
+                    if ( this.moduleHolderComp == null )
                     {
                         Log.Error( "[MSE] Null ModuleHolder for module " + this.Label );
                     }
                 }
 
-                return moduleHolderComp;
+                return this.moduleHolderComp;
             }
         }
 
@@ -47,7 +47,7 @@ namespace MSE2
         {
             base.ExposeData();
 
-            Scribe_References.Look( ref moduleHolderDiff, "moduleHolder" ); // need to save the diff as the comp is not referenceable
+            Scribe_References.Look( ref this.moduleHolderDiff, "moduleHolder" ); // need to save the diff as the comp is not referenceable
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit && this.moduleHolderDiff == null )
             {

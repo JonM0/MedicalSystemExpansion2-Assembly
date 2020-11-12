@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Verse;
 
 namespace MSE2
@@ -12,13 +13,13 @@ namespace MSE2
     /// </summary>
     internal class MSE_cachedStandardParents : DefModExtension
     {
-        private List<HediffDef> standardParents = new List<HediffDef>();
+        private readonly List<HediffDef> standardParents = new List<HediffDef>();
 
         public override IEnumerable<string> ConfigErrors ()
         {
-            foreach ( var ce in base.ConfigErrors() ) yield return ce;
+            foreach ( string ce in base.ConfigErrors() ) yield return ce;
 
-            if ( standardParents.NullOrEmpty() ) yield return "[MSE2] standardParents null or empty";
+            if ( this.standardParents.NullOrEmpty() ) yield return "[MSE2] standardParents null or empty";
         }
 
         public void Add ( HediffDef parent )
@@ -28,7 +29,7 @@ namespace MSE2
 
         public bool Contains ( HediffDef parent )
         {
-            return standardParents.Contains( parent );
+            return this.standardParents.Contains( parent );
         }
     }
 }

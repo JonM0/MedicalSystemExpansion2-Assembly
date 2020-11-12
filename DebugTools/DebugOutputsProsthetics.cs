@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Verse;
+
 using RimWorld;
-using System.Runtime.InteropServices;
+
+using Verse;
 
 namespace MSE2.DebugTools
 {
@@ -86,11 +88,11 @@ namespace MSE2.DebugTools
 
             while ( Q.Any() )
             {
-                var comp = Q.Dequeue().GetCompProperties<CompProperties_IncludedChildParts>();
+                CompProperties_IncludedChildParts comp = Q.Dequeue().GetCompProperties<CompProperties_IncludedChildParts>();
 
                 if ( comp != null )
                 {
-                    foreach ( var child in comp.standardChildren )
+                    foreach ( ThingDef child in comp.standardChildren )
                     {
                         if ( allThings.Add( child ) )
                         {
@@ -100,7 +102,7 @@ namespace MSE2.DebugTools
 
                     if ( comp.alwaysInclude != null )
                     {
-                        foreach ( var child in comp.alwaysInclude )
+                        foreach ( ThingDef child in comp.alwaysInclude )
                         {
                             if ( allThings.Add( child ) )
                             {

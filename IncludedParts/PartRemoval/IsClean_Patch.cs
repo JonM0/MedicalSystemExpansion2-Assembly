@@ -1,6 +1,9 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+
+using HarmonyLib;
+
 using RimWorld;
-using System.Linq;
+
 using Verse;
 
 namespace MSE2.HarmonyPatches

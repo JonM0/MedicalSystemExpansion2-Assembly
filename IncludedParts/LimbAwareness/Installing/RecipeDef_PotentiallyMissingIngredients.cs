@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using Verse;
-using HarmonyLib;
-using RimWorld;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Collections;
+using System.Text;
+using System.Threading.Tasks;
+
+using HarmonyLib;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -53,7 +56,7 @@ namespace MSE2.HarmonyPatches
 
             for ( int i = 0; i < instructions.Count; i++ )
             {
-                var instruction = instructions[i];
+                CodeInstruction instruction = instructions[i];
 
                 // if last pushed a false and current pops it into the flag
                 if ( lastInstLoadedFalse && instruction.opcode == OpCodes.Stloc_3 )
@@ -84,8 +87,8 @@ namespace MSE2.HarmonyPatches
 
         internal static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )
         {
-            var recipeTarget = recipe.GetModExtension<TargetLimb>();
-            var thingComp = thing.TryGetComp<CompIncludedChildParts>();
+            TargetLimb recipeTarget = recipe.GetModExtension<TargetLimb>();
+            CompIncludedChildParts thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
             if ( recipeTarget != null && thingComp != null )
             {

@@ -1,8 +1,11 @@
-﻿using HarmonyLib;
-using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using HarmonyLib;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2.HarmonyPatches
@@ -67,7 +70,7 @@ namespace MSE2.HarmonyPatches
                 Thing item = ThingMaker.MakeThing( spawnableFromPart );
 
                 // compose if possible
-                var comp = item.TryGetComp<CompIncludedChildParts>();
+                CompIncludedChildParts comp = item.TryGetComp<CompIncludedChildParts>();
                 if ( comp != null )
                 {
                     comp.TargetLimb = LimbConfiguration.LimbConfigForBodyPartRecord( part );
@@ -78,7 +81,7 @@ namespace MSE2.HarmonyPatches
             }
 
             // merge siblings
-            foreach ( var item in items.ToArray() )
+            foreach ( Thing item in items.ToArray() )
             {
                 if ( items.Contains( item ) )
                 {

@@ -1,9 +1,11 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2.RecipeFixer
@@ -18,7 +20,7 @@ namespace MSE2.RecipeFixer
                                                           select (tc.Key, tc.Select( x => x.Item2 ).Sum()) ) // add up all the total by thingdef
             {
                 // take the corresponding price item
-                var originalPartCost = thingDef.costList.Find( x => x.thingDef == part );
+                ThingDefCountClass originalPartCost = thingDef.costList.Find( x => x.thingDef == part );
                 if ( originalPartCost != null )
                 {
                     // decrement it by totalOfPart, but leave at least the minimum specified in partsDefMod rounded up
@@ -31,19 +33,19 @@ namespace MSE2.RecipeFixer
 
         private static void FixWorkToMake ( ThingDef thingDef, PartsIncludedInCost partsDefMod, List<ThingDefCountClass> allPartsList )
         {
-            var work = thingDef.GetStatValueAbstract( StatDefOf.WorkToMake );
+            float work = thingDef.GetStatValueAbstract( StatDefOf.WorkToMake );
             work *= partsDefMod.baseWorkFactor;
             //var temp = allPartsList.Select( p => p.thingDef.GetStatValueAbstract( StatDefOf.WorkToMake ) ).ToList();
-            var workOfParts = allPartsList.Select( p => p.thingDef.GetStatValueAbstract( StatDefOf.WorkToMake ) * p.count ).Sum();
+            float workOfParts = allPartsList.Select( p => p.thingDef.GetStatValueAbstract( StatDefOf.WorkToMake ) * p.count ).Sum();
             work = Math.Max( work * partsDefMod.minToLeave, work - workOfParts );
             thingDef.SetStatBaseValue( StatDefOf.WorkToMake, work );
         }
 
         internal static void FixRecipe ( ThingDef thingDef, PartsIncludedInCost partsDefMod )
         {
-            var allPartsList = partsDefMod.partsInCost.ToList();
+            List<ThingDefCountClass> allPartsList = partsDefMod.partsInCost.ToList();
 
-            foreach ( var part in allPartsList )
+            foreach ( ThingDefCountClass part in allPartsList )
             {
                 EnsureFixedRecipe( part.thingDef );
             }
@@ -58,7 +60,7 @@ namespace MSE2.RecipeFixer
                 break;
 
             case PartsIncludedInCost.FixMode.MarketValue:
-                var valueOfParts = allPartsList.Select( p => p.thingDef.BaseMarketValue * p.count ).Sum();
+                float valueOfParts = allPartsList.Select( p => p.thingDef.BaseMarketValue * p.count ).Sum();
                 thingDef.BaseMarketValue = Math.Max( thingDef.BaseMarketValue * partsDefMod.minToLeave, thingDef.BaseMarketValue - valueOfParts );
 
                 break;
@@ -73,7 +75,7 @@ namespace MSE2.RecipeFixer
 
         internal static void EnsureFixedRecipe ( ThingDef thingDef )
         {
-            var partsIncluded = thingDef.GetModExtension<PartsIncludedInCost>();
+            PartsIncludedInCost partsIncluded = thingDef.GetModExtension<PartsIncludedInCost>();
             if ( partsIncluded != null && !partsIncluded.wasFixed )
             {
                 FixRecipe( thingDef, partsIncluded );
@@ -84,7 +86,7 @@ namespace MSE2.RecipeFixer
         {
             Log.Message( DefDatabase<ThingDef>.AllDefsListForReading.Count + " thingdefs existing" );
 
-            foreach ( var def in DefDatabase<ThingDef>.AllDefs )
+            foreach ( ThingDef def in DefDatabase<ThingDef>.AllDefs )
             {
                 EnsureFixedRecipe( def );
             }

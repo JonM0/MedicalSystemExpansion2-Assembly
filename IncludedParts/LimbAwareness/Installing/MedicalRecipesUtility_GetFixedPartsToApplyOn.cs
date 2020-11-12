@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -19,7 +21,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void RemoveWrongTargetLimb ( ref IEnumerable<BodyPartRecord> __result, RecipeDef recipe )
         {
-            var recipeTargetLimb = recipe.GetModExtension<TargetLimb>();
+            TargetLimb recipeTargetLimb = recipe.GetModExtension<TargetLimb>();
 
             if ( recipeTargetLimb != null )
             {

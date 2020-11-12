@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -27,7 +29,7 @@ namespace MSE2.HarmonyPatches
         {
             if ( __state && __result.Count > 0 )
             {
-                var resCopy = __result.ToArray();
+                RecipeDef[] resCopy = __result.ToArray();
 
                 __result.Clear();
 

@@ -1,8 +1,11 @@
-﻿using RimWorld;
-using RimWorld.Planet;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+
+using RimWorld;
+using RimWorld.Planet;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -25,13 +28,7 @@ namespace MSE2
                 this.defaultDesc = "CommandAddExistingSubpart_Description".Translate();
             }
 
-            public override bool Visible
-            {
-                get
-                {
-                    return comp.AllMissingParts.Any();
-                }
-            }
+            public override bool Visible => this.comp.AllMissingParts.Any();
 
             public override void ProcessInput ( Event ev )
             {
@@ -78,14 +75,10 @@ namespace MSE2
             /// <summary>
             /// Returns all things on the map that could be added to this part, and the comp that can accept them
             /// </summary>
-            private IEnumerable<(Thing, CompIncludedChildParts)> PossibleThings
-            {
-                get =>
-                    from t in this.comp.parent.Map.listerThings.AllThings
-                    from u in this.comp.AllMissingParts.Distinct()
-                    where u.Item1 == t.def
-                    select (t, u.Item3);
-            }
+            private IEnumerable<(Thing, CompIncludedChildParts)> PossibleThings => from t in this.comp.parent.Map.listerThings.AllThings
+                                                                                   from u in this.comp.AllMissingParts.Distinct()
+                                                                                   where u.Item1 == t.def
+                                                                                   select (t, u.Item3);
 
             public override GizmoResult GizmoOnGUI ( Vector2 loc, float maxWidth )
             {

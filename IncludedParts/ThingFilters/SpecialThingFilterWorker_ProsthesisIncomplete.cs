@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Verse;
 
 namespace MSE2
@@ -21,7 +22,7 @@ namespace MSE2
 
         public override bool Matches ( Thing t )
         {
-            var comp = t.TryGetComp<CompIncludedChildParts>();
+            CompIncludedChildParts comp = t.TryGetComp<CompIncludedChildParts>();
 
             return comp != null && !comp.IsComplete;
         }

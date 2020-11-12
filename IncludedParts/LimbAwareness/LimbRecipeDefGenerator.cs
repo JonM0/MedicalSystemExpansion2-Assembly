@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RimWorld;
+
 using Verse;
 using Verse.Noise;
 
@@ -38,7 +39,7 @@ namespace MSE2
                     );
 
                     int count = 0;
-                    foreach ( var limb in tmplimbsItCanTargetList )
+                    foreach ( LimbConfiguration limb in tmplimbsItCanTargetList )
                     {
                         if ( count == 0 )
                         {
@@ -104,7 +105,7 @@ namespace MSE2
             // all the actual segments the part will include
             List<ThingDefCountClass> allParts = new List<ThingDefCountClass>();
             allParts.Add( new ThingDefCountClass( thingDef, 1 ) );
-            var comp = thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
+            CompProperties_IncludedChildParts comp = thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
             if ( comp != null )
             {
                 // add the rest grouped by thingdef
@@ -112,16 +113,16 @@ namespace MSE2
             }
 
             // exit if any part has not segment recipe
-            if(allParts.Any(p => !p.thingDef.CanCraftSegment()))
+            if ( allParts.Any( p => !p.thingDef.CanCraftSegment() ) )
             {
                 return (null, 0);
             }
 
             // the ingredients to make the segments, not grouped by thingdef
             List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
-            foreach ( var partCount in allParts )
+            foreach ( ThingDefCountClass partCount in allParts )
             {
-                var recipeProductCount = partCount.thingDef.recipeMaker.productCount;
+                int recipeProductCount = partCount.thingDef.recipeMaker.productCount;
 
                 // add up work
                 work += partCount.thingDef.GetStatValueAbstract( StatDefOf.WorkToMake ) * partCount.count / recipeProductCount;
@@ -129,7 +130,7 @@ namespace MSE2
                 // add up parts
                 if ( partCount.thingDef.costList != null )
                 {
-                    foreach ( var intIngredientCount in partCount.thingDef.costList )
+                    foreach ( ThingDefCountClass intIngredientCount in partCount.thingDef.costList )
                     {
                         // add it's ingredients, adjusted by how many are crafted and rounded up
                         intermediateIngredients.Add( new ThingDefCountClass( intIngredientCount.thingDef, (intIngredientCount.count * partCount.count - 1) / recipeProductCount + 1 ) );
@@ -158,47 +159,47 @@ namespace MSE2
 
         internal static IEnumerable<RecipeDef> LimbCreationDef ( ThingDef prosthesisDef )
         {
-            var comp = prosthesisDef.GetCompProperties<CompProperties_IncludedChildParts>();
+            CompProperties_IncludedChildParts comp = prosthesisDef.GetCompProperties<CompProperties_IncludedChildParts>();
 
             // relabel original recipe
-            var originalRecipe = DefDatabase<RecipeDef>.GetNamed( "Make_" + prosthesisDef.defName );
+            RecipeDef originalRecipe = DefDatabase<RecipeDef>.GetNamed( "Make_" + prosthesisDef.defName );
             if ( originalRecipe != null )
             {
                 switch ( comp.costListType )
                 {
-                    case CompProperties_IncludedChildParts.CLType.Segment:
-                        originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
-                        break;
+                case CompProperties_IncludedChildParts.CLType.Segment:
+                    originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
+                    break;
 
-                    case CompProperties_IncludedChildParts.CLType.Upgrade:
-                        originalRecipe.label = "RecipeMakeUpgrade".Translate( prosthesisDef.label );
-                        break;
+                case CompProperties_IncludedChildParts.CLType.Upgrade:
+                    originalRecipe.label = "RecipeMakeUpgrade".Translate( prosthesisDef.label );
+                    break;
 
-                    case CompProperties_IncludedChildParts.CLType.FirstLimb:
-                        var firstLimb = comp.InstallationDestinations[0];
-                        string limbComparison = comp.LabelComparisonForLimb( firstLimb );
+                case CompProperties_IncludedChildParts.CLType.FirstLimb:
+                    LimbConfiguration firstLimb = comp.InstallationDestinations[0];
+                    string limbComparison = comp.LabelComparisonForLimb( firstLimb );
 
-                        originalRecipe.label = (limbComparison == "" ? "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
-                        originalRecipe.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                        string[] items = originalRecipe.products.Select( delegate ( ThingDefCountClass p )
+                    originalRecipe.label = (limbComparison == "" ? "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
+                    originalRecipe.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
+                    string[] items = originalRecipe.products.Select( delegate ( ThingDefCountClass p )
+                    {
+                        if ( p.count != 1 )
                         {
-                            if ( p.count != 1 )
-                            {
-                                return p.Label;
-                            }
-                            return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
-                        } ).ToArray<string>();
-                        originalRecipe.description = "RecipeMakeForLimbDescription".Translate( items.ToCommaList( true ), limbComparison );
-                        originalRecipe.descriptionHyperlinks = (from p in originalRecipe.products
-                                                                select new DefHyperlink( p.thingDef )).ToList();
+                            return p.Label;
+                        }
+                        return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
+                    } ).ToArray<string>();
+                    originalRecipe.description = "RecipeMakeForLimbDescription".Translate( items.ToCommaList( true ), limbComparison );
+                    originalRecipe.descriptionHyperlinks = (from p in originalRecipe.products
+                                                            select new DefHyperlink( p.thingDef )).ToList();
 
-                        if ( originalRecipe.modExtensions == null ) originalRecipe.modExtensions = new List<DefModExtension>();
-                        originalRecipe.modExtensions.Add( new TargetLimb( firstLimb ) );
+                    if ( originalRecipe.modExtensions == null ) originalRecipe.modExtensions = new List<DefModExtension>();
+                    originalRecipe.modExtensions.Add( new TargetLimb( firstLimb ) );
 
-                        break;
+                    break;
 
-                    default:
-                        break;
+                default:
+                    break;
                 }
             }
 

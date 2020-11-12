@@ -1,9 +1,11 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2.DebugTools
@@ -59,7 +61,7 @@ namespace MSE2.DebugTools
                     {
                         Log.Message( "Fixing " + hediff.Label + " on " + pawn.Name );
 
-                        var part = hediff.Part;
+                        BodyPartRecord part = hediff.Part;
                         pawn.health.RestorePart( part );
 
                         recipeDef.Worker.ApplyOnPawn( pawn, part, null, null, null );

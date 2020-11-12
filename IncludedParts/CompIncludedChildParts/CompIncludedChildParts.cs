@@ -1,10 +1,13 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+
+using RimWorld;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -12,7 +15,7 @@ namespace MSE2
     public partial class CompIncludedChildParts : ThingComp
     {
         private CompIncludedChildParts holderComp;
-        private CompIncludedChildParts TopHolderComp => holderComp == null ? this : this.holderComp.TopHolderComp;
+        private CompIncludedChildParts TopHolderComp => this.holderComp == null ? this : this.holderComp.TopHolderComp;
         private Map Map => this.TopHolderComp.parent.Map;
         private IntVec3 Position => this.TopHolderComp.parent.Position;
 
@@ -26,13 +29,7 @@ namespace MSE2
             this.command_SplitOffSubpart = new Command_SplitOffSubpart( this );
         }
 
-        public CompProperties_IncludedChildParts Props
-        {
-            get
-            {
-                return this.props as CompProperties_IncludedChildParts;
-            }
-        }
+        public CompProperties_IncludedChildParts Props => this.props as CompProperties_IncludedChildParts;
 
         // Save / Load
 
@@ -48,7 +45,7 @@ namespace MSE2
             // set the holder comp of the included parts
             for ( int i = 0; i < this.IncludedParts.Count; i++ )
             {
-                var comp = this.IncludedParts[i].TryGetComp<CompIncludedChildParts>();
+                CompIncludedChildParts comp = this.IncludedParts[i].TryGetComp<CompIncludedChildParts>();
                 if ( comp != null )
                 {
                     comp.holderComp = this;
@@ -92,7 +89,7 @@ namespace MSE2
             yield return this.command_AddExistingSubpart;
             yield return this.command_SplitOffSubpart;
 
-            foreach ( var g in base.CompGetGizmosExtra() ) yield return g;
+            foreach ( Gizmo g in base.CompGetGizmosExtra() ) yield return g;
 
             yield break;
         }
@@ -128,16 +125,16 @@ namespace MSE2
         {
             get
             {
-                tmpThingList.Clear();
-                tmpThingList.AddRange( this.IncludedParts );
+                this.tmpThingList.Clear();
+                this.tmpThingList.AddRange( this.IncludedParts );
 
                 foreach ( (ThingDef def, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
                 {
-                    var thing = tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
+                    Thing thing = this.tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
 
                     if ( thing != null )
                     {
-                        tmpThingList.Remove( thing );
+                        this.tmpThingList.Remove( thing );
                         yield return (thing, limb);
                     }
                 }
@@ -211,10 +208,7 @@ namespace MSE2
 
         public LimbConfiguration TargetLimb
         {
-            get
-            {
-                return targetLimb;
-            }
+            get => this.targetLimb;
             set
             {
                 if ( value != null && !this.Props.EverInstallableOn( value ) )
@@ -235,23 +229,23 @@ namespace MSE2
         {
             if ( this.TargetLimb == null )
             {
-                foreach ( var comp in this.IncludedPartComps )
+                foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
                 {
                     comp.TargetLimb = null;
                 }
             }
             else
             {
-                tmpThingList.Clear();
-                tmpThingList.AddRange( this.IncludedParts );
+                this.tmpThingList.Clear();
+                this.tmpThingList.AddRange( this.IncludedParts );
 
                 // update compatible parts
                 foreach ( (ThingDef thingDef, LimbConfiguration limb) in this.StandardPartsForTargetLimb() )
                 {
-                    Thing candidate = tmpThingList.Find( t => t.def == thingDef );
+                    Thing candidate = this.tmpThingList.Find( t => t.def == thingDef );
                     if ( candidate != null )
                     {
-                        tmpThingList.Remove( candidate );
+                        this.tmpThingList.Remove( candidate );
 
                         CompIncludedChildParts potentialComp = candidate.TryGetComp<CompIncludedChildParts>();
 
@@ -271,7 +265,7 @@ namespace MSE2
                 }
 
                 // remove the others
-                foreach ( var thing in tmpThingList )
+                foreach ( Thing thing in this.tmpThingList )
                 {
                     this.RemoveAndSpawnPart( thing );
                 }
@@ -287,10 +281,7 @@ namespace MSE2
 
         #region Standard parts
 
-        public List<ThingDef> StandardParts
-        {
-            get => this.Props?.standardChildren;
-        }
+        public List<ThingDef> StandardParts => this.Props?.standardChildren;
 
         #endregion Standard parts
 
@@ -302,27 +293,27 @@ namespace MSE2
         {
             get
             {
-                if ( !cachedMissingParts.valid )
+                if ( !this.cachedMissingParts.valid )
                 {
-                    cachedMissingParts.list.Clear();
+                    this.cachedMissingParts.list.Clear();
 
                     if ( this.TargetLimb != null )
                     {
-                        cachedMissingParts.list.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
+                        this.cachedMissingParts.list.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
 
-                        foreach ( var thing in this.IncludedParts )
+                        foreach ( Thing thing in this.IncludedParts )
                         {
-                            var thingComp = thing.TryGetComp<CompIncludedChildParts>();
+                            CompIncludedChildParts thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
-                            cachedMissingParts.list.Remove( cachedMissingParts.list.Find( c =>
+                            this.cachedMissingParts.list.Remove( this.cachedMissingParts.list.Find( c =>
                                  thing.def == c.Item1
                                  && (thingComp == null || thingComp.TargetLimb == c.Item2) ) );
                         }
                     }
-                    cachedMissingParts.valid = true;
+                    this.cachedMissingParts.valid = true;
                 }
 
-                return cachedMissingParts.list;
+                return this.cachedMissingParts.list;
             }
         }
 
@@ -374,7 +365,7 @@ namespace MSE2
             this.tmpThingList.AddRange( available );
 
             // first add things that match both def and target
-            foreach ( var availableThing in available.ToArray() )
+            foreach ( Thing availableThing in available.ToArray() )
             {
                 if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def && mp.Item2 == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetLimb ) )
                 {
@@ -387,7 +378,7 @@ namespace MSE2
             this.tmpThingList.AddRange( available );
 
             // then just match thingdef
-            foreach ( var availableThing in available.ToArray() )
+            foreach ( Thing availableThing in available.ToArray() )
             {
                 if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def ) )
                 {
@@ -431,8 +422,8 @@ namespace MSE2
                 this.TargetLimb = otherTarget;
 
                 // initialize for that target
-                var otherMissing = other.MissingParts;
-                var otherIncluded = other.IncludedPartsLimbs.ToList();
+                List<(ThingDef, LimbConfiguration)> otherMissing = other.MissingParts;
+                List<(Thing, LimbConfiguration)> otherIncluded = other.IncludedPartsLimbs.ToList();
 
                 this.childPartsIncluded.Clear();
                 this.DirtyCache();
@@ -447,15 +438,15 @@ namespace MSE2
                         // if it is a limb segment, try to initialize based on similar or limb
                         if ( bpr != null )
                         {
-                            var childComp = child.TryGetComp<CompIncludedChildParts>();
+                            CompIncludedChildParts childComp = child.TryGetComp<CompIncludedChildParts>();
 
                             // initialize the child comp
                             if ( childComp != null )
                             {
                                 // find corresponding
-                                var otherChild = otherIncluded.Find( i => i.Item2 == bpr );
+                                (Thing, LimbConfiguration) otherChild = otherIncluded.Find( i => i.Item2 == bpr );
                                 otherIncluded.Remove( otherChild );
-                                var otherComp = otherChild.Item1?.TryGetComp<CompIncludedChildParts>();
+                                CompIncludedChildParts otherComp = otherChild.Item1?.TryGetComp<CompIncludedChildParts>();
 
                                 if ( otherComp != null )
                                 {
@@ -521,7 +512,7 @@ namespace MSE2
 
         // Label
 
-        protected String cachedTransformLabelString = null;
+        protected string cachedTransformLabelString = null;
 
         //public override string TransformLabel ( string label )
         //{
@@ -599,8 +590,8 @@ namespace MSE2
 
         public override IEnumerable<StatDrawEntry> SpecialDisplayStats ()
         {
-            yield return IncluededPartsStat;
-            yield return CompatibilityStat;
+            yield return this.IncluededPartsStat;
+            yield return this.CompatibilityStat;
         }
 
         #endregion StatsDisplay
@@ -610,9 +601,7 @@ namespace MSE2
         /// <summary>
         /// Recursively searches for IncludedParts in all of the sub-parts
         /// </summary>
-        public IEnumerable<(Thing, CompIncludedChildParts)> AllIncludedParts
-        {
-            get => Enumerable.Concat(
+        public IEnumerable<(Thing, CompIncludedChildParts)> AllIncludedParts => Enumerable.Concat(
 
                 // the sub-parts included in this part
                 this.IncludedParts.Select( p => (p, this) ),
@@ -623,14 +612,11 @@ namespace MSE2
                 where comp != null
                 from couple in comp.AllIncludedParts
                 select couple );
-        }
 
         /// <summary>
         /// Recursively searches for StandardParts in all of the sub-parts
         /// </summary>
-        public IEnumerable<(ThingDef, CompIncludedChildParts)> AllStandardParts
-        {
-            get => Enumerable.Concat(
+        public IEnumerable<(ThingDef, CompIncludedChildParts)> AllStandardParts => Enumerable.Concat(
 
                 // the standard sub-parts included in this part
                 this.StandardParts.Select( p => (p, this) ),
@@ -641,11 +627,8 @@ namespace MSE2
                 where comp != null
                 from couple in comp.AllStandardParts
                 select couple );
-        }
 
-        public IEnumerable<(ThingDef, LimbConfiguration, CompIncludedChildParts)> AllMissingParts
-        {
-            get => Enumerable.Concat(
+        public IEnumerable<(ThingDef, LimbConfiguration, CompIncludedChildParts)> AllMissingParts => Enumerable.Concat(
 
                 // the standard sub-parts included in this part
                 this.MissingParts.Select( p => (p.Item1, p.Item2, this) ),
@@ -656,7 +639,6 @@ namespace MSE2
                 where comp != null
                 from triplet in comp.AllMissingParts
                 select triplet );
-        }
 
         #endregion RecursiveData
     }

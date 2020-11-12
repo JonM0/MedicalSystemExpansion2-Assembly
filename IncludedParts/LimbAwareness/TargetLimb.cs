@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
 using RimWorld;
+
+using Verse;
 
 namespace MSE2
 {
@@ -22,11 +23,11 @@ namespace MSE2
         {
             foreach ( string error in base.ConfigErrors() ) yield return error;
 
-            if ( targetLimb == null )
+            if ( this.targetLimb == null )
             {
                 yield return "[MSE2] targetLimb is null";
             }
-            else if ( targetLimb.RecordExample == null )
+            else if ( this.targetLimb.RecordExample == null )
             {
                 yield return "[MSE2] targetLimb contains no records";
             }
@@ -50,7 +51,7 @@ namespace MSE2
 
         public override string ToString ()
         {
-            return "TargetLimb=" + targetLimb?.UniqueName;
+            return "TargetLimb=" + this.targetLimb?.UniqueName;
         }
     }
 }

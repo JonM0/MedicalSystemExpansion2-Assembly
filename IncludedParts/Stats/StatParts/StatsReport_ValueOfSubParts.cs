@@ -1,6 +1,9 @@
-﻿using RimWorld;
-using System.Text;
+﻿using System.Text;
+
+using RimWorld;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -11,7 +14,7 @@ namespace MSE2
 
         protected float ValueOfChildParts ( CompIncludedChildParts comp )
         {
-            var list = comp.IncludedParts;
+            System.Collections.Generic.List<Thing> list = comp.IncludedParts;
             float tot = 0;
 
             for ( int i = 0; i < list.Count; i++ )
@@ -26,16 +29,16 @@ namespace MSE2
         {
             if ( req.HasThing )
             {
-                var comp = req.Thing.TryGetComp<CompIncludedChildParts>();
+                CompIncludedChildParts comp = req.Thing.TryGetComp<CompIncludedChildParts>();
 
                 if ( comp != null )
                 {
-                    var list = comp.IncludedParts;
-                    var builder = new StringBuilder();
+                    System.Collections.Generic.List<Thing> list = comp.IncludedParts;
+                    StringBuilder builder = new StringBuilder();
 
                     for ( int i = 0; i < list.Count; i++ )
                     {
-                        var part = list[i];
+                        Thing part = list[i];
 
                         builder.AppendLine( "StatsReport_ValueOfSubParts".Translate( part.Label, part.GetStatValue( StatDefOf.MarketValue ).ToStringMoneyOffset() ) );
                     }
@@ -51,11 +54,11 @@ namespace MSE2
         {
             if ( req.HasThing )
             {
-                var comp = req.Thing.TryGetComp<CompIncludedChildParts>();
+                CompIncludedChildParts comp = req.Thing.TryGetComp<CompIncludedChildParts>();
 
                 if ( comp != null )
                 {
-                    val += ValueOfChildParts( comp );
+                    val += this.ValueOfChildParts( comp );
                 }
             }
         }

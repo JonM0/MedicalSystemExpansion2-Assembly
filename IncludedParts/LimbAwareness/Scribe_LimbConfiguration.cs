@@ -14,9 +14,9 @@ namespace MSE2
         {
             // Save an example of record in the limbTarget
             BodyPartRecord limbPartExample = limbConfiguration?.RecordExample;
-            
+
             Scribe_BodyParts.Look( ref limbPartExample, label );
-            
+
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
             {
                 limbConfiguration = LimbConfiguration.LimbConfigForBodyPartRecord( limbPartExample );

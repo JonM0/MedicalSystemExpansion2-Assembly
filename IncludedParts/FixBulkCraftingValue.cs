@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
-using System.Reflection.Emit;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -18,9 +20,9 @@ namespace MSE2.HarmonyPatches
         [HarmonyTranspiler]
         internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
-            var instrList = instructions.ToList();
+            List<CodeInstruction> instrList = instructions.ToList();
 
-            var index = InsertionIndex( instrList );
+            int index = InsertionIndex( instrList );
 
             // remove the 1
             instrList.RemoveAt( index );
@@ -40,7 +42,7 @@ namespace MSE2.HarmonyPatches
 
             for ( int i = 0; i < instructions.Count; i++ )
             {
-                var instruction = instructions[i];
+                CodeInstruction instruction = instructions[i];
 
                 // if last pushed a 1 and current pops it into the loc3
                 if ( lastInstLoaded1 && instruction.opcode == OpCodes.Stloc_3 )

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -28,10 +30,10 @@ namespace MSE2
                 base.ProcessInput( ev );
                 List<FloatMenuOption> options = new List<FloatMenuOption>();
 
-                foreach ( LimbConfiguration possibleTarget in this.comp.Props.InstallationDestinations.Where( t => t != comp.TargetLimb ) )
+                foreach ( LimbConfiguration possibleTarget in this.comp.Props.InstallationDestinations.Where( t => t != this.comp.TargetLimb ) )
                 {
                     options.Add( new FloatMenuOption(
-                        comp.Props.LabelComparisonForLimb( possibleTarget ).CapitalizeFirst(),
+                        this.comp.Props.LabelComparisonForLimb( possibleTarget ).CapitalizeFirst(),
                         () => // click action
                         {
                             this.comp.TargetLimb = possibleTarget;
@@ -40,7 +42,7 @@ namespace MSE2
                 }
 
                 // Option to set to no target
-                if ( comp.targetLimb != null )
+                if ( this.comp.targetLimb != null )
                     options.Add( new FloatMenuOption(
                         "Command_SetTargetLimb_NoTarget".Translate(),
                         () => // click action

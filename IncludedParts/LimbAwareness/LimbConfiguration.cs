@@ -1,10 +1,12 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2
@@ -12,7 +14,7 @@ namespace MSE2
     public class LimbConfiguration
     {
         protected HashSet<BodyPartRecord> allRecords = new HashSet<BodyPartRecord>();
-        public IReadOnlyCollection<BodyPartRecord> AllRecords => allRecords;
+        public IReadOnlyCollection<BodyPartRecord> AllRecords => this.allRecords;
 
         protected LimbConfiguration ()
         {
@@ -22,7 +24,7 @@ namespace MSE2
         {
             this.TryAddRecord( bodyPartRecord );
 
-            foreach ( var item in
+            foreach ( BodyPartRecord item in
                 from body in DefDatabase<BodyDef>.AllDefs
                 from bpr in body.AllParts
                 where bpr.def == bodyPartRecord.def
@@ -32,14 +34,14 @@ namespace MSE2
                 this.TryAddRecord( item );
             }
 
-            id = this.CountSimilar();
+            this.id = this.CountSimilar();
             allLimbConfigs.Add( this );
         }
 
         private bool HasCompatibleStructure ( BodyPartRecord bodyPartRecord )
         {
-            return allRecords.EnumerableNullOrEmpty() ||
-            bodyPartRecord.HasSameStructure( allRecords.FirstOrDefault() );
+            return this.allRecords.EnumerableNullOrEmpty() ||
+            bodyPartRecord.HasSameStructure( this.allRecords.FirstOrDefault() );
         }
 
         private void TryAddRecord ( BodyPartRecord recordToAdd )
@@ -53,15 +55,15 @@ namespace MSE2
             }
         }
 
-        public BodyPartDef PartDef => 
+        public BodyPartDef PartDef =>
             this.allRecords.FirstOrDefault()?.def;
 
-        public IEnumerable<BodyDef> Bodies => 
+        public IEnumerable<BodyDef> Bodies =>
             this.allRecords.Select( r => r.body ).Distinct();
 
         public bool Contains ( BodyPartRecord bodyPartRecord )
         {
-            return allRecords.Contains( bodyPartRecord );
+            return this.allRecords.Contains( bodyPartRecord );
         }
 
         public readonly int id = -1;
@@ -77,7 +79,7 @@ namespace MSE2
         }
 
         public /*virtual*/ string UniqueName =>
-            this.PartDef.defName + "_" + id;
+            this.PartDef.defName + "_" + this.id;
 
         public BodyPartRecord RecordExample =>
             this.allRecords.FirstOrDefault();
@@ -90,7 +92,7 @@ namespace MSE2
         private List<(BodyPartDef, int)> cachedAllSegments;
 
         public List<(BodyPartDef, int)> AllSegments =>
-            cachedAllSegments ?? (cachedAllSegments = this.CalculateAllSegments.ToList());
+            this.cachedAllSegments ?? (this.cachedAllSegments = this.CalculateAllSegments.ToList());
 
         public IEnumerable<LimbConfiguration> ChildLimbs
         {

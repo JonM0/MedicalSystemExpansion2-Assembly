@@ -1,8 +1,11 @@
-﻿using HarmonyLib;
-using MSE2.HarmonyPatches;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+
+using HarmonyLib;
+
+using MSE2.HarmonyPatches;
+
 using Verse;
 
 namespace MSE2.HarmonyPatches

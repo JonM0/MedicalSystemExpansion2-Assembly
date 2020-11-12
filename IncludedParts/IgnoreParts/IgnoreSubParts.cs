@@ -15,9 +15,9 @@ namespace MSE2
 
         public override IEnumerable<string> ConfigErrors ()
         {
-            foreach ( var ce in base.ConfigErrors() ) yield return ce;
+            foreach ( string ce in base.ConfigErrors() ) yield return ce;
 
-            if ( this.ignoredSubParts == null && !ignoreAll )
+            if ( this.ignoredSubParts == null && !this.ignoreAll )
             {
                 yield return "[MSE2] ignoredSubPart is null and ignoreAll is false, this will do nothing";
             }

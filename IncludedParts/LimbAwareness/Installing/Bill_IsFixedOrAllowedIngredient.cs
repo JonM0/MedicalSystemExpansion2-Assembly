@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
 using HarmonyLib;
+
 using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -22,8 +24,8 @@ namespace MSE2.HarmonyPatches
         {
             if ( __result )
             {
-                var comp = thing.TryGetComp<CompIncludedChildParts>();
-                var recipeTargetLimb = __instance.recipe?.GetModExtension<TargetLimb>();
+                CompIncludedChildParts comp = thing.TryGetComp<CompIncludedChildParts>();
+                TargetLimb recipeTargetLimb = __instance.recipe?.GetModExtension<TargetLimb>();
 
                 __result = comp == null || recipeTargetLimb == null || recipeTargetLimb.IsValidThingComp( comp );
             }

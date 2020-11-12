@@ -10,7 +10,7 @@ namespace MSE2
     {
         public static bool Remove<T> ( this List<T> list, Predicate<T> predicate )
         {
-            var index = list.FindIndex( predicate );
+            int index = list.FindIndex( predicate );
 
             if ( index != -1 )
             {

@@ -1,12 +1,15 @@
-﻿using RimWorld;
-using RimWorld.QuestGen;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+
+using RimWorld;
+using RimWorld.QuestGen;
+
 using UnityEngine;
+
 using Verse;
 
 namespace MSE2
@@ -18,7 +21,7 @@ namespace MSE2
         /// </summary>
         public static void CacheAllStandardParents ()
         {
-            foreach ( var def in DefDatabase<HediffDef>.AllDefs )
+            foreach ( HediffDef def in DefDatabase<HediffDef>.AllDefs )
             {
                 def.CacheParentOfChildren();
             }
@@ -26,13 +29,13 @@ namespace MSE2
 
         private static void CacheParentOfChildren ( this HediffDef parent )
         {
-            var comp = parent.spawnThingOnRemoved?.GetCompProperties<CompProperties_IncludedChildParts>(); // comp on the corresponding ThingDef
+            CompProperties_IncludedChildParts comp = parent.spawnThingOnRemoved?.GetCompProperties<CompProperties_IncludedChildParts>(); // comp on the corresponding ThingDef
             if ( comp != null && !comp.standardChildren.NullOrEmpty() ) // if it has standard children
             {
-                foreach ( var def in from d in DefDatabase<HediffDef>.AllDefs
-                                     where d.spawnThingOnRemoved != null
-                                     where comp.standardChildren.Contains( d.spawnThingOnRemoved )
-                                     select d )
+                foreach ( HediffDef def in from d in DefDatabase<HediffDef>.AllDefs
+                                           where d.spawnThingOnRemoved != null
+                                           where comp.standardChildren.Contains( d.spawnThingOnRemoved )
+                                           select d )
                 {
                     def.AddStandardParent( parent ); // add it to the hediffdefs corresponding to the standard children
                 }
@@ -56,7 +59,7 @@ namespace MSE2
         /// </summary>
         public static bool IsParentStandard ( this Hediff hediff )
         {
-            var modExt = hediff.def.GetModExtension<MSE_cachedStandardParents>();
+            MSE_cachedStandardParents modExt = hediff.def.GetModExtension<MSE_cachedStandardParents>();
 
             return modExt != null && hediff.Part != null && hediff.Part.parent != null
                 && hediff.pawn.health.hediffSet.hediffs.Any( h => h.Part == hediff.Part.parent && modExt.Contains( h.def ) );
@@ -124,7 +127,7 @@ namespace MSE2
             }
             else
             {
-                var allFromSurgeries =
+                IEnumerable<LimbConfiguration> allFromSurgeries =
                     (from s in SurgeryToInstall( parentDef )
                      from u in s.AllRecipeUsers
                      let b = u.race.body
@@ -134,7 +137,7 @@ namespace MSE2
                      select lc)
                      .Distinct();
 
-                var newVal = /*parentDef.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinationsFilter( allFromSurgeries ).ToList()
+                List<LimbConfiguration> newVal = /*parentDef.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinationsFilter( allFromSurgeries ).ToList()
                     ?? */allFromSurgeries.ToList();
 
                 cachedInstallationDestinations.Add( parentDef, newVal );
@@ -162,9 +165,9 @@ namespace MSE2
         {
             //Log.Message( "compat: " + thingDefs.Count() + " " + bodyPartRecords.Count() );
 
-            foreach ( var limb in limbs )
+            foreach ( LimbConfiguration limb in limbs )
             {
-                foreach ( var thing in things )
+                foreach ( Thing thing in things )
                 {
                     if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
                         CachedInstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible

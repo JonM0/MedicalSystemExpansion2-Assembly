@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-using RimWorld;
 using HarmonyLib;
-using System.Reflection;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -20,7 +22,7 @@ namespace MSE2.HarmonyPatches
         {
             if ( stat == StatDefOf.MarketValue )
             {
-                var compProp = __instance.thing.GetCompProperties<CompProperties_IncludedChildParts>();
+                CompProperties_IncludedChildParts compProp = __instance.thing.GetCompProperties<CompProperties_IncludedChildParts>();
                 if ( compProp != null )
                 {
                     __result = compProp.AverageValue;

@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
 using RimWorld;
-using System.Collections;
+
+using Verse;
 
 namespace MSE2
 {
@@ -20,8 +21,8 @@ namespace MSE2
 
         private HashSet<BodyDef> cachedAllBodies;
 
-        private ISet<BodyDef> AllBodies => cachedAllBodies
-            ?? (cachedAllBodies = new HashSet<BodyDef>( limbPool.SelectMany( l => l.Bodies ).Where( bodyRestrictions.Invoke ) ));
+        private ISet<BodyDef> AllBodies => this.cachedAllBodies
+            ?? (this.cachedAllBodies = new HashSet<BodyDef>( this.limbPool.SelectMany( l => l.Bodies ).Where( this.bodyRestrictions.Invoke ) ));
 
         public LimbLabeler ( List<LimbConfiguration> limbPool, List<BodyPartDef> ignoredParts, Predicate<BodyDef> bodyRestrictions )
         {
@@ -32,13 +33,13 @@ namespace MSE2
             this.cachedLimbComparisons = new string[limbPool.Count];
             for ( int i = 0; i < limbPool.Count; i++ )
             {
-                cachedLimbComparisons[i] = this.GetComparisonForLimb_Int( limbPool[i] );
+                this.cachedLimbComparisons[i] = this.GetComparisonForLimb_Int( limbPool[i] );
             }
         }
 
         private bool PartShouldBeIgnored ( BodyPartDef bodyPartDef )
         {
-            return ignoredParts != null && ignoredParts.Contains( bodyPartDef );
+            return this.ignoredParts != null && this.ignoredParts.Contains( bodyPartDef );
         }
 
         public List<string> GetRacesForLimb ( LimbConfiguration limb )
@@ -48,25 +49,25 @@ namespace MSE2
                 return null;
             }
 
-            var outList = new List<string>();
+            List<string> outList = new List<string>();
 
-            var pawns = DefDatabase<ThingDef>.AllDefsListForReading;
+            List<ThingDef> pawns = DefDatabase<ThingDef>.AllDefsListForReading;
             for ( int i = 0; i < pawns.Count; i++ )
             {
-                var pawnDef = pawns[i];
-                var body = pawnDef.race?.body;
-                if ( body != null && limb.Bodies.Contains( body ) && AllBodies.Contains( body ) )
+                ThingDef pawnDef = pawns[i];
+                BodyDef body = pawnDef.race?.body;
+                if ( body != null && limb.Bodies.Contains( body ) && this.AllBodies.Contains( body ) )
                 {
                     // if is the only limb from this body
-                    if ( !limbPool.Except( limb ).Any( l => l.Bodies.Contains( body ) ) )
+                    if ( !this.limbPool.Except( limb ).Any( l => l.Bodies.Contains( body ) ) )
                     {
                         outList.AddDistinct( pawnDef.label );
                     }
                     else
                     {
-                        var recordUniqueNames = from bpr in limb.AllRecords
-                                                where bpr.body == body
-                                                select bpr.Label.Replace( bpr.LabelShort, "" ).Trim();
+                        IEnumerable<string> recordUniqueNames = from bpr in limb.AllRecords
+                                                                where bpr.body == body
+                                                                select bpr.Label.Replace( bpr.LabelShort, "" ).Trim();
 
                         string records = string.Join( ", ", recordUniqueNames );
 
@@ -80,13 +81,13 @@ namespace MSE2
 
         private List<(BodyPartDef, int)> LimbDifference ( LimbConfiguration limb )
         {
-            var difference = new List<(BodyPartDef, int)>();
+            List<(BodyPartDef, int)> difference = new List<(BodyPartDef, int)>();
 
             for ( int i = 0; i < limb.AllSegments.Count; i++ )
             {
-                var item = limb.AllSegments[i];
+                (BodyPartDef, int) item = limb.AllSegments[i];
 
-                if ( !limbPool.TrueForAll( l => l.AllSegments.Contains( item ) ) )
+                if ( !this.limbPool.TrueForAll( l => l.AllSegments.Contains( item ) ) )
                 {
                     difference.Add( item );
                 }
@@ -101,14 +102,14 @@ namespace MSE2
         {
             if ( limb == null ) return null;
 
-            var diffLimbs = LimbDifference( limb );
+            List<(BodyPartDef, int)> diffLimbs = this.LimbDifference( limb );
             builder.Clear();
 
             for ( int i = 0; i < diffLimbs.Count; i++ )
             {
                 (BodyPartDef part, int count) = diffLimbs[i];
 
-                if ( !PartShouldBeIgnored( part ) && count > 0 )
+                if ( !this.PartShouldBeIgnored( part ) && count > 0 )
                 {
                     builder.AppendWithComma( count.ToStringCached() );
                     builder.Append( " " );
@@ -129,17 +130,17 @@ namespace MSE2
             //}
             //else
             //{
-                return builder.ToString();
+            return builder.ToString();
             //}
         }
 
         public string GetComparisonForLimb ( LimbConfiguration limb )
         {
-            int i = limbPool.IndexOf( limb );
+            int i = this.limbPool.IndexOf( limb );
 
             if ( i != -1 )
             {
-                return cachedLimbComparisons[i];
+                return this.cachedLimbComparisons[i];
             }
             else
             {
@@ -151,14 +152,14 @@ namespace MSE2
         {
             builder.Clear();
 
-            for ( int i = 0; i < limbPool.Count; i++ )
+            for ( int i = 0; i < this.limbPool.Count; i++ )
             {
                 builder.AppendFormat( "{0} {1}: {2}",
-                    cachedLimbComparisons[i],
+                    this.cachedLimbComparisons[i],
                     "LimbVersion".Translate(),
-                    isCompatible( limbPool[i] ) ? "LimbCompatible".TranslateSimple() : "LimbIncompatible".TranslateSimple() ).AppendLine();
+                    isCompatible( this.limbPool[i] ) ? "LimbCompatible".TranslateSimple() : "LimbIncompatible".TranslateSimple() ).AppendLine();
 
-                var labels = GetRacesForLimb( limbPool[i] );
+                List<string> labels = this.GetRacesForLimb( this.limbPool[i] );
                 for ( int l = 0; l < labels.Count; l++ )
                 {
                     builder.AppendFormat( " - {0}", labels[l] ).AppendLine();

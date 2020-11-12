@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
 using RimWorld;
+
+using Verse;
 
 namespace MSE2.RecipeFixer
 {
@@ -24,22 +25,22 @@ namespace MSE2.RecipeFixer
 
         public override IEnumerable<string> ConfigErrors ()
         {
-            if ( baseWorkFactor < 0 )
+            if ( this.baseWorkFactor < 0 )
             {
-                yield return "[MSE2] baseWorkFactor has to be positive. Value: " + baseWorkFactor;
+                yield return "[MSE2] baseWorkFactor has to be positive. Value: " + this.baseWorkFactor;
             }
 
-            if ( baseWorkFactor != 1f && fixMode != FixMode.CostList )
+            if ( this.baseWorkFactor != 1f && this.fixMode != FixMode.CostList )
             {
-                yield return "[MSE2] baseWorkFactor does nothing when fixMode is not CostList. Value: " + baseWorkFactor;
+                yield return "[MSE2] baseWorkFactor does nothing when fixMode is not CostList. Value: " + this.baseWorkFactor;
             }
 
-            if ( minToLeave < 0 || minToLeave > 1 )
+            if ( this.minToLeave < 0 || this.minToLeave > 1 )
             {
-                yield return "[MSE2] minToLeave has to be between 0. and 1. Value: " + minToLeave;
+                yield return "[MSE2] minToLeave has to be between 0. and 1. Value: " + this.minToLeave;
             }
 
-            if ( !wasFixed )
+            if ( !this.wasFixed )
             {
                 yield return "[MSE2] part still has cost to fix";
             }

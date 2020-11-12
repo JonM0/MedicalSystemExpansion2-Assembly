@@ -1,8 +1,10 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using RimWorld;
+
 using Verse;
 
 namespace MSE2
@@ -13,7 +15,7 @@ namespace MSE2
         {
             if ( bodyPart != null && bodyPart.parent != null )
             {
-                var modExt = set.GetHediffs<Hediff_AddedPart>()
+                IgnoreSubParts modExt = set.GetHediffs<Hediff_AddedPart>()
                     .FirstOrDefault( h => h.Part == bodyPart.parent )? // added part on parent bodypartrecord
                     .def.GetModExtension<IgnoreSubParts>();
 
@@ -26,10 +28,10 @@ namespace MSE2
 
         public static IEnumerable<BodyPartRecord> AllChildParts ( this BodyPartRecord bodyPart )
         {
-            foreach ( var p in bodyPart.parts )
+            foreach ( BodyPartRecord p in bodyPart.parts )
             {
                 yield return p;
-                foreach ( var p2 in p.AllChildParts() )
+                foreach ( BodyPartRecord p2 in p.AllChildParts() )
                     yield return p2;
             }
             yield break;
@@ -39,9 +41,9 @@ namespace MSE2
         {
             List<BodyPartDef> list = new List<BodyPartDef>();
 
-            foreach ( var bodyDef in bodies ?? DefDatabase<BodyDef>.AllDefs )
+            foreach ( BodyDef bodyDef in bodies ?? DefDatabase<BodyDef>.AllDefs )
             {
-                foreach ( var partRecord in bodyDef.AllParts )
+                foreach ( BodyPartRecord partRecord in bodyDef.AllParts )
                 {
                     if ( partRecord.def == bodyPartDef )
                     {
@@ -87,7 +89,7 @@ namespace MSE2
                     me == null || me.ignoreAll
                 select (r, me) )
             {
-                var modExt = oldME ?? new IgnoreSubParts();
+                IgnoreSubParts modExt = oldME ?? new IgnoreSubParts();
 
                 // add all the subparts this prosthesis could have
                 if ( recipeDef.appliedOnFixedBodyParts != null )
