@@ -12,11 +12,11 @@ namespace MSE2
 
         public bool CompatibleWithPart ( BodyPartRecord part, HediffSet hediffSet )
         {
-            return (this.whitelist == null || (from h in hediffSet.hediffs // no white list or there is a whitelisted hediff
+            return (this.whitelist == null || (from h in hediffSet.hediffs // no whitelist or there is a whitelisted hediff on the part
                                                where h.Part == part
                                                where this.whitelist.Contains( h.def )
                                                select h).Any())
-                && !(this.whitelist == null && this.onlyOnNatural && hediffSet.HasDirectlyAddedPartFor( part ));
+                && !(this.onlyOnNatural && hediffSet.HasDirectlyAddedPartFor( part )); // there is no added part when onlyOnNatural
         }
 
         public override IEnumerable<string> ConfigErrors ()
