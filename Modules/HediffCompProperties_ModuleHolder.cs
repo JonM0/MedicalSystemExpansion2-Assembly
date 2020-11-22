@@ -17,7 +17,7 @@ namespace MSE2
 
             if ( this.maxModules <= 0 )
             {
-                cancraftsegment helper func, defdatabase null check yield return "[MSE2] Part has negative or no module slots";
+                yield return "[MSE2] Part has negative or no module slots";
             }
 
             yield break;
