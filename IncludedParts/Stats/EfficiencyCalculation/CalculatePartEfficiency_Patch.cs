@@ -28,5 +28,20 @@ namespace MSE2.HarmonyPatches
             // skip them
             return instructions.Skip( firstBranchJump );
         }
+
+
+        // return parent if part should be ignored
+
+        [HarmonyPrefix]
+        public static bool Prefix ( ref float __result, HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts, List<PawnCapacityUtility.CapacityImpactor> impactors )
+        {
+            if ( diffSet.PartShouldBeIgnored( part ) )
+            {
+                // PartShouldBeIgnored returns false on null part.parent
+                __result = PawnCapacityUtility.CalculatePartEfficiency( diffSet, part.parent, ignoreAddedParts, impactors );
+                return false;
+            }
+            return true;
+        }
     }
 }
