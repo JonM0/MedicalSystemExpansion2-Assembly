@@ -57,7 +57,7 @@ namespace MSE2.HarmonyPatches
                                                         where !partsToIgnore.Contains( p.def )
                                                         select p )
                 {
-                    float segmentEff = PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord( diffSet, limbSegment, impactors );
+                    float segmentEff = PawnCapacityUtility.CalculatePartEfficiency( diffSet, limbSegment, false, impactors );
                     limbEff *= segmentEff;
 
                     totLimbSegments++;
@@ -82,7 +82,7 @@ namespace MSE2.HarmonyPatches
 
                         if ( CalculatePartEfficiency == null )
                         {
-                            CalculatePartEfficiency = ( BodyPartRecord part ) => PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord( diffSet, part, impactors );
+                            CalculatePartEfficiency = ( BodyPartRecord part ) => PawnCapacityUtility.CalculatePartEfficiency( diffSet, part, false, impactors );
                         }
 
                         limbEff = Mathf.Lerp( limbEff, limbEff * digits.Average( CalculatePartEfficiency ), appendageWeight );
