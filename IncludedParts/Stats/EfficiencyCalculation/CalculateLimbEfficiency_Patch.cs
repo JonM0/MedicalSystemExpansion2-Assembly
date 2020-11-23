@@ -26,73 +26,49 @@ namespace MSE2.HarmonyPatches
             int totLimbs = 0;
             int functionalLimbs = 0;
 
-            Func<BodyPartRecord, float> CalculatePartEfficiency = null;
-
             foreach ( BodyPartRecord limbCore in body.GetPartsWithTag( limbCoreTag ) )
             {
-                //Log.Message( "limb efficiency of " + diffSet.pawn.Name + ", " + limbCore.customLabel );
-
                 // segments
+                List<BodyPartRecord> segments = new List<BodyPartRecord>
+                {
+                    limbCore
+                };
+                segments.AddRange( limbCore.GetConnectedParts( limbSegmentTag ) );
 
-                List<BodyPartRecord> segments = new List<BodyPartRecord>( limbCore.GetConnectedParts( limbSegmentTag ).Prepend( limbCore ) );
-
-                // parts to ignore
-
-                List<BodyPartDef> partsToIgnore =
-                    new List<BodyPartDef>(
-                        from hediff in diffSet.hediffs
-                        where hediff is Hediff_AddedPart
-                        where segments.Contains( hediff.Part )
-                        let modExt = hediff.def.GetModExtension<IgnoreSubParts>()
-                        where modExt != null
-                        from p in modExt.ignoredSubParts
-                        select p );
+                // remove parts to ignore
+                segments.RemoveAll( diffSet.PartShouldBeIgnored );
 
                 // segment calculations
-
                 float limbEff = 1f;
-                int totLimbSegments = 0;
-
-                foreach ( BodyPartRecord limbSegment in from p in segments
-                                                        where !partsToIgnore.Contains( p.def )
-                                                        select p )
+                if ( segments.Count > 0 )
                 {
-                    float segmentEff = PawnCapacityUtility.CalculatePartEfficiency( diffSet, limbSegment, false, impactors );
-                    limbEff *= segmentEff;
-
-                    totLimbSegments++;
+                    // geometric mean of segments
+                    for ( int i = 0; i < segments.Count; i++ )
+                    {
+                        float segmentEff = PawnCapacityUtility.CalculatePartEfficiency( diffSet, segments[i], false, impactors );
+                        limbEff *= segmentEff;
+                    }
+                    limbEff = Mathf.Pow( limbEff, 1f / segments.Count );
                 }
-
-                limbEff = Mathf.Pow( limbEff, 2f / totLimbSegments ); // square of the geometric mean of segments
-
-                //Log.Message( "parts: " + totLimbSegments + "; eff: " + limbEff );
 
                 // digit calculations
-
-                if ( limbCore.HasChildParts( limbDigitTag ) )
+                var digits = limbCore.GetChildParts( limbDigitTag ).ToList();
+                digits.RemoveAll( diffSet.PartShouldBeIgnored );
+                if ( digits.Count > 0 )
                 {
-                    IEnumerable<BodyPartRecord> digits =
-                        from p in limbCore.GetChildParts( limbDigitTag )
-                        where !partsToIgnore.Contains( p.def )
-                        select p;
-
-                    if ( digits.Any() )
+                    // avg of digit efficiency
+                    var digitsAvg = 0f;
+                    for ( int i = 0; i < digits.Count; i++ )
                     {
-                        // part efficiency lambda
-
-                        if ( CalculatePartEfficiency == null )
-                        {
-                            CalculatePartEfficiency = ( BodyPartRecord part ) => PawnCapacityUtility.CalculatePartEfficiency( diffSet, part, false, impactors );
-                        }
-
-                        limbEff = Mathf.Lerp( limbEff, limbEff * digits.Average( CalculatePartEfficiency ), appendageWeight );
+                        digitsAvg += PawnCapacityUtility.CalculatePartEfficiency( diffSet, digits[i], false, impactors );
                     }
+                    digitsAvg /= digits.Count;
+
+                    // Lerp it with the square root (should consider removing sqrt and reducing part efficiency of finger defs)
+                    limbEff *= Mathf.Lerp( 1, Mathf.Sqrt( digitsAvg ), appendageWeight );
                 }
 
-                limbEff = Mathf.Sqrt( limbEff );
-
-                //Log.Message( "with fingers: " + limbEff ); //
-
+                // add limb stats to totals
                 totLimbEff += limbEff;
                 totLimbs++;
                 if ( limbEff > 0f )

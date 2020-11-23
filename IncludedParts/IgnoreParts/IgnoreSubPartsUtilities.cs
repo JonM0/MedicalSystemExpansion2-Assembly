@@ -15,9 +15,9 @@ namespace MSE2
         {
             if ( bodyPart != null && bodyPart.parent != null )
             {
-                IgnoreSubParts modExt = set.GetHediffs<Hediff_AddedPart>()
-                    .FirstOrDefault( h => h.Part == bodyPart.parent )? // added part on parent bodypartrecord
-                    .def.GetModExtension<IgnoreSubParts>();
+                IgnoreSubParts modExt = set.hediffs
+                    .Find( h => h.Part == bodyPart.parent && h.def.HasModExtension<IgnoreSubParts>() )// added part on parent bodypartrecord
+                    ?.def.GetModExtension<IgnoreSubParts>();
 
                 return
                     (modExt != null && modExt.ignoredSubParts.Contains( bodyPart.def ))
