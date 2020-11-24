@@ -51,8 +51,11 @@ namespace MSE2.HarmonyPatches
                 var hd = diffSet.hediffs.Find( h => h.Part == part && h.def.HasModExtension<MultiplyByParent>() );
                 if ( hd != null )
                 {
-                    __result *= PawnCapacityUtility.CalculatePartEfficiency( diffSet, part.parent, ignoreAddedParts, null );
-                    if ( impactors != null && impactors.Find( i => (i as PawnCapacityUtility.CapacityImpactorHediff)?.hediff == hd ) == null )
+                    // multiply result by efficiency of parent part
+                    var parentEff = PawnCapacityUtility.CalculatePartEfficiency( diffSet, part.parent, ignoreAddedParts, null );
+                    __result *= parentEff;
+                    // add current part as impactor if parent had different eff
+                    if ( impactors != null && parentEff != 1f && impactors.Find( i => (i as PawnCapacityUtility.CapacityImpactorHediff)?.hediff == hd ) == null )
                     {
                         impactors.Add( new PawnCapacityUtility.CapacityImpactorHediff
                         {

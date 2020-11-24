@@ -135,7 +135,7 @@
     <Compile Include="IncludedParts\PartInstallation\Recipe_InstallArtificialBodyPartWithChildren.cs" />
     <Compile Include="IncludedParts\PartInstallation\Recipe_InstallNaturalBodyPartWithChildren.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompIncludedChildParts.cs" />
-    <Compile Include="PartEfficiencyDependency\MultiplyByParent.cs" />
+    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\MultiplyByParent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Actual\Recipe_InstallModule.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
