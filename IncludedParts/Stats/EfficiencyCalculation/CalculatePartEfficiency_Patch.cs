@@ -29,7 +29,6 @@ namespace MSE2.HarmonyPatches
             return instructions.Skip( firstBranchJump );
         }
 
-
         // return parent if part should be ignored
 
         [HarmonyPrefix]
@@ -42,6 +41,26 @@ namespace MSE2.HarmonyPatches
                 return false;
             }
             return true;
+        }
+
+        [HarmonyPostfix]
+        public static void CheckForMultiplyByParent ( ref float __result, HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts, List<PawnCapacityUtility.CapacityImpactor> impactors )
+        {
+            if ( MultiplyByParent.anyExist && !ignoreAddedParts && part.parent != null )
+            {
+                var hd = diffSet.hediffs.Find( h => h.Part == part && h.def.HasModExtension<MultiplyByParent>() );
+                if ( hd != null )
+                {
+                    __result *= PawnCapacityUtility.CalculatePartEfficiency( diffSet, part.parent, ignoreAddedParts, null );
+                    if ( impactors != null && impactors.Find( i => (i as PawnCapacityUtility.CapacityImpactorHediff)?.hediff == hd ) == null )
+                    {
+                        impactors.Add( new PawnCapacityUtility.CapacityImpactorHediff
+                        {
+                            hediff = hd,
+                        } );
+                    }
+                }
+            }
         }
     }
 }
