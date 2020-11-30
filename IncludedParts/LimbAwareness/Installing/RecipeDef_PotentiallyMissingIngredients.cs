@@ -82,7 +82,7 @@ namespace MSE2.HarmonyPatches
             // push the Thing to the stack
             yield return new CodeInstruction( OpCodes.Ldloc_S, 6 );
             // call HasNoOrCorrectTargetLimb and push result to stack
-            yield return new CodeInstruction( OpCodes.Callvirt, typeof( RecipeDef_PotentiallyMissingIngredients ).GetMethod( "HasNoOrCorrectTargetLimb", BindingFlags.NonPublic | BindingFlags.Static ) );
+            yield return new CodeInstruction( OpCodes.Call, typeof( RecipeDef_PotentiallyMissingIngredients ).GetMethod( "HasNoOrCorrectTargetLimb", BindingFlags.NonPublic | BindingFlags.Static ) );
         }
 
         internal static bool HasNoOrCorrectTargetLimb ( RecipeDef recipe, Thing thing )

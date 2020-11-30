@@ -28,7 +28,7 @@ namespace MSE2.HarmonyPatches
                 // substitute call to PartOrAnyAncestorHasDirectlyAddedParts with a call to PartShouldBeIgnored
                 if ( instruction.Calls( typeof( HediffSet ).GetMethod( nameof( HediffSet.PartOrAnyAncestorHasDirectlyAddedParts ) ) ) )
                 {
-                    yield return new CodeInstruction( OpCodes.Callvirt, typeof( IgnoreSubPartsUtilities ).GetMethod( nameof( IgnoreSubPartsUtilities.PartShouldBeIgnored ) ) );
+                    yield return new CodeInstruction( OpCodes.Call, typeof( IgnoreSubPartsUtilities ).GetMethod( nameof( IgnoreSubPartsUtilities.PartShouldBeIgnored ) ) );
                 }
                 else yield return instruction;
             }
