@@ -14,7 +14,7 @@ namespace MSE2
             return
                 // in the parts that the recipe can be applied to and that the pawn has a slot in
                 (from slot in pawn.health.hediffSet.GetHediffs<Hediff_ModuleSlot>()
-                 where recipe.appliedOnFixedBodyParts == null || recipe.appliedOnFixedBodyParts.Contains( slot.Part.def )
+                 where recipe.appliedOnFixedBodyParts.Count == 0 || recipe.appliedOnFixedBodyParts.Contains( slot.Part.def )
                  select slot.Part)
                 .Distinct();
         }
