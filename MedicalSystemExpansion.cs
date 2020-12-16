@@ -23,6 +23,12 @@ namespace MSE2
     [StaticConstructorOnStartup]
     public class MedicalSystemExpansion : ModBase
     {
+        public override void StaticInitialize ()
+        {
+            base.StaticInitialize();
+            Instance = this;
+        }
+
         public override void DefsLoaded ()
         {
             base.DefsLoaded();
@@ -51,5 +57,7 @@ namespace MSE2
         }
 
         public override string ModIdentifier => "MSE2";
+
+        public static MedicalSystemExpansion Instance { get; private set; }
     }
 }
