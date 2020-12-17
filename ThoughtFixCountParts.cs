@@ -10,7 +10,7 @@ using Verse;
 using RimWorld;
 using System.Reflection.Emit;
 
-namespace MSE2
+namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( HediffUtility ) )]
     [HarmonyPatch( nameof( HediffUtility.CountAddedAndImplantedParts ) )]
