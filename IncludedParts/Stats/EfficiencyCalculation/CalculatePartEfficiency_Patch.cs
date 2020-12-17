@@ -32,7 +32,7 @@ namespace MSE2.HarmonyPatches
         // return parent if part should be ignored
 
         [HarmonyPrefix]
-        public static bool Prefix ( ref float __result, HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts, List<PawnCapacityUtility.CapacityImpactor> impactors )
+        public static bool ParentWhenShouldIgnore ( ref float __result, HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts, List<PawnCapacityUtility.CapacityImpactor> impactors )
         {
             if ( diffSet.PartShouldBeIgnored( part ) )
             {
