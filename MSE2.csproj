@@ -150,6 +150,7 @@
     <Compile Include="RecipeFixer\FixRecipesPatch.cs" />
     <Compile Include="RecipeFixer\PartsIncludedInCost.cs" />
     <Compile Include="RecipeFixer\RecipeFixingUtilities.cs" />
+    <Compile Include="SortAndGroupPawnCapacityTip.cs" />
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
   <ItemGroup />
