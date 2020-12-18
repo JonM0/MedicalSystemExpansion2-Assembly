@@ -19,7 +19,7 @@ namespace MSE2
 
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
             {
-                limbConfiguration = LimbConfiguration.LimbConfigForBodyPartRecord( limbPartExample );
+                limbConfiguration = limbPartExample == null ? null : LimbConfiguration.LimbConfigForBodyPartRecord( limbPartExample );
             }
         }
     }
