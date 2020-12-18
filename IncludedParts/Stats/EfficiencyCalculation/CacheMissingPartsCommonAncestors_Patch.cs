@@ -18,10 +18,11 @@ namespace MSE2.HarmonyPatches
             return typeof( HediffSet ).GetMethod( "CacheMissingPartsCommonAncestors", BindingFlags.NonPublic | BindingFlags.Instance );
         }
 
-        // Patch to show that child parts of prosthetics are missing in the health tab and to hide ignored parts
+		// vanilla behaviour: ignore (dont count as missing) if parent has added parts
+		// transpiler: ignore if IgnoreSubPartsUtilities.PartShouldBeIgnored 
 
-        [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
+		[HarmonyTranspiler]
+        private static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
             foreach ( CodeInstruction instruction in instructions )
             {
@@ -37,44 +38,43 @@ namespace MSE2.HarmonyPatches
 
         // equivalent change:
 
-        //[HarmonyPrefix]
-        //public static bool PreFix ( HediffSet __instance, ref List<Hediff_MissingPart> ___cachedMissingPartsCommonAncestors, ref Queue<BodyPartRecord> ___missingPartsCommonAncestorsQueue )
-        //{
-        //	if ( ___cachedMissingPartsCommonAncestors == null )
-        //	{
-        //		___cachedMissingPartsCommonAncestors = new List<Hediff_MissingPart>();
-        //	}
-        //	else
-        //	{
-        //		___cachedMissingPartsCommonAncestors.Clear();
-        //	}
-        //	___missingPartsCommonAncestorsQueue.Clear();
-        //	___missingPartsCommonAncestorsQueue.Enqueue( __instance.pawn.def.race.body.corePart );
-        //	while ( ___missingPartsCommonAncestorsQueue.Count != 0 )
-        //	{
-        //		BodyPartRecord node = ___missingPartsCommonAncestorsQueue.Dequeue();
+        /*
+        private void CacheMissingPartsCommonAncestors()
+		{
+			if (this.cachedMissingPartsCommonAncestors == null)
+			{
+				this.cachedMissingPartsCommonAncestors = new List<Hediff_MissingPart>();
+			}
+			else
+			{
+				this.cachedMissingPartsCommonAncestors.Clear();
+			}
+			this.missingPartsCommonAncestorsQueue.Clear();
+			this.missingPartsCommonAncestorsQueue.Enqueue(this.pawn.def.race.body.corePart);
+			while (this.missingPartsCommonAncestorsQueue.Count != 0)
+			{
+				BodyPartRecord node = this.missingPartsCommonAncestorsQueue.Dequeue();
 
-        //		// show even if child of added part
-        //		if ( !__instance.PartShouldBeIgnored( node ) ) //!__instance.PartOrAnyAncestorHasDirectlyAddedParts( node ) )
-        //		{
-        //			Hediff_MissingPart hediff_MissingPart = (from x in __instance.GetHediffs<Hediff_MissingPart>()
-        //													 where x.Part == node
-        //													 select x).FirstOrDefault<Hediff_MissingPart>();
-        //			if ( hediff_MissingPart != null )
-        //			{
-        //				___cachedMissingPartsCommonAncestors.Add( hediff_MissingPart );
-        //			}
-        //			else
-        //			{
-        //				for ( int i = 0; i < node.parts.Count; i++ )
-        //				{
-        //					___missingPartsCommonAncestorsQueue.Enqueue( node.parts[i] );
-        //				}
-        //			}
-        //		}
-        //	}
+                if ( !this.PartShouldBeIgnored( node ) ) // ----- !this.PartOrAnyAncestorHasDirectlyAddedParts( node ) ) // <<<<<<<<<<<<< REPLACED FUNCTION CALL HERE
 
-        //	return false;
-        //}
+				{
+					Hediff_MissingPart hediffMissingPart = (from x in this.GetHediffs<Hediff_MissingPart>()
+					where x.Part == node
+					select x).FirstOrDefault<Hediff_MissingPart>();
+					if (hediffMissingPart != null)
+					{
+						this.cachedMissingPartsCommonAncestors.Add(hediffMissingPart);
+					}
+					else
+					{
+						for (int index = 0; index < node.parts.Count; index++)
+						{
+							this.missingPartsCommonAncestorsQueue.Enqueue(node.parts[index]);
+						}
+					}
+				}
+			}
+		}
+        */
     }
 }

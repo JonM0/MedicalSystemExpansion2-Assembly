@@ -12,6 +12,8 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch( nameof( PawnCapacityUtility.CalculateImmediatePartEfficiencyAndRecord ) )]
     internal static class CalculateImmediatePartEfficiencyAndRecord_Patch
     {
+        // this function is never called anyway, since LimbEfficiencyFix removes it from the only function that called it before (PawnCapacityUtility.CalculateLimbEfficiency)
+
         // don't say it has some efficiency just because it is child of added part
 
         [HarmonyTranspiler]
@@ -27,12 +29,14 @@ namespace MSE2.HarmonyPatches
         /*
         public static float CalculateImmediatePartEfficiencyAndRecord ( HediffSet diffSet, BodyPartRecord part, List<PawnCapacityUtility.CapacityImpactor> impactors = null )
         {
+            // ========== REMOVE FROM HERE
+
             if ( diffSet.AncestorHasDirectlyAddedParts( part ) )
             {
                 return 1f;
             }
 
-            // -- transpiler removes the above code
+            // ========== REMOVE TO HERE
 
             return PawnCapacityUtility.CalculatePartEfficiency( diffSet, part, false, impactors );
         }

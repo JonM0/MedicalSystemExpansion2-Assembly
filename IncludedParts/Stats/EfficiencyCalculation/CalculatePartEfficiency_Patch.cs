@@ -14,6 +14,47 @@ namespace MSE2.HarmonyPatches
     {
         // remove the copying of the efficiency of a parent added part
 
+        /*
+        public static float CalculatePartEfficiency(HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts = false, List<PawnCapacityUtility.CapacityImpactor> impactors = null)
+		{
+            // ========== REMOVE FROM HERE
+
+		    BodyPartRecord rec;
+		    Func<Hediff_AddedPart, bool> <>9__0;
+		    for (rec = part.parent; rec != null; rec = rec.parent)
+		    {
+			    if (diffSet.HasDirectlyAddedPartFor(rec))
+			    {
+				    IEnumerable<Hediff_AddedPart> hediffs = diffSet.GetHediffs<Hediff_AddedPart>();
+				    Func<Hediff_AddedPart, bool> predicate;
+				    if ((predicate = <>9__0) == null)
+				    {
+					    predicate = (<>9__0 = ((Hediff_AddedPart x) => x.Part == rec));
+				    }
+				    Hediff_AddedPart hediffAddedPart = hediffs.Where(predicate).First<Hediff_AddedPart>();
+				    if (impactors != null)
+				    {
+					    impactors.Add(new PawnCapacityUtility.CapacityImpactorHediff
+					    {
+						    hediff = hediffAddedPart
+					    });
+				    }
+				    return hediffAddedPart.def.addedPartProps.partEfficiency;
+			    }
+		    }
+        
+            // ========== REMOVE TO HERE
+
+		    if (part.parent != null && diffSet.PartIsMissing(part.parent))
+		    {
+			    return 0f;
+		    }         
+
+            // .......... REST IS THE SAME   V    
+
+         */
+
+
         [HarmonyTranspiler]
         [HarmonyPriority( Priority.Low )]
         public static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
@@ -42,6 +83,8 @@ namespace MSE2.HarmonyPatches
             }
             return true;
         }
+
+        // patch to make MultiplyByParent ModExtension work
 
         [HarmonyPostfix]
         public static void CheckForMultiplyByParent ( ref float __result, HediffSet diffSet, BodyPartRecord part, bool ignoreAddedParts, List<PawnCapacityUtility.CapacityImpactor> impactors )
