@@ -52,7 +52,7 @@ namespace MSE2
             if ( Scribe.mode == LoadSaveMode.PostLoadInit && this.moduleHolderDiff == null )
             {
                 Log.Error( "[MSE2] " + this.Label + " on " + this.pawn.Name + " has null holder after loading, removing.", false );
-                this.pawn.health.hediffSet.hediffs.Remove( this );
+                this.pawn.health.RemoveHediff( this );
                 if ( this.def.spawnThingOnRemoved != null && this.pawn?.Map != null && this.pawn.IsColonistPlayerControlled )
                 {
                     GenPlace.TryPlaceThing( ThingMaker.MakeThing( this.def.spawnThingOnRemoved ), this.pawn.Position, this.pawn.Map, ThingPlaceMode.Near );
