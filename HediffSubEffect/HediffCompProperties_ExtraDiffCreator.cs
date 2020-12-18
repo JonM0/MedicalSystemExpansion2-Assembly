@@ -28,7 +28,7 @@ namespace MSE2
             {
                 errors = errors.Append( "<extraDiffDef> cannot be null" );
             }
-            else if ( extraDiffDef.hediffClass != typeof( HediffExtraDiff ) )
+            else if ( !typeof( HediffExtraDiff ).IsAssignableFrom(extraDiffDef.hediffClass)  )
             {
                 errors = errors.Append( "<extraDiffDef> needs to have <hediffClass> MSE2.HediffExtraDiff or subclass" );
             }

@@ -11,28 +11,36 @@ namespace MSE2
     public class HediffExtraDiff : HediffWithComps
     {
         internal HediffComp_ExtraDiffCreator diffCreator;
+        internal int distance = -1;
 
         public override void PostRemoved ()
         {
             base.PostRemoved();
-            diffCreator?.extraDiffs?.Remove( this );
+            this.diffCreator?.extraDiffs?.Remove( this );
         }
 
         public override void ExposeData ()
         {
             base.ExposeData();
 
+            Scribe_Values.Look( ref distance, nameof( distance ), -1 );
+
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
-                if ( diffCreator == null )
+                if ( this.diffCreator == null )
                 {
                     Log.Error( string.Format( "[MSE2] On {0} ({1}): missing creator at loading, removing", this, this.pawn ) );
                     this.pawn.health.RemoveHediff( this );
                 }
-                else if ( !diffCreator.extraDiffs.Contains( this ) )
+                else if ( !this.diffCreator.extraDiffs.Contains( this ) )
                 {
                     Log.Error( string.Format( "[MSE2] On {0} ({1}): creator does not have this in extraDiffs at loading, should never happen wtf", this, this.pawn ) );
-                    diffCreator.extraDiffs.Add( this );
+                    this.diffCreator.extraDiffs.Add( this );
+                }
+
+                if ( this.distance == -1 )
+                {
+                    Log.Error( string.Format( "[MSE2] On {0} ({1}): failed to load distance", this, this.pawn ) );
                 }
             }
         }

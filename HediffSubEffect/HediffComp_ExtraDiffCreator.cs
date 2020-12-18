@@ -23,7 +23,7 @@ namespace MSE2
             base.CompExposeData();
             Scribe_Collections.Look( ref this.extraDiffs, "extraDiffs", LookMode.Reference );
 
-            if ( Scribe.mode == LoadSaveMode.LoadingVars )
+            if ( Scribe.mode == LoadSaveMode.ResolvingCrossRefs )
             {
                 if ( this.extraDiffs == null )
                 {
@@ -32,7 +32,7 @@ namespace MSE2
                 }
                 if ( this.extraDiffs.RemoveAll( d => d == null ) != 0 )
                 {
-                    Log.Error( string.Format( "[MSE2] On {0} ({1}): HediffComp_ExtraDiffCreator.extraDiffs null after load", this.parent, this.Pawn ) );
+                    Log.Error( string.Format( "[MSE2] On {0} ({1}): some effectors in extraDiffs were null after load", this.parent, this.Pawn ) );
                 }
                 foreach ( HediffExtraDiff diff in this.extraDiffs )
                 {
@@ -47,7 +47,6 @@ namespace MSE2
 
         public override void CompPostMerged ( Hediff other )
         {
-            base.CompPostMerged( other );
             throw new NotImplementedException();
         }
 
@@ -99,11 +98,11 @@ namespace MSE2
             while ( partsToDo.Count > 0 )
             {
                 (BodyPartRecord part, int dist) = partsToDo.Dequeue();
-                if ( this.Props.maxDistance >= 0 && dist <= this.Props.maxDistance && this.ShouldAddExtraToPart( part ) )
+                if ( this.ShouldAddExtraToPart( part, dist ) )
                 {
-                    this.AddExtraToPart( part );
-                    partsDone.Add( part );
+                    this.AddExtraToPart( part, dist );
 
+                    partsDone.Add( part );
                     // enqueue relatives
                     if ( !partsDone.Contains( part.parent ) ) partsToDo.Enqueue( (part.parent, dist + 1) );
                     for ( int i = 0; i < part.parts.Count; i++ )
@@ -114,24 +113,46 @@ namespace MSE2
             }
 
             // release data structures
+            partsDone.Clear();
             tmpPartsDone = partsDone;
-            tmpPartsDone.Clear();
+            partsToDo.Clear();
             tmpPartsToDo = partsToDo;
-            tmpPartsToDo.Clear();
         }
 
-        private bool ShouldAddExtraToPart ( BodyPartRecord bodyPart )
+        private bool ShouldAddExtraToPart ( BodyPartRecord bodyPart, int distance )
         {
             return bodyPart != null
+                && (this.Props.maxDistance < 0 || distance <= this.Props.maxDistance)
                 && this.Pawn.health.hediffSet.hediffs.Find( h => h.Part == bodyPart && h is Hediff_AddedPart ) != null;
         }
 
-        private void AddExtraToPart ( BodyPartRecord bodyPart )
+        private void AddExtraToPart ( BodyPartRecord bodyPart, int distance )
         {
-            HediffExtraDiff diff = (HediffExtraDiff)HediffMaker.MakeHediff( this.Props.extraDiffDef, this.Pawn, bodyPart );
+            HediffExtraDiff diff = (HediffExtraDiff)this.Pawn.health.AddHediff( this.Props.extraDiffDef, bodyPart );
+
             diff.diffCreator = this;
-            this.Pawn.health.AddHediff( diff );
+            diff.distance = distance;
             this.extraDiffs.Add( diff );
+        }
+
+        public void Notify_AddedHediffAddedPart ( Hediff hediff )
+        {
+            var part = hediff.Part;
+
+            // new part is directly under module
+            if ( this.parent.Part == part.parent && ShouldAddExtraToPart( part, 1 ) )
+            {
+                AddExtraToPart( part, 1 );
+            }
+            else
+            {
+                // new part is under other extra part
+                var extraOnParentPart = extraDiffs.Find( h => h.Part == part.parent );
+                if ( extraOnParentPart != null && ShouldAddExtraToPart( part, extraOnParentPart.distance + 1 ) )
+                {
+                    AddExtraToPart( part, extraOnParentPart.distance + 1 );
+                }
+            }
         }
     }
 }
