@@ -74,6 +74,15 @@ namespace MSE2
 
             return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.IsIngredient( thing ) );
         }
+        public static IEnumerable<RecipeDef> SurgeryToInstall ( HediffDef hediffDef )
+        {
+            if ( DefDatabase<RecipeDef>.AllDefsListForReading.NullOrEmpty() )
+            {
+                throw new ApplicationException( "[MSE2] Tried to find SurgeryToInstall before DefDatabase was loaded. HediffDef: " + hediffDef.defName );
+            }
+
+            return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.addsHediff == hediffDef );
+        }
 
         public static bool HasSameStructure ( this BodyPartRecord a, BodyPartRecord b )
         {
