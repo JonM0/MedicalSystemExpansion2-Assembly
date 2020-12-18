@@ -9,14 +9,14 @@ using Verse;
 
 namespace MSE2.HarmonyPatches
 {
-    public class MedicalRecipesUtility_SpawnNaturalPartIfClean_Patch
+    internal static class MedicalRecipesUtility_SpawnNaturalPartIfClean_Patch
     {
         [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
         [HarmonyPatch( nameof( MedicalRecipesUtility.SpawnNaturalPartIfClean ) )]
-        internal class SpawnNaturalPartIfClean
+        internal static class SpawnNaturalPartIfClean
         {
             [HarmonyPostfix]
-            public static void PostFix ( ref Thing __result, Pawn pawn, BodyPartRecord part )
+            internal static void PostFix ( ref Thing __result, Pawn pawn, BodyPartRecord part )
             {
                 // if it created a Thing check the children for Things to add
                 if ( __result != null && __result is ThingWithComps resWithComps )

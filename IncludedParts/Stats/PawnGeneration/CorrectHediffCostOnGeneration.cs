@@ -15,7 +15,7 @@ namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( PawnTechHediffsGenerator ) )]
     [HarmonyPatch( nameof( PawnTechHediffsGenerator.GenerateTechHediffsFor ) )]
-    internal class CorrectHediffCostOnGeneration
+    internal static class CorrectHediffCostOnGeneration
     {
         // makes pawn generation count hediff value correctly (using average of possibilities for pawn instead of just segment value)
 

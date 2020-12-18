@@ -16,7 +16,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch]
-    internal class CorrectHediffCostOnGenerationLambda
+    internal static class CorrectHediffCostOnGenerationLambda
     {
         // makes pawn generation count hediff value correctly (using average of possibilities for pawn instead of just segment value)
 

@@ -9,7 +9,7 @@ namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( Hediff_AddedPart ) )]
     [HarmonyPatch( nameof( Hediff_AddedPart.PostAdd ) )]
-    internal class AddedPart_PostAdd
+    internal static class AddedPart_PostAdd
     {
         // swap calls to base.postAdd and restorepart
         // this allows to add hediffs in comppostpostadd

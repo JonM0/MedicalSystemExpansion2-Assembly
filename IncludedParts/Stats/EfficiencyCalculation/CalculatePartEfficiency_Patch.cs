@@ -10,7 +10,7 @@ namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch( typeof( PawnCapacityUtility ) )]
     [HarmonyPatch( nameof( PawnCapacityUtility.CalculatePartEfficiency ) )]
-    internal class CalculatePartEfficiency_Patch
+    internal static class CalculatePartEfficiency_Patch
     {
         // remove the copying of the efficiency of a parent added part
 

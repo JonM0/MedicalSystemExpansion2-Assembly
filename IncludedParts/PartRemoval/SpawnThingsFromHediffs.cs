@@ -10,11 +10,11 @@ using Verse;
 
 namespace MSE2.HarmonyPatches
 {
-    public class MedicalRecipesUtility_SpawnThingsFromHediffs_Patch
+    internal static class MedicalRecipesUtility_SpawnThingsFromHediffs_Patch
     {
         [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
         [HarmonyPatch( nameof( MedicalRecipesUtility.SpawnThingsFromHediffs ) )]
-        internal class SpawnThingsFromHediffs
+        internal static class SpawnThingsFromHediffs
         {
             [HarmonyPrefix]
             [HarmonyPriority( Priority.Last )]

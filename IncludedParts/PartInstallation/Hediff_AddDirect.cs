@@ -4,7 +4,7 @@ using Verse;
 
 namespace MSE2.HarmonyPatches
 {
-    public class Hediff_AddDirect
+    public static class Hediff_AddDirect
     {
         [HarmonyPatch( typeof( HediffSet ) )]
         [HarmonyPatch( nameof( HediffSet.AddDirect ) )]

@@ -12,7 +12,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch]
-    internal class AddSubpartsAfterCreation
+    internal static class AddSubpartsAfterCreation
     {
         // initialize for limb on newly crafted prostheses using the limb specified in the modextension of the recipedef
 

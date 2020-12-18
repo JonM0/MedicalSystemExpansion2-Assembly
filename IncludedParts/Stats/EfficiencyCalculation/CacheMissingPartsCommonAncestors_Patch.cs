@@ -11,7 +11,7 @@ using Verse;
 namespace MSE2.HarmonyPatches
 {
     [HarmonyPatch]
-    internal class CacheMissingPartsCommonAncestors_Patch
+    internal static class CacheMissingPartsCommonAncestors_Patch
     {
         private static MethodBase TargetMethod ()
         {
