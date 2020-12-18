@@ -111,7 +111,7 @@
     <Compile Include="DebugTools\GlobalProthesisFix.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculateImmediatePartEfficiencyAndRecord_Patch.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CacheMissingPartsCommonAncestors_Patch.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculateLimbEfficiency_Patch.cs" />
+    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\LimbEfficiencyFix.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculatePartEfficiency_Patch.cs" />
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubParts.cs" />
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubPartsUtilities.cs" />
