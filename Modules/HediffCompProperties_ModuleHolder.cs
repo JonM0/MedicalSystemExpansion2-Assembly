@@ -13,7 +13,6 @@ namespace MSE2
         public HediffCompProperties_ModuleHolder ()
         {
             this.compClass = typeof( HediffComp_ModuleHolder );
-            this.lazyCompatibleModulesStat = new Lazy<StatDrawEntry>( CompatibleModulesStatFactory );
         }
 
         private HediffDef parentDef;
@@ -34,10 +33,10 @@ namespace MSE2
 
         public virtual IEnumerable<StatDrawEntry> SpecialDisplayStats ( StatRequest req )
         {
-            yield return lazyCompatibleModulesStat.Value;
+            yield return cachedCompatibleModulesStat ?? (cachedCompatibleModulesStat = CompatibleModulesStatFactory());
         }
 
-        private readonly Lazy<StatDrawEntry> lazyCompatibleModulesStat;
+        private StatDrawEntry cachedCompatibleModulesStat;
 
         private StatDrawEntry CompatibleModulesStatFactory ()
         {
