@@ -124,14 +124,14 @@ namespace MSE2
                 }
             }
 
-            //if ( builder.Length == 0 )
-            //{
-            //    return "LimbComplete".Translate();
-            //}
-            //else
-            //{
-            return builder.ToString();
-            //}
+            if ( builder.Length == 0 )
+            {
+                return "LimbComplete".Translate();
+            }
+            else
+            {
+                return builder.ToString();
+            }
         }
 
         public string GetComparisonForLimb ( LimbConfiguration limb )
@@ -155,7 +155,7 @@ namespace MSE2
             for ( int i = 0; i < this.limbPool.Count; i++ )
             {
                 builder.AppendFormat( "{0} {1}: {2}",
-                    this.cachedLimbComparisons[i],
+                    this.cachedLimbComparisons[i].CapitalizeFirst(),
                     "LimbVersion".Translate(),
                     isCompatible( this.limbPool[i] ) ? "LimbCompatible".TranslateSimple() : "LimbIncompatible".TranslateSimple() ).AppendLine();
 

@@ -216,7 +216,8 @@ namespace MSE2
                     string limbComparison = comp.LabelComparisonForLimb( limb );
 
                     recipeDef.defName = "Make_" + prosthesisDef.defName + "_" + limb.UniqueName;
-                    recipeDef.label = (limbComparison == "" ? "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
+                    recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
+                        "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
                     recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
                     string[] products = recipeDef.products.Select( delegate ( ThingDefCountClass p )
                     {
