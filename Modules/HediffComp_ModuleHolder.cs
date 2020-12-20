@@ -12,39 +12,10 @@ namespace MSE2
         {
             base.CompPostPostAdd( dinfo );
 
-            this.currentModules = 0;
-
             this.moduleSlots = new List<Hediff_ModuleSlot>( this.Props.maxModules );
             for ( int i = 0; i < this.Props.maxModules; i++ )
             {
-                this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
-            }
-        }
-
-        public void Notify_ModuleAdded ()
-        {
-            this.currentModules++;
-
-            if ( this.currentModules > this.Props.maxModules )
-            {
-                Log.Error( "[MSE2] Added too many modules to part " + this.parent.Label );
-            }
-
-            // remove last slot in list
-            if ( this.moduleSlots.Count > 0 )
-            {
-                this.parent.pawn.health.RemoveHediff( this.moduleSlots[this.moduleSlots.Count - 1] );
-            }
-        }
-
-        public void Notify_ModuleRemoved ()
-        {
-            this.currentModules--;
-
-            // add a slot (unless parent hediff was just removed)
-            if ( this.Pawn.health.hediffSet.hediffs.Contains( this.parent ) && this.currentModules < this.Props.maxModules )
-            {
-                this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
+                this.AddSlot();
             }
         }
 
@@ -52,44 +23,129 @@ namespace MSE2
         {
             base.CompPostPostRemoved();
 
+            if ( this.moduleAddeds != null )
+            {
+                for ( int i = this.moduleAddeds.Count - 1; i >= 0; i-- )
+                {
+                    this.parent.pawn.health.RemoveHediff( this.moduleAddeds[i] );
+                }
+                this.moduleAddeds = null;
+            }
+
             if ( this.moduleSlots != null )
             {
                 for ( int i = this.moduleSlots.Count - 1; i >= 0; i-- )
                 {
                     this.parent.pawn.health.RemoveHediff( this.moduleSlots[i] );
                 }
+                this.moduleSlots = null;
             }
         }
 
-        protected void PostLoadInit ()
+        public void AddModule ( Hediff_ModuleAdded module, Hediff_ModuleSlot slot )
         {
-            // remove null slots from the list
-            this.moduleSlots.RemoveAll( s => s == null );
+            this.moduleSlots.Remove( slot );
+            this.Pawn.health.RemoveHediff( slot );
 
-            // add extra slots if there arent enough (maybe def was edited)
-            int missingSlots = this.Props.maxModules - this.currentModules - this.moduleSlots.Count;
-            for ( int i = 0; i < missingSlots; i++ )
+            this.moduleAddeds.Add( module );
+            module.ModuleHolder = this;
+
+            if ( this.CurrentModules > this.MaxModules )
             {
-                this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
+                Log.Error( "[MSE2] Added too many modules to part " + this.parent.Label );
             }
+        }
+
+        public void Notify_ModuleRemoved ( Hediff_ModuleAdded module )
+        {
+            this.moduleAddeds.Remove( module );
+
+            // add a slot (unless parent hediff was just removed)
+            if ( !this.Pawn.health.hediffSet.PartIsMissing( this.parent.Part ) && this.CurrentModules < this.MaxModules )
+            {
+                this.AddSlot();
+            }
+        }
+
+        public void AddSlot ()
+        {
+            var slot = (Hediff_ModuleSlot)this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
+            slot.ModuleHolder = this;
+            this.moduleSlots.Add( slot );
         }
 
         public override void CompExposeData ()
         {
             base.CompExposeData();
 
-            Scribe_Values.Look( ref this.currentModules, "currentModules" );
-
             Scribe_Collections.Look( ref this.moduleSlots, "moduleSlots", LookMode.Reference );
+            Scribe_Collections.Look( ref this.moduleAddeds, "moduleAddeds", LookMode.Reference );
+
+            if ( Scribe.mode == LoadSaveMode.ResolvingCrossRefs )
+            {
+                // error check and remove null modules
+                if ( this.moduleAddeds == null )
+                {
+                    Log.Error( "[MSE2] " + this + ": null moduleAddeds after loading" );
+                    this.moduleAddeds = new List<Hediff_ModuleAdded>();
+                }
+                else if ( this.moduleAddeds.RemoveAll( m => m == null ) > 0 )
+                {
+                    Log.Error( "[MSE2] " + this + ": found null modules after loading" );
+                }
+                // error check and remove null slots
+                if ( this.moduleSlots == null )
+                {
+                    Log.Error( "[MSE2] " + this + ": null moduleSlots after loading" );
+                    this.moduleSlots = new List<Hediff_ModuleSlot>();
+                }
+                else if ( this.moduleSlots.RemoveAll( m => m == null ) > 0 )
+                {
+                    Log.Error( "[MSE2] " + this + ": found null slots after loading" );
+                }
+
+                // link holder
+                foreach ( var module in this.moduleAddeds )
+                {
+                    if ( module.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": module " + module + " already had a ModuleHolder when loading" );
+                    module.ModuleHolder = this;
+                }
+                foreach ( var slot in this.moduleSlots )
+                {
+                    if ( slot.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": slot " + slot + " already had a ModuleHolder when loading" );
+                    slot.ModuleHolder = this;
+                }
+            }
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
-                this.PostLoadInit();
+                // add extra slots if there arent enough (maybe def was edited)
+                int missingSlots = this.MaxModules - this.CurrentModules - this.RemainingSlots;
+                while ( missingSlots > 0 )
+                {
+                    this.AddSlot();
+                    missingSlots--;
+                }
+                while ( missingSlots < 0 && this.RemainingSlots > 0 )
+                {
+                    var slotToRemove = this.moduleSlots[this.RemainingSlots - 1];
+                    this.Pawn.health.RemoveHediff( slotToRemove );
+                    this.moduleSlots.Remove( slotToRemove );
+                    missingSlots++;
+                }
             }
         }
 
-        public int currentModules;
+        public int MaxModules => this.Props.maxModules;
+        public int CurrentModules => moduleAddeds.Count;
+        public int RemainingSlots => moduleSlots.Count;
 
-        public List<Hediff_ModuleSlot> moduleSlots;
+        private List<Hediff_ModuleSlot> moduleSlots = new List<Hediff_ModuleSlot>();
+        private List<Hediff_ModuleAdded> moduleAddeds = new List<Hediff_ModuleAdded>();
+
+        public override string ToString ()
+        {
+            return this.parent + "_ModuleHolder";
+        }
     }
 }

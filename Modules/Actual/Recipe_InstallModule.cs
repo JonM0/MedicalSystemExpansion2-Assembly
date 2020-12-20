@@ -21,22 +21,23 @@ namespace MSE2
 
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
         {
-            bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
-
             if ( billDoer != null )
             {
+                bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
+
                 TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[]
                 {
                     billDoer,
                     pawn
                 } );
+
                 if ( isViolation )
                 {
                     base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_NeedlesslyInstalledWorseBodyPart".Translate( this.recipe.addsHediff.label ) );
                 }
             }
 
-            pawn.health.AddHediff( this.recipe.addsHediff, part, null, null );
+            pawn.health.AddHediff( this.recipe.addsHediff, part );
         }
     }
 }
