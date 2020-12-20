@@ -121,7 +121,7 @@
     <Compile Include="IncludedParts\HediffHiding\VisibleHediffs_patch.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbLabeler.cs" />
     <Compile Include="IncludedParts\Stats\StatParts\StatsReport_MassOfSubParts.cs" />
-    <Compile Include="Modules\Actual\Recipe_RemoveModules.cs" />
+    <Compile Include="Modules\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
     <Compile Include="Modules\HediffComp_ModuleHolder.cs" />
     <Compile Include="Modules\HediffCompProperties_ModuleHolder.cs" />
@@ -136,14 +136,14 @@
     <Compile Include="MSE_HediffDefOf.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterCreation.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbRecipeDefGenerator.cs" />
-    <Compile Include="Modules\Actual\Hediff_ModuleAdded.cs" />
-    <Compile Include="Modules\Slots\Hediff_ModuleSlot.cs" />
+    <Compile Include="Modules\Hediff_ModuleAdded.cs" />
+    <Compile Include="Modules\Hediff_ModuleSlot.cs" />
     <Compile Include="IncludedParts\PartInstallation\Recipe_InstallArtificialBodyPartWithChildren.cs" />
     <Compile Include="IncludedParts\PartInstallation\Recipe_InstallNaturalBodyPartWithChildren.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompIncludedChildParts.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\MultiplyByParent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\Actual\Recipe_InstallModule.cs" />
+    <Compile Include="Modules\Recipe_InstallModule.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Installing\MedicalRecipesUtility_GetFixedPartsToApplyOn.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
@@ -157,7 +157,8 @@
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Modules\CompatibleModulesStat\" />
+    <Folder Include="Modules\Actual\" />
+    <Folder Include="Modules\Slots\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
