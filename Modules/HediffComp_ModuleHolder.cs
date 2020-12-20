@@ -41,8 +41,8 @@ namespace MSE2
         {
             this.currentModules--;
 
-            // add a slot
-            if ( this.currentModules < this.Props.maxModules )
+            // add a slot (unless parent hediff was just removed)
+            if ( this.Pawn.health.hediffSet.hediffs.Contains( this.parent ) && this.currentModules < this.Props.maxModules )
             {
                 this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
             }
