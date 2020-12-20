@@ -15,7 +15,7 @@ namespace MSE2
         public override void PostRemoved ()
         {
             base.PostRemoved();
-            ModuleHolder = null;
+            this.ModuleHolder = null;
         }
 
         public override void ExposeData ()

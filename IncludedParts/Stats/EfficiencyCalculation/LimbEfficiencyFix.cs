@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 using HarmonyLib;
 
@@ -72,7 +72,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyTranspiler]
         internal static IEnumerable<CodeInstruction> ReplaceLimbCalculation ( IEnumerable<CodeInstruction> instructions )
         {
-            var instList = instructions.ToList();
+            List<CodeInstruction> instList = instructions.ToList();
 
             // find instruction before foreach loop starts
             int foreachPartSetIndex = instList.FindIndex( i =>
@@ -141,12 +141,12 @@ namespace MSE2.HarmonyPatches
             }
 
             // digit calculations
-            var digits = limbCore.GetChildParts( limbDigitTag ).ToList();
+            List<BodyPartRecord> digits = limbCore.GetChildParts( limbDigitTag ).ToList();
             digits.RemoveAll( diffSet.PartShouldBeIgnored );
             if ( digits.Count > 0 )
             {
                 // avg of digit efficiency
-                var digitsAvg = 0f;
+                float digitsAvg = 0f;
                 for ( int i = 0; i < digits.Count; i++ )
                 {
                     digitsAvg += PawnCapacityUtility.CalculatePartEfficiency( diffSet, digits[i], false, impactors );

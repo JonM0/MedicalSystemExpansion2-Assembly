@@ -156,9 +156,6 @@
     <Compile Include="SortAndGroupPawnCapacityTip.cs" />
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\Actual\" />
-    <Folder Include="Modules\Slots\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

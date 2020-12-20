@@ -17,18 +17,18 @@ namespace MSE2
 
         public override IEnumerable<string> ConfigErrors ( HediffDef parentDef )
         {
-            var errors = base.ConfigErrors( parentDef );
+            IEnumerable<string> errors = base.ConfigErrors( parentDef );
 
             if ( parentDef.hediffClass == typeof( HediffExtraDiff ) )
             {
                 errors = errors.Append( "invalid recursion, HediffExtraDiff cannot have an HediffCompProperties_ExtraDiffCreator" );
             }
 
-            if ( extraDiffDef == null )
+            if ( this.extraDiffDef == null )
             {
                 errors = errors.Append( "<extraDiffDef> cannot be null" );
             }
-            else if ( !typeof( HediffExtraDiff ).IsAssignableFrom(extraDiffDef.hediffClass)  )
+            else if ( !typeof( HediffExtraDiff ).IsAssignableFrom( this.extraDiffDef.hediffClass ) )
             {
                 errors = errors.Append( "<extraDiffDef> needs to have <hediffClass> MSE2.HediffExtraDiff or subclass" );
             }

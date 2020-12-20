@@ -69,7 +69,7 @@ namespace MSE2
 
         public void AddSlot ()
         {
-            var slot = (Hediff_ModuleSlot)this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
+            Hediff_ModuleSlot slot = (Hediff_ModuleSlot)this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
             slot.ModuleHolder = this;
             this.moduleSlots.Add( slot );
         }
@@ -105,12 +105,12 @@ namespace MSE2
                 }
 
                 // link holder
-                foreach ( var module in this.moduleAddeds )
+                foreach ( Hediff_ModuleAdded module in this.moduleAddeds )
                 {
                     if ( module.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": module " + module + " already had a ModuleHolder when loading" );
                     module.ModuleHolder = this;
                 }
-                foreach ( var slot in this.moduleSlots )
+                foreach ( Hediff_ModuleSlot slot in this.moduleSlots )
                 {
                     if ( slot.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": slot " + slot + " already had a ModuleHolder when loading" );
                     slot.ModuleHolder = this;
@@ -128,7 +128,7 @@ namespace MSE2
                 }
                 while ( missingSlots < 0 && this.RemainingSlots > 0 )
                 {
-                    var slotToRemove = this.moduleSlots[this.RemainingSlots - 1];
+                    Hediff_ModuleSlot slotToRemove = this.moduleSlots[this.RemainingSlots - 1];
                     this.Pawn.health.RemoveHediff( slotToRemove );
                     this.moduleSlots.Remove( slotToRemove );
                     missingSlots++;
@@ -137,8 +137,8 @@ namespace MSE2
         }
 
         public int MaxModules => this.Props.maxModules;
-        public int CurrentModules => moduleAddeds.Count;
-        public int RemainingSlots => moduleSlots.Count;
+        public int CurrentModules => this.moduleAddeds.Count;
+        public int RemainingSlots => this.moduleSlots.Count;
 
         private List<Hediff_ModuleSlot> moduleSlots = new List<Hediff_ModuleSlot>();
         private List<Hediff_ModuleAdded> moduleAddeds = new List<Hediff_ModuleAdded>();

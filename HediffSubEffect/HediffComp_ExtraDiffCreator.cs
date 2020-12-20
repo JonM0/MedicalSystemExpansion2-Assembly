@@ -137,20 +137,20 @@ namespace MSE2
 
         public void Notify_AddedHediffAddedPart ( Hediff hediff )
         {
-            var part = hediff.Part;
+            BodyPartRecord part = hediff.Part;
 
             // new part is directly under module
-            if ( this.parent.Part == part.parent && ShouldAddExtraToPart( part, 1 ) )
+            if ( this.parent.Part == part.parent && this.ShouldAddExtraToPart( part, 1 ) )
             {
-                AddExtraToPart( part, 1 );
+                this.AddExtraToPart( part, 1 );
             }
             else
             {
                 // new part is under other extra part
-                var extraOnParentPart = extraDiffs.Find( h => h.Part == part.parent );
-                if ( extraOnParentPart != null && ShouldAddExtraToPart( part, extraOnParentPart.distance + 1 ) )
+                HediffExtraDiff extraOnParentPart = this.extraDiffs.Find( h => h.Part == part.parent );
+                if ( extraOnParentPart != null && this.ShouldAddExtraToPart( part, extraOnParentPart.distance + 1 ) )
                 {
-                    AddExtraToPart( part, extraOnParentPart.distance + 1 );
+                    this.AddExtraToPart( part, extraOnParentPart.distance + 1 );
                 }
             }
         }

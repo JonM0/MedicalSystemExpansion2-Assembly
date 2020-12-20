@@ -33,16 +33,16 @@ namespace MSE2
 
         public virtual IEnumerable<StatDrawEntry> SpecialDisplayStats ( StatRequest req )
         {
-            yield return cachedCompatibleModulesStat ?? (cachedCompatibleModulesStat = CompatibleModulesStatFactory());
+            yield return this.cachedCompatibleModulesStat ?? (this.cachedCompatibleModulesStat = this.CompatibleModulesStatFactory());
         }
 
         private StatDrawEntry cachedCompatibleModulesStat;
 
         private StatDrawEntry CompatibleModulesStatFactory ()
         {
-            var destinations = IncludedPartsUtilities.SurgeryToInstall( this.parentDef ).SelectMany( s => s.appliedOnFixedBodyParts ).ToList();
+            List<BodyPartDef> destinations = IncludedPartsUtilities.SurgeryToInstall( this.parentDef ).SelectMany( s => s.appliedOnFixedBodyParts ).ToList();
 
-            var compat =
+            List<ThingDef> compat =
                 (from r in DefDatabase<RecipeDef>.AllDefs
                  where typeof( Recipe_InstallModule ).IsAssignableFrom( r.workerClass )
                      && (r.appliedOnFixedBodyParts.Count == 0 || r.appliedOnFixedBodyParts.Exists( destinations.Contains ))

@@ -8,9 +8,9 @@ using Verse;
 
 namespace MSE2
 {
-    class MultiplyByParent : DefModExtension
+    internal class MultiplyByParent : DefModExtension
     {
-        public MultiplyByParent()
+        public MultiplyByParent ()
         {
             anyExist = true;
         }

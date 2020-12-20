@@ -8,7 +8,7 @@ namespace MSE2
         {
             base.PostAdd( dinfo );
 
-            var slot = (Hediff_ModuleSlot)this.pawn.health.hediffSet.hediffs.Find( h => h.Part == this.Part && h is Hediff_ModuleSlot );
+            Hediff_ModuleSlot slot = (Hediff_ModuleSlot)this.pawn.health.hediffSet.hediffs.Find( h => h.Part == this.Part && h is Hediff_ModuleSlot );
 
             if ( slot != null )
             {
@@ -32,7 +32,7 @@ namespace MSE2
             {
                 if ( this.ModuleHolder == null )
                 {
-                    var slot = (Hediff_ModuleSlot)this.pawn.health.hediffSet.hediffs.Find( h => h.Part == this.Part && h is Hediff_ModuleSlot );
+                    Hediff_ModuleSlot slot = (Hediff_ModuleSlot)this.pawn.health.hediffSet.hediffs.Find( h => h.Part == this.Part && h is Hediff_ModuleSlot );
                     slot?.InstallModule( this );
                 }
             }

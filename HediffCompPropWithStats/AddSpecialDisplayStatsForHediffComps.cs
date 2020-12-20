@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
+using HarmonyLib;
+
 using RimWorld;
 
-using HarmonyLib;
+using Verse;
 
 namespace MSE2
 {
@@ -18,7 +19,7 @@ namespace MSE2
         [HarmonyPostfix]
         internal static void AddCompStats ( HediffDef __instance, ref IEnumerable<StatDrawEntry> __result, StatRequest req )
         {
-            var comps = __instance.comps;
+            List<HediffCompProperties> comps = __instance.comps;
             if ( comps != null )
             {
                 for ( int i = 0; i < comps.Count; i++ )

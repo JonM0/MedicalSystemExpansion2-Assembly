@@ -23,7 +23,7 @@ namespace MSE2
         {
             base.ExposeData();
 
-            Scribe_Values.Look( ref distance, nameof( distance ), -1 );
+            Scribe_Values.Look( ref this.distance, nameof( this.distance ), -1 );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {

@@ -18,10 +18,10 @@ namespace MSE2.HarmonyPatches
             return typeof( HediffSet ).GetMethod( "CacheMissingPartsCommonAncestors", BindingFlags.NonPublic | BindingFlags.Instance );
         }
 
-		// vanilla behaviour: ignore (dont count as missing) if parent has added parts
-		// transpiler: ignore if IgnoreSubPartsUtilities.PartShouldBeIgnored 
+        // vanilla behaviour: ignore (dont count as missing) if parent has added parts
+        // transpiler: ignore if IgnoreSubPartsUtilities.PartShouldBeIgnored 
 
-		[HarmonyTranspiler]
+        [HarmonyTranspiler]
         private static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
             foreach ( CodeInstruction instruction in instructions )

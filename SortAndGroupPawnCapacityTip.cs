@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RimWorld;
-using Verse;
 using HarmonyLib;
+
+using RimWorld;
+
+using Verse;
 
 namespace MSE2.HarmonyPatches
 {
@@ -19,7 +21,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         private static void SortAndGroup ( ref string __result )
         {
-            var lines = __result.Split( '\n' );
+            string[] lines = __result.Split( '\n' );
 
             if ( lines.Length > 5 ) // has more than 1 impactor (+3 starting lines and +1 empty line at the end)
             {
@@ -37,7 +39,7 @@ namespace MSE2.HarmonyPatches
                 // loop from second impactor to last impactor
                 for ( int i = 4; i < lines.Length - 1; i++ )
                 {
-                    var line = lines[i];
+                    string line = lines[i];
 
                     if ( prev != line )
                     {
