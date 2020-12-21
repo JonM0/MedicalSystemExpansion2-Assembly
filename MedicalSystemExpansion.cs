@@ -19,8 +19,6 @@ using Verse;
 
 namespace MSE2
 {
-    [EarlyInit]
-    [StaticConstructorOnStartup]
     public class MedicalSystemExpansion : ModBase
     {
         public override void StaticInitialize ()
@@ -33,27 +31,13 @@ namespace MSE2
         {
             base.DefsLoaded();
 
+            AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
+
             IncludedPartsUtilities.CacheAllStandardParents();
 
             IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
 
-            // add the recipes to craft the prostheses with the various configurations of parts
-            foreach ( RecipeDef def in LimbRecipeDefGenerator.ImpliedLimbRecipeDefs() )
-            {
-                def.ResolveReferences();
-                DefGenerator.AddImpliedDef<RecipeDef>( def );
-                HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
-            }
-
-            // duplicate ambiguous installation surgeries
-            foreach ( RecipeDef def in LimbRecipeDefGenerator.ExtraLimbSurgeryRecipeDefs() )
-            {
-                def.ResolveReferences();
-                DefGenerator.AddImpliedDef<RecipeDef>( def );
-                HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
-            }
-
-            DefDatabase<RecipeDef>.ErrorCheckAllDefs();
+            LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
         }
 
         public override string ModIdentifier => "MSE2";

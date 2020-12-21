@@ -23,7 +23,14 @@ namespace MSE2
         {
             foreach ( HediffDef def in DefDatabase<HediffDef>.AllDefs )
             {
-                def.CacheParentOfChildren();
+                try
+                {
+                    def.CacheParentOfChildren();
+                }
+                catch ( Exception ex )
+                {
+                    Log.Error( "[MSE2] Exception applying CacheParentOfChildren to " + def.defName + ": " + ex );
+                }
             }
         }
 

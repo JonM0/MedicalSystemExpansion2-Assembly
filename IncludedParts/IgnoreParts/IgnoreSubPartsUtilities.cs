@@ -63,73 +63,80 @@ namespace MSE2
         /// </summary>
         public static void IgnoreAllNonCompedSubparts ()
         {
-            List<string> brokenMods = new List<string>();
-
-            StringBuilder unpatchedDefs = new StringBuilder();
-
-            foreach ( (RecipeDef recipeDef, IgnoreSubParts oldME) in
-                from r in DefDatabase<RecipeDef>.AllDefs
-                where r != null
-                where r.IsSurgery
-                where
-                    // has ingredients
-                    r.fixedIngredientFilter?.AllowedThingDefs != null
-                    // no ingredient has a CompProperties_IncludedChildParts
-                    && !r.fixedIngredientFilter.AllowedThingDefs
-                        .Select( t => t.GetCompProperties<CompProperties_IncludedChildParts>() )
-                        .Any( c => c != null )
-                where
-                    // adds a hediff
-                    r.addsHediff?.hediffClass != null
-                    // of type addedpart
-                    && typeof( Hediff_AddedPart ).IsAssignableFrom( r.addsHediff.hediffClass )
-                let me = r.addsHediff.GetModExtension<IgnoreSubParts>()
-                where
-                    // that does not already ignore parts
-                    me == null || me.ignoreAll
-                select (r, me) )
+            try
             {
-                IgnoreSubParts modExt = oldME ?? new IgnoreSubParts();
+                List<string> brokenMods = new List<string>();
 
-                // add all the subparts this prosthesis could have
-                if ( recipeDef.appliedOnFixedBodyParts != null )
-                    foreach ( BodyPartDef partDef in recipeDef.appliedOnFixedBodyParts )
-                    {
-                        if ( modExt.ignoredSubParts == null )
-                            modExt.ignoredSubParts = new List<BodyPartDef>();
+                StringBuilder unpatchedDefs = new StringBuilder();
 
-                        modExt.ignoredSubParts.AddRange( partDef.AllChildPartDefs( recipeDef.AllRecipeUsers.Select( ru => ru.race.body ) ) );
-                    }
-
-                // found any and it wasnt already present
-                if ( !modExt.ignoredSubParts.NullOrEmpty() && oldME == null )
+                foreach ( (RecipeDef recipeDef, IgnoreSubParts oldME) in
+                    from r in DefDatabase<RecipeDef>.AllDefs
+                    where r != null
+                    where r.IsSurgery
+                    where
+                        // has ingredients
+                        r.fixedIngredientFilter?.AllowedThingDefs != null
+                        // no ingredient has a CompProperties_IncludedChildParts
+                        && !r.fixedIngredientFilter.AllowedThingDefs
+                            .Select( t => t.GetCompProperties<CompProperties_IncludedChildParts>() )
+                            .Any( c => c != null )
+                    where
+                        // adds a hediff
+                        r.addsHediff?.hediffClass != null
+                        // of type addedpart
+                        && typeof( Hediff_AddedPart ).IsAssignableFrom( r.addsHediff.hediffClass )
+                    let me = r.addsHediff.GetModExtension<IgnoreSubParts>()
+                    where
+                        // that does not already ignore parts
+                        me == null || me.ignoreAll
+                    select (r, me) )
                 {
-                    // add the modextension
-                    if ( recipeDef.addsHediff.modExtensions == null )
-                        recipeDef.addsHediff.modExtensions = new List<DefModExtension>();
+                    IgnoreSubParts modExt = oldME ?? new IgnoreSubParts();
 
-                    recipeDef.addsHediff.modExtensions.Add( modExt );
+                    // add all the subparts this prosthesis could have
+                    if ( recipeDef.appliedOnFixedBodyParts != null )
+                        foreach ( BodyPartDef partDef in recipeDef.appliedOnFixedBodyParts )
+                        {
+                            if ( modExt.ignoredSubParts == null )
+                                modExt.ignoredSubParts = new List<BodyPartDef>();
 
-                    // log only for humanlike
-                    //if ( recipeDef.AllRecipeUsers.Any( td => td.race.Humanlike ) )
+                            modExt.ignoredSubParts.AddRange( partDef.AllChildPartDefs( recipeDef.AllRecipeUsers.Select( ru => ru.race.body ) ) );
+                        }
+
+                    // found any and it wasnt already present
+                    if ( !modExt.ignoredSubParts.NullOrEmpty() && oldME == null )
                     {
-                        unpatchedDefs.AppendLine(
-                            string.Format( "<{0}> from \"{1}\": {2}",
-                                recipeDef.addsHediff.defName,
-                                recipeDef.modContentPack?.Name ?? "???",
-                                string.Join( ", ", modExt.ignoredSubParts.Select( p => p.label ) )
-                                )
-                            );
+                        // add the modextension
+                        if ( recipeDef.addsHediff.modExtensions == null )
+                            recipeDef.addsHediff.modExtensions = new List<DefModExtension>();
 
-                        if ( !brokenMods.Contains( recipeDef.modContentPack?.Name ) )
-                            brokenMods.Add( recipeDef.modContentPack?.Name );
+                        recipeDef.addsHediff.modExtensions.Add( modExt );
+
+                        // log only for humanlike
+                        //if ( recipeDef.AllRecipeUsers.Any( td => td.race.Humanlike ) )
+                        {
+                            unpatchedDefs.AppendLine(
+                                string.Format( "<{0}> from \"{1}\": {2}",
+                                    recipeDef.addsHediff.defName,
+                                    recipeDef.modContentPack?.Name ?? "???",
+                                    string.Join( ", ", modExt.ignoredSubParts.Select( p => p.label ) )
+                                    )
+                                );
+
+                            if ( !brokenMods.Contains( recipeDef.modContentPack?.Name ) )
+                                brokenMods.Add( recipeDef.modContentPack?.Name );
+                        }
                     }
                 }
-            }
 
-            if ( brokenMods.Count > 0 )
+                if ( brokenMods.Count > 0 )
+                {
+                    Log.Warning( string.Format( "[MSE2] Some prostheses that have not been patched were detected in mods: {0}. They will default to vanilla behaviour.\n\n{1}", string.Join( ", ", brokenMods ), unpatchedDefs ) );
+                }
+            }
+            catch ( Exception ex )
             {
-                Log.Warning( string.Format( "[MSE2] Some prostheses that have not been patched were detected in mods: {0}. They will default to vanilla behaviour.\n\n{1}", string.Join( ", ", brokenMods ), unpatchedDefs ) );
+                Log.Error( "[MSE2] Exception applying IgnoreAllNonCompedSubparts: " + ex );
             }
         }
     }

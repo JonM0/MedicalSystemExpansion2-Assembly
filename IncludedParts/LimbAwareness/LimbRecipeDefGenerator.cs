@@ -14,7 +14,64 @@ namespace MSE2
 {
     public static class LimbRecipeDefGenerator
     {
-        public static IEnumerable<RecipeDef> ExtraLimbSurgeryRecipeDefs ()
+        public static void AddExtraRecipesToDefDatabase ()
+        {
+            var defsToCheck = new List<RecipeDef>();
+
+            try
+            {
+                // add the recipes to craft the prostheses with the various configurations of parts
+                foreach ( RecipeDef def in ImpliedLimbRecipeDefs() )
+                {
+                    def.ResolveReferences();
+                    DefGenerator.AddImpliedDef<RecipeDef>( def );
+                    HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
+                    defsToCheck.Add( def );
+                }
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception adding ImpliedLimbRecipeDefs: " + ex );
+            }
+
+            try
+            {
+                // duplicate ambiguous installation surgeries
+                foreach ( RecipeDef def in ExtraLimbSurgeryRecipeDefs() )
+                {
+                    def.ResolveReferences();
+                    DefGenerator.AddImpliedDef<RecipeDef>( def );
+                    HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
+                    defsToCheck.Add( def );
+                }
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception adding ExtraLimbSurgeryRecipeDefs: " + ex );
+            }
+
+            foreach ( var def in defsToCheck )
+            {
+                try
+                {
+                    if ( def.ignoreConfigErrors )
+                    {
+                        continue;
+                    }
+
+                    foreach ( string item in def.ConfigErrors() )
+                    {
+                        Log.Error( string.Concat( "Config error in ", def, ": ", item ) );
+                    }
+                }
+                catch ( Exception ex )
+                {
+                    Log.Error( "[MSE2] Exception in ConfigErrors() of " + def.defName + ": " + ex );
+                }
+            }
+        }
+
+        internal static IEnumerable<RecipeDef> ExtraLimbSurgeryRecipeDefs ()
         {
             List<LimbConfiguration> tmplimbsItCanTargetList = new List<LimbConfiguration>();
 
@@ -81,7 +138,7 @@ namespace MSE2
             }
         }
 
-        public static IEnumerable<RecipeDef> ImpliedLimbRecipeDefs ()
+        internal static IEnumerable<RecipeDef> ImpliedLimbRecipeDefs ()
         {
             return from ThingDef thingDef in DefDatabase<ThingDef>.AllDefs
                    where thingDef.GetCompProperties<CompProperties_IncludedChildParts>() != null

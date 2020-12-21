@@ -41,8 +41,7 @@ namespace MSE2.HarmonyPatches
 
             if ( lastBranchIfFalse.opcode != OpCodes.Brfalse_S )
             {
-                Log.Error( "MSE2 MissingIfWrongTargetLimb failed. lastBranchIfFalse: " + lastBranchIfFalse );
-                return instrList;
+                throw new ApplicationException( "[MSE2] MissingIfWrongTargetLimb failed. lastBranchIfFalse: " + lastBranchIfFalse );
             }
 
             instrList.InsertRange( indexAt, ExtraCheck().Append( new CodeInstruction( lastBranchIfFalse ) ) );

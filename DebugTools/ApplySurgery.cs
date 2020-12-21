@@ -39,7 +39,7 @@ namespace MSE2.DebugTools
         {
             if ( pawn == null )
             {
-                throw new ArgumentNullException( "p" );
+                throw new ArgumentNullException( nameof(pawn) );
             }
             List<DebugMenuOption> list = new List<DebugMenuOption>();
 

@@ -39,9 +39,9 @@ namespace MSE2
                         "\n new: " + string.Join( ", ", recipedef.recipeUsers.Select( u => (u, u.race.body.AllParts.Count) ) ) );
                 }
             }
-            catch ( Exception e )
+            catch ( Exception ex )
             {
-                Log.Error( "[MSE2] Error applying AutoRecipeUsers: " + e.Message );
+                Log.Error( "[MSE2] Exception applying AutoRecipeUsers: " + ex );
             }
         }
     }
