@@ -34,9 +34,6 @@ namespace MSE2
                             recipedef.recipeUsers.Add( pawndef );
                         }
                     }
-
-                    Log.Message( recipedef.defName + " AutoRecipeUsers" +
-                        "\n new: " + string.Join( ", ", recipedef.recipeUsers.Select( u => (u, u.race.body.AllParts.Count) ) ) );
                 }
             }
             catch ( Exception ex )
