@@ -150,9 +150,6 @@
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
-    <Compile Include="RecipeFixer\FixRecipesPatch.cs" />
-    <Compile Include="RecipeFixer\PartsIncludedInCost.cs" />
-    <Compile Include="RecipeFixer\RecipeFixingUtilities.cs" />
     <Compile Include="SortAndGroupPawnCapacityTip.cs" />
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
