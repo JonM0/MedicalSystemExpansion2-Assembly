@@ -169,12 +169,6 @@ namespace MSE2
                 allParts.AddRange( comp.AllPartsForLimb( limb ).GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
             }
 
-            // exit if any part has not segment recipe
-            if ( allParts.Any( p => !p.thingDef.CanCraftSegment() ) )
-            {
-                return (null, 0);
-            }
-
             // the ingredients to make the segments, not grouped by thingdef
             List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
             foreach ( ThingDefCountClass partCount in allParts )
@@ -222,101 +216,63 @@ namespace MSE2
             RecipeDef originalRecipe = DefDatabase<RecipeDef>.GetNamed( "Make_" + prosthesisDef.defName );
             if ( originalRecipe != null )
             {
-                switch ( comp.costListType )
-                {
-                case CompProperties_IncludedChildParts.CLType.Segment:
-                    originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
-                    break;
-
-                case CompProperties_IncludedChildParts.CLType.Upgrade:
-                    originalRecipe.label = "RecipeMakeUpgrade".Translate( prosthesisDef.label );
-                    break;
-
-                case CompProperties_IncludedChildParts.CLType.FirstLimb:
-                    LimbConfiguration firstLimb = comp.InstallationDestinations[0];
-                    string limbComparison = comp.LabelComparisonForLimb( firstLimb );
-
-                    originalRecipe.label = (limbComparison == "" ? "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
-                    originalRecipe.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                    string[] items = originalRecipe.products.Select( delegate ( ThingDefCountClass p )
-                    {
-                        if ( p.count != 1 )
-                        {
-                            return p.Label;
-                        }
-                        return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
-                    } ).ToArray<string>();
-                    originalRecipe.description = "RecipeMakeForLimbDescription".Translate( items.ToCommaList( true ), limbComparison );
-                    originalRecipe.descriptionHyperlinks = (from p in originalRecipe.products
-                                                            select new DefHyperlink( p.thingDef )).ToList();
-
-                    if ( originalRecipe.modExtensions == null ) originalRecipe.modExtensions = new List<DefModExtension>();
-                    originalRecipe.modExtensions.Add( new TargetLimb( firstLimb ) );
-
-                    break;
-
-                default:
-                    break;
-                }
+                originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
             }
 
-            // generate limb specific crafting recipes only when the costlist is that of a segment
-            if ( comp.costListType == CompProperties_IncludedChildParts.CLType.Segment )
+            // generate limb specific crafting recipes
+            foreach ( LimbConfiguration limb in comp.InstallationDestinations )
             {
-                foreach ( LimbConfiguration limb in comp.InstallationDestinations )
+                RecipeDef recipeDef = new RecipeDef();
+
+                RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
+
+                // set all text
+                string limbComparison = comp.LabelComparisonForLimb( limb );
+
+                recipeDef.defName = "Make_" + prosthesisDef.defName + "_" + limb.UniqueName;
+                recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
+                    "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
+                recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
+                string[] products = recipeDef.products.Select( delegate ( ThingDefCountClass p )
                 {
-                    RecipeDef recipeDef = new RecipeDef();
-
-                    RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
-
-                    // set all text
-                    string limbComparison = comp.LabelComparisonForLimb( limb );
-
-                    recipeDef.defName = "Make_" + prosthesisDef.defName + "_" + limb.UniqueName;
-                    recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
-                        "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
-                    recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                    string[] products = recipeDef.products.Select( delegate ( ThingDefCountClass p )
+                    if ( p.count != 1 )
                     {
-                        if ( p.count != 1 )
-                        {
-                            return p.Label;
-                        }
-                        return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
-                    } ).ToArray<string>();
-                    recipeDef.description = "RecipeMakeForLimbDescription".Translate( products.ToCommaList( true ), limbComparison );
-                    recipeDef.descriptionHyperlinks = (from p in recipeDef.products
-                                                       select new DefHyperlink( p.thingDef )).ToList();
+                        return p.Label;
+                    }
+                    return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
+                } ).ToArray<string>();
+                recipeDef.description = "RecipeMakeForLimbDescription".Translate( products.ToCommaList( true ), limbComparison );
+                recipeDef.descriptionHyperlinks = (from p in recipeDef.products
+                                                   select new DefHyperlink( p.thingDef )).ToList();
 
-                    // copy other values
-                    recipeDef.modContentPack = prosthesisDef.modContentPack;
-                    recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
-                    recipeDef.efficiencyStat = recipeMaker.efficiencyStat;
-                    recipeDef.defaultIngredientFilter = recipeMaker.defaultIngredientFilter;
-                    recipeDef.products.Add( new ThingDefCountClass( prosthesisDef, recipeMaker.productCount ) );
-                    recipeDef.targetCountAdjustment = recipeMaker.targetCountAdjustment;
-                    recipeDef.skillRequirements = recipeMaker.skillRequirements.ListFullCopyOrNull<SkillRequirement>();
-                    recipeDef.workSkill = recipeMaker.workSkill;
-                    recipeDef.workSkillLearnFactor = recipeMaker.workSkillLearnPerTick;
-                    recipeDef.requiredGiverWorkType = recipeMaker.requiredGiverWorkType;
-                    recipeDef.unfinishedThingDef = recipeMaker.unfinishedThingDef;
-                    recipeDef.recipeUsers = recipeMaker.recipeUsers.ListFullCopyOrNull<ThingDef>();
-                    recipeDef.effectWorking = recipeMaker.effectWorking;
-                    recipeDef.soundWorking = recipeMaker.soundWorking;
-                    recipeDef.researchPrerequisite = recipeMaker.researchPrerequisite;
-                    recipeDef.researchPrerequisites = recipeMaker.researchPrerequisites;
-                    recipeDef.factionPrerequisiteTags = recipeMaker.factionPrerequisiteTags;
+                // copy other values
+                recipeDef.modContentPack = prosthesisDef.modContentPack;
+                recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
+                recipeDef.efficiencyStat = recipeMaker.efficiencyStat;
+                recipeDef.defaultIngredientFilter = recipeMaker.defaultIngredientFilter;
+                recipeDef.products.Add( new ThingDefCountClass( prosthesisDef, recipeMaker.productCount ) );
+                recipeDef.targetCountAdjustment = recipeMaker.targetCountAdjustment;
+                recipeDef.skillRequirements = recipeMaker.skillRequirements.ListFullCopyOrNull<SkillRequirement>();
+                recipeDef.workSkill = recipeMaker.workSkill;
+                recipeDef.workSkillLearnFactor = recipeMaker.workSkillLearnPerTick;
+                recipeDef.requiredGiverWorkType = recipeMaker.requiredGiverWorkType;
+                recipeDef.unfinishedThingDef = recipeMaker.unfinishedThingDef;
+                recipeDef.recipeUsers = recipeMaker.recipeUsers.ListFullCopyOrNull<ThingDef>();
+                recipeDef.effectWorking = recipeMaker.effectWorking;
+                recipeDef.soundWorking = recipeMaker.soundWorking;
+                recipeDef.researchPrerequisite = recipeMaker.researchPrerequisite;
+                recipeDef.researchPrerequisites = recipeMaker.researchPrerequisites;
+                recipeDef.factionPrerequisiteTags = recipeMaker.factionPrerequisiteTags;
 
-                    // set ingredients and work based on combined subparts
-                    (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForLimb( prosthesisDef, limb );
+                // set ingredients and work based on combined subparts
+                (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForLimb( prosthesisDef, limb );
 
-                    // add specific limb modextension
-                    if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
-                    recipeDef.modExtensions.Add( new TargetLimb( limb ) );
+                // add specific limb modextension
+                if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
+                recipeDef.modExtensions.Add( new TargetLimb( limb ) );
 
-                    if ( !recipeDef.ingredients.NullOrEmpty() )
-                        yield return recipeDef;
-                }
+                if ( !recipeDef.ingredients.NullOrEmpty() )
+                    yield return recipeDef;
             }
         }
     }

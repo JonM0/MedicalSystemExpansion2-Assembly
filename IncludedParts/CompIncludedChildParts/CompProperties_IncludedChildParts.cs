@@ -223,21 +223,10 @@ namespace MSE2
             }
         }
 
-        public enum CLType
-        {
-            Segment,
-            Upgrade,
-            FirstLimb,
-        }
-
-        public bool CanCraftSegment => this.costListType == CLType.Segment;
-
         // xml def fields
 
         public List<ThingDef> standardChildren;
 
         public List<ThingDef> alwaysInclude;
-
-        public CLType costListType = CLType.Segment;
     }
 }

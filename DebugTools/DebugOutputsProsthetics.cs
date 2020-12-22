@@ -25,14 +25,7 @@ namespace MSE2.DebugTools
 
         private static string SegmentCostList ( ThingDef thingDef )
         {
-            if ( thingDef.GetCompProperties<CompProperties_IncludedChildParts>()?.CanCraftSegment ?? true )
-            {
-                return thingDef.costList?.Select( c => c.thingDef.defName + " x" + c.count ).ToCommaList() ?? "NULL";
-            }
-            else
-            {
-                return "No segment recipe";
-            }
+            return thingDef.costList?.Select( c => c.thingDef.defName + " x" + c.count ).ToCommaList() ?? "NULL";
         }
 
         private static float SegmentValue ( ThingDef thingDef )

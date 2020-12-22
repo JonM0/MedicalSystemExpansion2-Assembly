@@ -201,15 +201,5 @@ namespace MSE2
             }
             return !limbs.Any();
         }
-
-        //public static bool EverInstallableOn ( ThingDef thingDef, BodyPartRecord bodyPartRecord )
-        //{
-        //    return CachedInstallationDestinations( thingDef ).Any( bd_bpd => bd_bpd.Item1 == bodyPartRecord.body && bd_bpd.Item2 == bodyPartRecord.def );
-        //}
-
-        public static bool CanCraftSegment ( this ThingDef thingDef )
-        {
-            return thingDef.GetCompProperties<CompProperties_IncludedChildParts>()?.CanCraftSegment ?? true;
-        }
     }
 }
