@@ -22,10 +22,6 @@ namespace MSE2
             base.ResolveReferences( parentDef );
 
             this.parentDef = parentDef;
-
-            this.limbLabeller = new LimbLabeler( this.InstallationDestinations, this.IgnoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                                                                       from u in s.AllRecipeUsers
-                                                                                                       select u.race.body).Contains );
         }
 
         public override IEnumerable<string> ConfigErrors ( ThingDef parentDef )
@@ -44,13 +40,7 @@ namespace MSE2
                 yield return "[MSE2] def must have stack limit of 1 to work properly";
             }
 
-            // warning for never installable
-            if ( this.InstallationDestinations.NullOrEmpty() )
-            {
-                yield return "[MSE2] will never be installable anywhere";
-            }
-
-            // warning for empy comp
+            // warning for empty comp
             if ( this.standardChildren.NullOrEmpty() )
             {
                 yield return "[MSE2] CompProperties_IncludedChildParts has no children";
@@ -77,7 +67,7 @@ namespace MSE2
                 // first standard child that can be installed on lc
                 ThingDef thingDef = this.standardChildren
                     .Find( td =>
-                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.CachedInstallationDestinations( td ))
+                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.InstallationDestinations( td ))
                         .Contains( lc )
                         );
                 if ( thingDef != null )
@@ -88,6 +78,8 @@ namespace MSE2
                 {
                     Log.Error( "[MSE2] Could not find a standard child of " + this.parentDef.defName + " compatible with body part record " + lc +
                         "\nIgnored parts: " + (this.IgnoredSubparts?.Select( p => p.defName ).ToCommaList() ?? "none") );
+
+                    this.InstallationDestinations.Remove( lc );
                 }
             }
 
@@ -121,12 +113,12 @@ namespace MSE2
 
         public string LabelComparisonForLimb ( LimbConfiguration limb )
         {
-            return this.limbLabeller.GetComparisonForLimb( limb );
+            return this.LimbLabeller.GetComparisonForLimb( limb );
         }
 
         public string GetCompatibilityReportDescription ( Predicate<LimbConfiguration> isCompatible )
         {
-            return this.limbLabeller.GetCompatibilityReport( isCompatible );
+            return this.LimbLabeller.GetCompatibilityReport( isCompatible );
         }
 
         private float MarketValueForConfiguration ( LimbConfiguration limb )
@@ -186,7 +178,12 @@ namespace MSE2
         private ThingDef parentDef;
 
         [Unsaved]
-        private LimbLabeler limbLabeller;
+        private LimbLabeler lazyLimbLabeller;
+
+        internal LimbLabeler LimbLabeller => lazyLimbLabeller
+            ?? (lazyLimbLabeller = new LimbLabeler( this.InstallationDestinations, this.IgnoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+                                                                                                          from u in s.AllRecipeUsers
+                                                                                                          select u.race.body).Contains ));
 
         [Unsaved]
         private (bool valid, List<BodyPartDef> list) cachedIgnoredSubparts = (false, null);
@@ -212,7 +209,7 @@ namespace MSE2
         }
 
         [Unsaved]
-        public List<LimbConfiguration> cachedInstallationDestinations;
+        private List<LimbConfiguration> cachedInstallationDestinations;
 
         public List<LimbConfiguration> InstallationDestinations
         {
@@ -220,7 +217,7 @@ namespace MSE2
             {
                 if ( this.cachedInstallationDestinations == null )
                 {
-                    this.cachedInstallationDestinations = IncludedPartsUtilities.CachedInstallationDestinations( this.parentDef ).ToList();
+                    this.cachedInstallationDestinations = IncludedPartsUtilities.InstallationDestinations( this.parentDef ).ToList();
                 }
                 return this.cachedInstallationDestinations;
             }

@@ -10,6 +10,8 @@ namespace MSE2
 {
     internal static class AutoRecipeUserUtilities
     {
+        internal static bool AutoRecipeUsersApplied { get; private set; } = false;
+
         internal static void ApplyAutoRecipeUsers ()
         {
             try
@@ -17,6 +19,11 @@ namespace MSE2
                 List<ThingDef> pawndefs = (from t in DefDatabase<ThingDef>.AllDefs
                                            where t.race != null
                                            select t).ToList();
+
+                if ( pawndefs.NullOrEmpty() || pawndefs.Exists( pawn => pawn.race.body.AllParts.NullOrEmpty() ) )
+                {
+                    throw new ApplicationException( "Pawn defs and bodies are not loaded" );
+                }
 
                 foreach ( (RecipeDef recipedef, AutoRecipeUsers aru) in from d in DefDatabase<RecipeDef>.AllDefs
                                                                         where d.HasModExtension<AutoRecipeUsers>()
@@ -35,6 +42,8 @@ namespace MSE2
                         }
                     }
                 }
+
+                AutoRecipeUsersApplied = true;
             }
             catch ( Exception ex )
             {

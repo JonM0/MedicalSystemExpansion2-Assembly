@@ -79,8 +79,14 @@ namespace MSE2
                 throw new ApplicationException( "[MSE2] Tried to find SurgeryToInstall before DefDatabase was loaded. ThingDef: " + thing.defName );
             }
 
+            if ( !AutoRecipeUserUtilities.AutoRecipeUsersApplied )
+            {
+                throw new ApplicationException( "[MSE2] Tried to find SurgeryToInstall before AutoRecipeUsers were applied. ThingDef: " + thing.defName );
+            }
+
             return DefDatabase<RecipeDef>.AllDefs.Where( d => d.IsSurgery && d.IsIngredient( thing ) );
         }
+
         public static IEnumerable<RecipeDef> SurgeryToInstall ( HediffDef hediffDef )
         {
             if ( DefDatabase<RecipeDef>.AllDefsListForReading.NullOrEmpty() )
@@ -135,7 +141,7 @@ namespace MSE2
 
         private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
 
-        public static IReadOnlyList<LimbConfiguration> CachedInstallationDestinations ( ThingDef parentDef )
+        public static IReadOnlyList<LimbConfiguration> InstallationDestinations ( ThingDef parentDef )
         {
             if ( cachedInstallationDestinations.TryGetValue( parentDef, out List<LimbConfiguration> val ) )
             {
@@ -186,7 +192,7 @@ namespace MSE2
                 foreach ( Thing thing in things )
                 {
                     if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
-                        CachedInstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
+                        InstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
                         && InstallationCompatibility( things.ExceptFirst( thing ), limbs.ExceptFirst( limb ) ) ) // all other things check out
                     {
                         return true;
