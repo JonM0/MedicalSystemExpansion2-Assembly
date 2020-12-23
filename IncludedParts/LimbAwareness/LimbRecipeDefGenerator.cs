@@ -233,17 +233,8 @@ namespace MSE2
                 recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
                     "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
                 recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                string[] products = recipeDef.products.Select( delegate ( ThingDefCountClass p )
-                {
-                    if ( p.count != 1 )
-                    {
-                        return p.Label;
-                    }
-                    return Find.ActiveLanguageWorker.WithIndefiniteArticle( p.thingDef.label, false, false );
-                } ).ToArray<string>();
-                recipeDef.description = "RecipeMakeForLimbDescription".Translate( products.ToCommaList( true ), limbComparison );
-                recipeDef.descriptionHyperlinks = (from p in recipeDef.products
-                                                   select new DefHyperlink( p.thingDef )).ToList();
+                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label );
+                recipeDef.descriptionHyperlinks = originalRecipe.descriptionHyperlinks;
 
                 // copy other values
                 recipeDef.modContentPack = prosthesisDef.modContentPack;
