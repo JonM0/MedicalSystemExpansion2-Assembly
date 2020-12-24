@@ -11,7 +11,7 @@ namespace MSE2
     {
         private class Command_SetTargetLimb : Command
         {
-            public readonly CompIncludedChildParts comp;
+            private readonly CompIncludedChildParts comp;
 
             public Command_SetTargetLimb ( CompIncludedChildParts comp )
             {
