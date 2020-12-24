@@ -128,16 +128,6 @@ namespace MSE2
             }
         }
 
-        public string LabelComparisonForLimb ( LimbConfiguration limb )
-        {
-            return this.LimbLabeller.GetComparisonForLimb( limb );
-        }
-
-        public string GetCompatibilityReportDescription ( Predicate<LimbConfiguration> isCompatible )
-        {
-            return this.LimbLabeller.GetCompatibilityReport( isCompatible );
-        }
-
         private float MarketValueForConfiguration ( LimbConfiguration limb )
         {
             float value = this.parentDef.BaseMarketValue;

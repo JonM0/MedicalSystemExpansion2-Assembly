@@ -227,13 +227,13 @@ namespace MSE2
                 RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
 
                 // set all text
-                string limbComparison = comp.LabelComparisonForLimb( limb );
+                string limbComparison = comp.LimbLabeller.GetComparisonForLimb( limb );
 
                 recipeDef.defName = "Make_" + prosthesisDef.defName + "_" + limb.UniqueName;
                 recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
                     "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
                 recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label );
+                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label, comp.LimbLabeller.GetRacesForLimb( limb ).ToCommaList( true ) );
                 recipeDef.descriptionHyperlinks = originalRecipe.descriptionHyperlinks;
 
                 // copy other values

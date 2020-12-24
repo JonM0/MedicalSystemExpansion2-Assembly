@@ -33,7 +33,7 @@ namespace MSE2
                 foreach ( LimbConfiguration possibleTarget in this.comp.Props.InstallationDestinations.Where( t => t != this.comp.TargetLimb ) )
                 {
                     options.Add( new FloatMenuOption(
-                        this.comp.Props.LabelComparisonForLimb( possibleTarget ).CapitalizeFirst(),
+                        this.comp.Props.LimbLabeller.GetComparisonForLimb( possibleTarget ).CapitalizeFirst(),
                         () => // click action
                         {
                             this.comp.TargetLimb = possibleTarget;

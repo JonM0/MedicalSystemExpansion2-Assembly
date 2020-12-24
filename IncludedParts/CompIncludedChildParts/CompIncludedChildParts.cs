@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -235,7 +235,7 @@ namespace MSE2
             }
         }
 
-        public string TargetLimbLabel => this.Props.LabelComparisonForLimb( this.TargetLimb );
+        public string TargetLimbLabel => this.Props.LimbLabeller.GetComparisonForLimb( this.TargetLimb ) ?? "LimbSegment".Translate();
 
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
