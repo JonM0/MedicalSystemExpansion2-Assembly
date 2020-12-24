@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -585,7 +585,7 @@ namespace MSE2
             "CompIncludedChildParts_StatIncludedParts_Label".Translate(),
             this.IncludedParts.Count.ToString(),
             "CompIncludedChildParts_StatIncludedParts_Description".Translate(),
-            2501,
+            2502,
             null,
             this.IncludedParts.Select( p => new Dialog_InfoCard.Hyperlink( p ) ),
             false );
@@ -594,13 +594,23 @@ namespace MSE2
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatCompatibility_Label".Translate(),
             "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleLimbs.Count, this.Props.InstallationDestinations.Count ),
-            this.Props.GetCompatibilityReportDescription( this.CompatibleLimbs.Contains ),
+            this.Props.LimbLabeller.GetCompatibilityReport( this.CompatibleLimbs.Contains ),
             2500 );
+
+        private StatDrawEntry MissingPartsStat => new StatDrawEntry(
+            StatCategoryDefOf.Basics,
+            "CompIncludedChildParts_StatMissing_Label".Translate(),
+            this.AllMissingParts.Count().ToString(),
+            this.AllMissingParts.Any() ? "CompIncludedChildParts_StatMissing_Description".Translate() : "CompIncludedChildParts_StatMissing_Desc_None".Translate(),
+            2501,
+            null,
+            this.AllMissingParts.Select( p => new Dialog_InfoCard.Hyperlink( p.thingDef ) ) );
 
         public override IEnumerable<StatDrawEntry> SpecialDisplayStats ()
         {
             yield return this.IncluededPartsStat;
             yield return this.CompatibilityStat;
+            yield return this.MissingPartsStat;
         }
 
         #endregion StatsDisplay
