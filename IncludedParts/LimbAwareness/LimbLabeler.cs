@@ -162,7 +162,7 @@ namespace MSE2
                 List<string> labels = this.GetRacesForLimb( this.limbPool[i] );
                 for ( int l = 0; l < labels.Count; l++ )
                 {
-                    builder.AppendFormat( " - {0}", labels[l] ).AppendLine();
+                    builder.AppendFormat( " - {0}", labels[l].CapitalizeFirst() ).AppendLine();
                 }
 
                 builder.AppendLine();

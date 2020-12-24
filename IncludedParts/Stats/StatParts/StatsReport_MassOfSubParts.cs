@@ -14,7 +14,7 @@ namespace MSE2
 
         protected float MassOfChildParts ( CompIncludedChildParts comp )
         {
-            System.Collections.Generic.List<Thing> list = comp.IncludedParts;
+            var list = comp.IncludedParts;
             float tot = 0;
 
             for ( int i = 0; i < list.Count; i++ )
@@ -33,7 +33,7 @@ namespace MSE2
 
                 if ( comp != null )
                 {
-                    System.Collections.Generic.List<Thing> list = comp.IncludedParts;
+                    var list = comp.IncludedParts;
                     StringBuilder builder = new StringBuilder();
 
                     for ( int i = 0; i < list.Count; i++ )

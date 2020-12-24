@@ -32,23 +32,27 @@ namespace MSE2
             } );
         }
 
+        public override void ConsumeIngredient ( Thing ingredient, RecipeDef recipe, Map map )
+        {
+            if ( ingredient.TryGetComp<CompIncludedChildParts>() == null )
+            {
+                base.ConsumeIngredient( ingredient, recipe, map );
+            }
+        }
+
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
         {
-            // START VANILLA CODE (couldn't know if the surgery was successfull)
-
             bool partIsClean = MedicalRecipesUtility.IsClean( pawn, part );
             bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
             if ( billDoer != null )
             {
                 if ( base.CheckSurgeryFail( billDoer, pawn, ingredients, part, bill ) )
                 {
+                    foreach ( var ingredient in ingredients )
+                        if ( !ingredient.Destroyed ) ingredient.Destroy();
                     return;
                 }
-                TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[]
-                {
-                    billDoer,
-                    pawn
-                } );
+                TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[] { billDoer, pawn } );
                 MedicalRecipesUtility.RestorePartAndSpawnAllPreviousParts( pawn, part, billDoer.Position, billDoer.Map );
                 if ( partIsClean && isViolation && part.def.spawnThingOnRemoved != null )
                 {
@@ -65,11 +69,10 @@ namespace MSE2
             }
             else
             {
-                pawn.health.RestorePart( part, null, true );
+                pawn.health.RestorePart( part );
             }
-            pawn.health.AddHediff( this.recipe.addsHediff, part, null, null );
+            pawn.health.AddHediff( this.recipe.addsHediff, part );
 
-            // END VANILLA CODE
 
             if ( !ingredients.NullOrEmpty() )
             {

@@ -12,16 +12,13 @@ using Verse;
 
 namespace MSE2
 {
-    public partial class CompIncludedChildParts : ThingComp
+    public partial class CompIncludedChildParts : ThingComp, IThingHolder
     {
-        private CompIncludedChildParts holderComp;
-        private CompIncludedChildParts TopHolderComp => this.holderComp == null ? this : this.holderComp.TopHolderComp;
-        private Map Map => this.TopHolderComp.parent.Map;
-        private IntVec3 Position => this.TopHolderComp.parent.Position;
-
         public override void Initialize ( CompProperties props )
         {
             base.Initialize( props );
+
+            childPartsIncluded = new ThingOwner<Thing>( this );
 
             // Create the needed command gizmos
             this.command_SetTargetLimb = new Command_SetTargetLimb( this );
@@ -38,18 +35,8 @@ namespace MSE2
             // init the list if it comes up null (loading a map created without MSE2)
             if ( this.IncludedParts == null )
             {
-                this.IncludedParts = new List<Thing>();
+                this.childPartsIncluded = new ThingOwner<Thing>( this );
                 Log.Warning( "[MSE2] Included parts was null during loading." );
-            }
-
-            // set the holder comp of the included parts
-            for ( int i = 0; i < this.IncludedParts.Count; i++ )
-            {
-                CompIncludedChildParts comp = this.IncludedParts[i].TryGetComp<CompIncludedChildParts>();
-                if ( comp != null )
-                {
-                    comp.holderComp = this;
-                }
             }
         }
 
@@ -58,8 +45,27 @@ namespace MSE2
             base.PostExposeData();
 
             // Deep save the included Things
-            Scribe_Collections.Look( ref this.childPartsIncluded, "childPartsIncluded", LookMode.Deep );
+
+            Scribe_Deep.Look( ref this.childPartsIncluded, "childPartsIncluded", new object[] { this } );
             Scribe_LimbConfiguration.Look( ref this.targetLimb, "targetLimb" );
+
+            // compatibility with old version
+            if ( this.IncludedParts == null && Scribe.mode == LoadSaveMode.LoadingVars )
+            {
+                List<Thing> oldThings = null;
+
+                Scribe_Collections.Look( ref oldThings, "childPartsIncluded", LookMode.Deep );
+
+                if ( oldThings != null )
+                {
+                    this.childPartsIncluded = new ThingOwner<Thing>( this );
+
+                    foreach ( var thing in oldThings )
+                    {
+                        this.AddPart( thing );
+                    }
+                }
+            }
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit ) this.PostLoadInitialization();
         }
@@ -74,7 +80,7 @@ namespace MSE2
             this.cachedTransformLabelString = null;
             this.cachedInspectString = null;
 
-            this.holderComp?.DirtyCache();
+            (this.ParentHolder as CompIncludedChildParts)?.DirtyCache();
         }
 
         // gizmos for merging and splitting
@@ -115,19 +121,27 @@ namespace MSE2
 
         private readonly List<Thing> tmpThingList = new List<Thing>();
 
+        #region Holder
+
+        public void GetChildHolders ( List<IThingHolder> outChildren )
+        {
+            ThingOwnerUtility.AppendThingHoldersFromThings( outChildren, this.GetDirectlyHeldThings() );
+        }
+
+        public ThingOwner GetDirectlyHeldThings ()
+        {
+            return this.childPartsIncluded;
+        }
+
+        #endregion Holder
+
         #region Included parts
 
-        private List<Thing> childPartsIncluded = new List<Thing>();
+        private ThingOwner childPartsIncluded;
 
-        public List<Thing> IncludedParts
+        public ThingOwner IncludedParts
         {
             get => this.childPartsIncluded;
-            set
-            {
-                this.childPartsIncluded.Clear();
-                if ( value != null ) this.childPartsIncluded.AddRange( value );
-                this.DirtyCache();
-            }
         }
 
         public IEnumerable<CompIncludedChildParts> IncludedPartComps =>
@@ -164,20 +178,19 @@ namespace MSE2
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
 
             // prioritize matches of both def and target part
-            (ThingDef, LimbConfiguration) target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetLimb == p.limb) );
+            var target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetLimb == p.limb) );
             // fallback to just matching the def
-            if ( target.Item1 == null ) target = this.MissingParts.Find( p => p.thingDef == part.def );
+            if ( target.thingDef == null ) target = this.MissingParts.Find( p => p.thingDef == part.def );
 
             // found a match (part is actually missing)
-            if ( target.Item1 != null )
+            if ( target.thingDef != null )
             {
-                this.childPartsIncluded.Add( part );
+                this.IncludedParts.TryAdd( part.SplitOff( 1 ), false );
                 this.DirtyCache();
 
                 if ( partComp != null )
                 {
-                    partComp.TargetLimb = target.Item2;
-                    partComp.holderComp = this;
+                    partComp.TargetLimb = target.limb;
                 }
 
                 if ( part.Spawned )
@@ -189,27 +202,21 @@ namespace MSE2
 
         public void RemoveAndSpawnPart ( Thing part, IntVec3 position, Map map )
         {
-            if ( !this.IncludedParts.Contains( part ) )
+            if ( this.IncludedParts.Remove( part ) )
+            {
+                this.DirtyCache();
+
+                GenPlace.TryPlaceThing( part, position, map, ThingPlaceMode.Near );
+            }
+            else
             {
                 Log.Error( "[MSE2] Tried to remove " + part.Label + " from " + this.parent.Label + " while it wasn't actually included." );
-                return;
             }
-
-            this.childPartsIncluded.Remove( part );
-            this.DirtyCache();
-
-            CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
-            if ( partComp != null )
-            {
-                partComp.holderComp = null;
-            }
-
-            GenPlace.TryPlaceThing( part, position, map, ThingPlaceMode.Near );
         }
 
         public void RemoveAndSpawnPart ( Thing part )
         {
-            this.RemoveAndSpawnPart( part, this.Position, this.Map );
+            this.RemoveAndSpawnPart( part, ThingOwnerUtility.GetRootPosition( this ), ThingOwnerUtility.GetRootMap( this ) );
         }
 
         #endregion Included parts
@@ -331,7 +338,7 @@ namespace MSE2
 
         public bool IsComplete => this.MissingParts.Count == 0 && this.IncludedPartComps.All( c => c.IsComplete );
 
-        public bool AllAlwaysIncludedPartsPresent => this.Props.alwaysInclude?.TrueForAll( p => this.IncludedParts.Find( t => t.def == p ) != null ) ?? true;
+        public bool AllAlwaysIncludedPartsPresent => this.Props.alwaysInclude?.TrueForAll( p => this.IncludedParts.Any( t => t.def == p ) ) ?? true;
 
         #endregion Missing Parts
 
@@ -509,11 +516,8 @@ namespace MSE2
         {
             base.PostDestroy( mode, previousMap );
 
-            // destroy included child items (idk if it does anything as they aren't spawned)
-            foreach ( Thing childPart in this.IncludedParts )
-            {
-                childPart.Destroy( DestroyMode.Vanish );
-            }
+            // destroy included child items
+            this.IncludedParts.ClearAndDestroyContents();
         }
 
         #endregion Creation / Deletion

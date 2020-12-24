@@ -45,8 +45,9 @@ namespace MSE2
             List<BodyPartRecord> partsToConsider = new List<BodyPartRecord>( part.GetDirectChildParts().Append( part ) );
 
             // iterate over included child things
-            foreach ( Thing childThing in compChildParts.IncludedParts )
+            foreach ( Thing childThing in compChildParts.IncludedParts.ToList() )
             {
+                Log.Message( "installing " + childThing );
                 if ( TryGetRecipeAndPart( pawn, childThing.def, partsToConsider.Contains, out RecipeDef recipe, out BodyPartRecord bpr ) )
                 {
                     // apply the recipe
@@ -58,18 +59,13 @@ namespace MSE2
                 {
                     if ( pawn.Map != null && pawn.Position != null )
                     {
-                        childThing.ForceSetStateToUnspawned();
-                        childThing.stackCount = 1;
-                        GenPlace.TryPlaceThing( childThing, pawn.Position, pawn.Map, ThingPlaceMode.Near );
+                        compChildParts.RemoveAndSpawnPart( childThing, pawn.Position, pawn.Map );
                     }
-                    else
-                    {
-                        childThing.Destroy();
-                    }
-
                     Log.Warning( "[MSE] Couldn't install " + childThing.Label + " on " + part.Label + " of " + pawn.Name );
                 }
             }
+
+            compChildParts.parent.Destroy();
         }
 
         /// <summary>
