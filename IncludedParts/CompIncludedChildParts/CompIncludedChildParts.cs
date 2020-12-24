@@ -96,7 +96,7 @@ namespace MSE2
                     defaultLabel = "DEBUG: Make complete",
                     action = delegate ()
                     {
-                        this.InitializeForLimb(this.TargetLimb);
+                        this.InitializeForLimb( this.TargetLimb );
                     }
                 };
             }
@@ -164,9 +164,9 @@ namespace MSE2
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
 
             // prioritize matches of both def and target part
-            (ThingDef, LimbConfiguration) target = this.MissingParts.Find( p => p.Item1 == part.def && (partComp == null || partComp.TargetLimb == p.Item2) );
+            (ThingDef, LimbConfiguration) target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetLimb == p.limb) );
             // fallback to just matching the def
-            if ( target.Item1 == null ) target = this.MissingParts.Find( p => p.Item1 == part.def );
+            if ( target.Item1 == null ) target = this.MissingParts.Find( p => p.thingDef == part.def );
 
             // found a match (part is actually missing)
             if ( target.Item1 != null )
@@ -299,9 +299,9 @@ namespace MSE2
 
         #region Missing Parts
 
-        private (List<(ThingDef, LimbConfiguration)> list, bool valid) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
+        private (List<(ThingDef thingDef, LimbConfiguration limb)> list, bool valid) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
 
-        public List<(ThingDef, LimbConfiguration)> MissingParts
+        public List<(ThingDef thingDef, LimbConfiguration limb)> MissingParts
         {
             get
             {
@@ -318,8 +318,8 @@ namespace MSE2
                             CompIncludedChildParts thingComp = thing.TryGetComp<CompIncludedChildParts>();
 
                             this.cachedMissingParts.list.Remove( this.cachedMissingParts.list.Find( c =>
-                                 thing.def == c.Item1
-                                 && (thingComp == null || thingComp.TargetLimb == c.Item2) ) );
+                                 thing.def == c.thingDef
+                                 && (thingComp == null || thingComp.TargetLimb == c.limb) ) );
                         }
                     }
                     this.cachedMissingParts.valid = true;
@@ -379,7 +379,7 @@ namespace MSE2
             // first add things that match both def and target
             foreach ( Thing availableThing in available.ToArray() )
             {
-                if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def && mp.Item2 == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetLimb ) )
+                if ( this.MissingParts.Any( mp => mp.thingDef == availableThing.def && mp.limb == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetLimb ) )
                 {
                     this.AddPart( availableThing );
                     available.Remove( availableThing );
@@ -392,7 +392,7 @@ namespace MSE2
             // then just match thingdef
             foreach ( Thing availableThing in available.ToArray() )
             {
-                if ( this.MissingParts.Any( mp => mp.Item1 == availableThing.def ) )
+                if ( this.MissingParts.Any( mp => mp.thingDef == availableThing.def ) )
                 {
                     this.AddPart( availableThing );
                     available.Remove( availableThing );
@@ -610,7 +610,7 @@ namespace MSE2
         /// <summary>
         /// Recursively searches for IncludedParts in all of the sub-parts
         /// </summary>
-        public IEnumerable<(Thing, CompIncludedChildParts)> AllIncludedParts => Enumerable.Concat(
+        public IEnumerable<(Thing thing, CompIncludedChildParts ownerComp)> AllIncludedParts => Enumerable.Concat(
 
                 // the sub-parts included in this part
                 this.IncludedParts.Select( p => (p, this) ),
@@ -625,7 +625,7 @@ namespace MSE2
         /// <summary>
         /// Recursively searches for StandardParts in all of the sub-parts
         /// </summary>
-        public IEnumerable<(ThingDef, CompIncludedChildParts)> AllStandardParts => Enumerable.Concat(
+        public IEnumerable<(ThingDef thingDef, CompIncludedChildParts ownerComp)> AllStandardParts => Enumerable.Concat(
 
                 // the standard sub-parts included in this part
                 this.StandardParts.Select( p => (p, this) ),
@@ -637,10 +637,10 @@ namespace MSE2
                 from couple in comp.AllStandardParts
                 select couple );
 
-        public IEnumerable<(ThingDef, LimbConfiguration, CompIncludedChildParts)> AllMissingParts => Enumerable.Concat(
+        public IEnumerable<(ThingDef thingDef, LimbConfiguration limb, CompIncludedChildParts ownerComp)> AllMissingParts => Enumerable.Concat(
 
                 // the standard sub-parts included in this part
-                this.MissingParts.Select( p => (p.Item1, p.Item2, this) ),
+                this.MissingParts.Select( p => (p.thingDef, p.limb, this) ),
 
                 // the standard sub-parts of the children with CompIncludedChildParts
                 from i in this.IncludedParts

@@ -77,8 +77,8 @@ namespace MSE2
             /// </summary>
             private IEnumerable<(Thing, CompIncludedChildParts)> PossibleThings => from t in this.comp.parent.Map.listerThings.AllThings
                                                                                    from u in this.comp.AllMissingParts.Distinct()
-                                                                                   where u.Item1 == t.def
-                                                                                   select (t, u.Item3);
+                                                                                   where u.thingDef == t.def
+                                                                                   select (t, u.ownerComp);
 
             public override GizmoResult GizmoOnGUI ( Vector2 loc, float maxWidth )
             {
