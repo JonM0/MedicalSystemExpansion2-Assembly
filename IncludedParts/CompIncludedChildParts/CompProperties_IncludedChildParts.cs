@@ -78,8 +78,6 @@ namespace MSE2
                 {
                     Log.Error( "[MSE2] Could not find a standard child of " + this.parentDef.defName + " compatible with body part record " + lc +
                         "\nIgnored parts: " + (this.IgnoredSubparts?.Select( p => p.defName ).ToCommaList() ?? "none") );
-
-                    this.InstallationDestinations.Remove( lc );
                 }
             }
 
@@ -91,6 +89,25 @@ namespace MSE2
                     yield return (this.alwaysInclude[i], null);
                 }
             }
+        }
+
+        private bool LimbIsCompatible ( LimbConfiguration limb )
+        {
+            if ( limb == null ) return true;
+
+            foreach ( LimbConfiguration lc in this.IgnoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ) )
+            {
+                // there is no standard child that can be installed on lc
+                if ( !this.standardChildren.Exists( td =>
+                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.InstallationDestinations( td ))
+                        .Contains( lc )
+                        ) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public IEnumerable<ThingDef> AllPartsForLimb ( LimbConfiguration limb )
@@ -217,7 +234,7 @@ namespace MSE2
             {
                 if ( this.cachedInstallationDestinations == null )
                 {
-                    this.cachedInstallationDestinations = IncludedPartsUtilities.InstallationDestinations( this.parentDef ).ToList();
+                    this.cachedInstallationDestinations = IncludedPartsUtilities.InstallationDestinations( this.parentDef ).Where( LimbIsCompatible ).ToList();
                 }
                 return this.cachedInstallationDestinations;
             }
