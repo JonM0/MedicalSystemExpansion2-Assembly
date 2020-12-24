@@ -565,13 +565,10 @@ namespace MSE2
 
                     stringBuilder.Append( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
 
-                    if ( this.TargetLimb != null )
+                    stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
+                    if ( this.AllMissingParts.Any() )
                     {
-                        stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
-                        if ( this.AllMissingParts.Any() )
-                        {
-                            stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize
-                        }
+                        stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize
                     }
 
                     this.cachedInspectString = stringBuilder.ToString();
