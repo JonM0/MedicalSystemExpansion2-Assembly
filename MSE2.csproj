@@ -132,7 +132,6 @@
     <Compile Include="IncludedParts\PartInstallation\InstallationRestrictions.cs" />
     <Compile Include="IncludedParts\PartRemoval\IsClean_Patch.cs" />
     <Compile Include="IncludedParts\PartInstallation\InstallationUtilities.cs" />
-    <Compile Include="IncludedParts\PartRemoval\SpawnNaturalPartIfClean.cs" />
     <Compile Include="IncludedParts\PartRemoval\SpawnThingsFromHediffs.cs" />
     <Compile Include="MedicalSystemExpansion.cs" />
     <Compile Include="MSE_HediffDefOf.cs" />
@@ -141,7 +140,6 @@
     <Compile Include="Modules\Hediff_ModuleAdded.cs" />
     <Compile Include="Modules\Hediff_ModuleSlot.cs" />
     <Compile Include="IncludedParts\PartInstallation\Recipe_InstallArtificialBodyPartWithChildren.cs" />
-    <Compile Include="IncludedParts\PartInstallation\Recipe_InstallNaturalBodyPartWithChildren.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompIncludedChildParts.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\MultiplyByParent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
