@@ -100,7 +100,7 @@ namespace MSE2
             {
                 if ( this.allRecords.EnumerableNullOrEmpty() )
                 {
-                    Log.Error( "Tried to get Child limbs of incomplete limb configuration" );
+                    Log.Error( "[MSE2] Tried to get Child limbs of incomplete limb configuration" );
                     return Enumerable.Empty<LimbConfiguration>();
                 }
                 else

@@ -167,9 +167,9 @@ namespace MSE2
             {
                 if ( this.cachedAverageValue == -1f )
                 {
-                    if ( this.InstallationDestinations == null )
+                    if ( this.cachedInstallationDestinations == null )
                     {
-                        Log.Error( "Tried to calculate min value before valid limbs were set. ThingDef: " + this.parentDef.defName );
+                        Log.Error( "[MSE2] Tried to calculate min value before valid limbs were set. ThingDef: " + this.parentDef.defName );
                     }
                     else
                     {

@@ -52,7 +52,7 @@ namespace MSE2
 
             if ( this.CurrentModules > this.MaxModules )
             {
-                Log.Error( "[MSE2] Added too many modules to part " + this.parent.Label );
+                Log.Warning( "[MSE2] Added too many modules to part " + this.parent.Label );
             }
         }
 
@@ -86,33 +86,33 @@ namespace MSE2
                 // error check and remove null modules
                 if ( this.moduleAddeds == null )
                 {
-                    Log.Error( "[MSE2] " + this + ": null moduleAddeds after loading" );
+                    Log.Warning( "[MSE2] " + this + ": null moduleAddeds after loading" );
                     this.moduleAddeds = new List<Hediff_ModuleAdded>();
                 }
                 else if ( this.moduleAddeds.RemoveAll( m => m == null ) > 0 )
                 {
-                    Log.Error( "[MSE2] " + this + ": found null modules after loading" );
+                    Log.Warning( "[MSE2] " + this + ": found null modules after loading" );
                 }
                 // error check and remove null slots
                 if ( this.moduleSlots == null )
                 {
-                    Log.Error( "[MSE2] " + this + ": null moduleSlots after loading" );
+                    Log.Warning( "[MSE2] " + this + ": null moduleSlots after loading" );
                     this.moduleSlots = new List<Hediff_ModuleSlot>();
                 }
                 else if ( this.moduleSlots.RemoveAll( m => m == null ) > 0 )
                 {
-                    Log.Error( "[MSE2] " + this + ": found null slots after loading" );
+                    Log.Warning( "[MSE2] " + this + ": found null slots after loading" );
                 }
 
                 // link holder
                 foreach ( Hediff_ModuleAdded module in this.moduleAddeds )
                 {
-                    if ( module.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": module " + module + " already had a ModuleHolder when loading" );
+                    if ( module.ModuleHolder != null ) Log.Warning( "[MSE2] " + this + ": module " + module + " already had a ModuleHolder when loading" );
                     module.ModuleHolder = this;
                 }
                 foreach ( Hediff_ModuleSlot slot in this.moduleSlots )
                 {
-                    if ( slot.ModuleHolder != null ) Log.Error( "[MSE2] " + this + ": slot " + slot + " already had a ModuleHolder when loading" );
+                    if ( slot.ModuleHolder != null ) Log.Warning( "[MSE2] " + this + ": slot " + slot + " already had a ModuleHolder when loading" );
                     slot.ModuleHolder = this;
                 }
             }

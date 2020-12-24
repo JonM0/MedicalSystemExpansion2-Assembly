@@ -27,18 +27,19 @@ namespace MSE2
             {
                 if ( this.extraDiffs == null )
                 {
-                    Log.Error( string.Format( "[MSE2] On {0} ({1}): HediffComp_ExtraDiffCreator.extraDiffs null after load", this.parent, this.Pawn ) );
+                    Log.Warning( string.Format( "[MSE2] On {0} ({1}): HediffComp_ExtraDiffCreator.extraDiffs null after load", this.parent, this.Pawn ) );
                     this.extraDiffs = new List<HediffExtraDiff>();
+                    this.AddAllExtraDiffs();
                 }
                 if ( this.extraDiffs.RemoveAll( d => d == null ) != 0 )
                 {
-                    Log.Error( string.Format( "[MSE2] On {0} ({1}): some effectors in extraDiffs were null after load", this.parent, this.Pawn ) );
+                    Log.Warning( string.Format( "[MSE2] On {0} ({1}): some effectors in extraDiffs were null after load", this.parent, this.Pawn ) );
                 }
                 foreach ( HediffExtraDiff diff in this.extraDiffs )
                 {
                     if ( diff.diffCreator != null )
                     {
-                        Log.Error( string.Format( "[MSE2] On {0} ({1}): extraDiff {2} had a creator at loading", this.parent, this.Pawn, diff ) );
+                        Log.Warning( string.Format( "[MSE2] On {0} ({1}): extraDiff {2} had a creator at loading", this.parent, this.Pawn, diff ) );
                     }
                     diff.diffCreator = this;
                 }

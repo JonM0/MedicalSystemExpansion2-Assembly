@@ -17,7 +17,7 @@ namespace MSE2.HarmonyPatches
             {
                 if ( !(hediff is Hediff_MissingPart) && __instance.PartShouldBeIgnored( hediff.Part ) )
                 {
-                    Log.Error( "Tried to add health diff to part that should be ignored. Canceling.", false );
+                    Log.Error( "[MSE2] Tried to add health diff to part that should be ignored. Canceling.", false );
                     return false;
                 }
 

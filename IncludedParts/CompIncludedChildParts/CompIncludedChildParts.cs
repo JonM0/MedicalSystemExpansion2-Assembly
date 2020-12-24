@@ -157,7 +157,7 @@ namespace MSE2
         {
             if ( !this.StandardParts.Contains( part.def ) && !this.Props.alwaysInclude.Contains( part.def ) )
             {
-                Log.Error( part.Label + " is not a valid subpart for " + this.parent.Label );
+                Log.Error( "[MSE2] " + part.Label + " is not a valid subpart for " + this.parent.Label );
                 return;
             }
 
@@ -225,7 +225,7 @@ namespace MSE2
             {
                 if ( value != null && !this.Props.EverInstallableOn( value ) )
                 {
-                    Log.Error( string.Format( "Tried to set invalid target limb ({0}) on {1}", value.UniqueName, this.parent.Label ) );
+                    Log.Error( string.Format( "[MSE2] Tried to set invalid target limb ({0}) on {1}", value.UniqueName, this.parent.Label ) );
                 }
 
                 this.targetLimb = value;

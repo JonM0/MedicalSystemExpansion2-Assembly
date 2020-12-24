@@ -29,12 +29,12 @@ namespace MSE2
             {
                 if ( this.diffCreator == null )
                 {
-                    Log.Error( string.Format( "[MSE2] On {0} ({1}): missing creator at loading, removing", this, this.pawn ) );
+                    Log.Warning( string.Format( "[MSE2] On {0} ({1}): missing creator at loading, removing", this, this.pawn ) );
                     this.pawn.health.RemoveHediff( this );
                 }
                 else if ( !this.diffCreator.extraDiffs.Contains( this ) )
                 {
-                    Log.Error( string.Format( "[MSE2] On {0} ({1}): creator does not have this in extraDiffs at loading, should never happen wtf", this, this.pawn ) );
+                    Log.Warning( string.Format( "[MSE2] On {0} ({1}): creator does not have this in extraDiffs at loading, should never happen wtf", this, this.pawn ) );
                     this.diffCreator.extraDiffs.Add( this );
                 }
 

@@ -61,7 +61,7 @@ namespace MSE2
 
                     foreach ( string item in def.ConfigErrors() )
                     {
-                        Log.Error( string.Concat( "Config error in ", def, ": ", item ) );
+                        Log.Error( string.Concat( "[MSE2] Config error in ", def, ": ", item ) );
                     }
                 }
                 catch ( Exception ex )
