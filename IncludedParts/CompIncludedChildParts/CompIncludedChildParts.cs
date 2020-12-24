@@ -89,6 +89,18 @@ namespace MSE2
             yield return this.command_AddExistingSubpart;
             yield return this.command_SplitOffSubpart;
 
+            if ( Prefs.DevMode )
+            {
+                yield return new Command_Action
+                {
+                    defaultLabel = "DEBUG: Make complete",
+                    action = delegate ()
+                    {
+                        this.InitializeForLimb(this.TargetLimb);
+                    }
+                };
+            }
+
             foreach ( Gizmo g in base.CompGetGizmosExtra() ) yield return g;
 
             yield break;
