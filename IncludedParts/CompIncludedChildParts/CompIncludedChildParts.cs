@@ -34,9 +34,11 @@ namespace MSE2
             base.PostExposeData();
 
             // Deep save the included Things
-
             Scribe_Deep.Look( ref this.childPartsIncluded, "childPartsIncluded", new object[] { this } );
+
+            // save target version index
             Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", this.Props.SupportedVersions.IndexOf( this.Props.SegmentVersion ) );
+
 
             // compatibility with old version
             if ( this.IncludedParts == null && Scribe.mode == LoadSaveMode.LoadingVars )
@@ -74,7 +76,7 @@ namespace MSE2
         /// </summary>
         private void DirtyCache ()
         {
-            this.cachedCompatibleLimbs.valid = false;
+            this.cachedCompatibleVersions.valid = false;
             this.cachedMissingParts.valid = false;
             this.cachedTransformLabelString = null;
             this.cachedInspectString = null;
@@ -109,7 +111,7 @@ namespace MSE2
                     defaultLabel = "DEBUG: Make complete",
                     action = delegate ()
                     {
-                        this.InitializeForLimb( this.TargetVersion );
+                        this.InitializeForVersion( this.TargetVersion );
                     }
                 };
             }
@@ -217,7 +219,6 @@ namespace MSE2
                 Log.Error( "[MSE2] Tried to remove " + part.Label + " from " + this.parent.Label + " while it wasn't actually included." );
             }
         }
-
         public void RemoveAndSpawnPart ( Thing part )
         {
             this.RemoveAndSpawnPart( part, ThingOwnerUtility.GetRootPosition( this ), ThingOwnerUtility.GetRootMap( this ) );
@@ -348,23 +349,23 @@ namespace MSE2
 
         #region Compatible limbs
 
-        private (List<ProsthesisVersion> list, bool valid) cachedCompatibleLimbs = (new List<ProsthesisVersion>(), false);
+        private (List<ProsthesisVersion> list, bool valid) cachedCompatibleVersions = (new List<ProsthesisVersion>(), false);
 
         public List<ProsthesisVersion> CompatibleVersions
         {
             get
             {
-                if ( !this.cachedCompatibleLimbs.valid )
+                if ( !this.cachedCompatibleVersions.valid )
                 {
-                    this.cachedCompatibleLimbs.list.Clear();
-                    this.cachedCompatibleLimbs.list.AddRange( from v in this.Props.SupportedVersions
-                                                              where IncludedPartsUtilities.InstallationCompatibility(
-                                                                  this.childPartsIncluded,
-                                                                  v.Parts.Select( p => p.version ) )
-                                                              select v );
-                    this.cachedCompatibleLimbs.valid = true;
+                    this.cachedCompatibleVersions.list.Clear();
+                    this.cachedCompatibleVersions.list.AddRange( from v in this.Props.SupportedVersions
+                                                                 where IncludedPartsUtilities.InstallationCompatibility(
+                                                                     this.childPartsIncluded,
+                                                                     v.Parts.Select( p => p.version ) )
+                                                                 select v );
+                    this.cachedCompatibleVersions.valid = true;
                 }
-                return this.cachedCompatibleLimbs.list;
+                return this.cachedCompatibleVersions.list;
             }
         }
 
@@ -411,9 +412,9 @@ namespace MSE2
             this.tmpThingList.Clear();
         }
 
-        public void InitializeForLimb ( ProsthesisVersion limb )
+        public void InitializeForVersion ( ProsthesisVersion version )
         {
-            this.TargetVersion = limb;
+            this.TargetVersion = version;
 
             this.childPartsIncluded.Clear();
             this.DirtyCache();
@@ -421,7 +422,7 @@ namespace MSE2
             foreach ( (ThingDef childDef, ProsthesisVersion bpr) in this.TargetVersion.Parts )
             {
                 Thing child = ThingMaker.MakeThing( childDef );
-                child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
+                child.TryGetComp<CompIncludedChildParts>()?.InitializeForVersion( bpr );
                 this.AddPart( child );
             }
         }

@@ -26,7 +26,7 @@ namespace MSE2.HarmonyPatches
         {
             if ( recipeDef.HasModExtension<TargetLimb>() && __result.TryGetComp<CompIncludedChildParts>() != null )
             {
-                __result.TryGetComp<CompIncludedChildParts>().InitializeForLimb( recipeDef.GetModExtension<TargetLimb>().targetLimb );
+                __result.TryGetComp<CompIncludedChildParts>().InitializeForVersion( recipeDef.GetModExtension<TargetLimb>().targetLimb );
             }
         }
     }

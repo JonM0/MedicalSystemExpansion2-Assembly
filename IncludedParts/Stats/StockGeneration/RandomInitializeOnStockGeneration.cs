@@ -23,7 +23,7 @@ namespace MSE2.HarmonyPatches
 
             if ( comp != null )
             {
-                comp.InitializeForLimb( comp.Props.SupportedVersions.RandomElement() );
+                comp.InitializeForVersion( comp.Props.SupportedVersions.RandomElement() );
             }
         }
     }
