@@ -29,15 +29,22 @@ namespace MSE2
 
         public override void DefsLoaded ()
         {
-            base.DefsLoaded();
+            try
+            {
+                base.DefsLoaded();
 
-            AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
+                AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
 
-            IncludedPartsUtilities.CacheAllStandardParents();
+                IncludedPartsUtilities.CacheAllStandardParents();
 
-            IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
+                IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
 
-            LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
+                LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception caught running DefsLoaded(): " + ex );
+            }
         }
 
         public override string ModIdentifier => "MSE2";

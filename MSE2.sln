@@ -13,7 +13,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "RimWorldWin64", "..\..\..\.
 		Executable = C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64.exe
 		RemoteMachine = GM-DESKTOP1
 		StartingDirectory = C:\Program Files (x86)\Steam\steamapps\common\RimWorld
-		Environment = dnspy_unity_dbg2=--debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:56000,suspend=y,no-hide-debugger	
+		Environment = dnspy_unity_dbg2=--debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:56000,suspend=--debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:56000,suspend=y,no-hide-debugger	
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		UseLegacyDebugEngines = No
 		LaunchSQLEngine = No

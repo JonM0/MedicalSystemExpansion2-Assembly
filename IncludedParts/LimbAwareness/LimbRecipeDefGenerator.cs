@@ -18,6 +18,7 @@ namespace MSE2
         {
             var defsToCheck = new List<RecipeDef>();
 
+
             try
             {
                 // add the recipes to craft the prostheses with the various configurations of parts
@@ -73,7 +74,7 @@ namespace MSE2
 
         internal static IEnumerable<RecipeDef> ExtraLimbSurgeryRecipeDefs ()
         {
-            List<LimbConfiguration> tmplimbsItCanTargetList = new List<LimbConfiguration>();
+            List<ProsthesisVersion> tmpVersionsItCanTargetList = new List<ProsthesisVersion>();
 
             // iterate over thingDefs with child parts
             foreach ( (ThingDef thingDef, CompProperties_IncludedChildParts comp) in
@@ -85,25 +86,25 @@ namespace MSE2
                 foreach ( RecipeDef surgery in IncludedPartsUtilities.SurgeryToInstall( thingDef ).ToArray() )
                 {
                     // take the limbs that the thing can be installed on that this recipe targets
-                    tmplimbsItCanTargetList.Clear();
-                    tmplimbsItCanTargetList.AddRange(
-                        comp.InstallationDestinations
+                    tmpVersionsItCanTargetList.Clear();
+                    tmpVersionsItCanTargetList.AddRange(
+                        comp.SupportedVersions
                         .Where(
                             l =>
-                            surgery.appliedOnFixedBodyParts.Contains( l.PartDef )
-                            && surgery.AllRecipeUsers.Any( ru => l.Bodies.Contains( ru.race.body ) )
+                            l.BodyPartDefs.Any( surgery.appliedOnFixedBodyParts.Contains )
+                            && surgery.AllRecipeUsers.Any( ru => l.BodyDefs.Contains( ru.race.body ) )
                         )
                     );
 
                     int count = 0;
-                    foreach ( LimbConfiguration limb in tmplimbsItCanTargetList )
+                    foreach ( ProsthesisVersion version in tmpVersionsItCanTargetList )
                     {
                         if ( count == 0 )
                         {
                             // put the first limb on the preexisting surgery
                             if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
 
-                            surgery.modExtensions.Add( new TargetLimb( limb ) );
+                            surgery.modExtensions.Add( new TargetLimb( version ) );
                         }
                         else
                         {
@@ -117,7 +118,7 @@ namespace MSE2
 
                             surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
                             surgeryClone.modExtensions.Remove( surgery.GetModExtension<TargetLimb>() );
-                            surgeryClone.modExtensions.Add( new TargetLimb( limb ) );
+                            surgeryClone.modExtensions.Add( new TargetLimb( version ) );
 
                             typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
                             typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
@@ -147,7 +148,7 @@ namespace MSE2
                    select recipe;
         }
 
-        internal static (List<IngredientCount>, float) AllIngredientsWorkForLimb ( ThingDef thingDef, LimbConfiguration limb )
+        internal static (List<IngredientCount>, float) AllIngredientsWorkForVersion ( ThingDef thingDef, ProsthesisVersion version )
         {
             //Log.Message( "Calculating ingredients of " + thingDef.defName );
 
@@ -166,7 +167,7 @@ namespace MSE2
             if ( comp != null )
             {
                 // add the rest grouped by thingdef
-                allParts.AddRange( comp.AllPartsForLimb( limb ).GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
+                allParts.AddRange( version.AllParts.GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
             }
 
             // the ingredients to make the segments, not grouped by thingdef
@@ -219,21 +220,23 @@ namespace MSE2
                 originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
             }
 
+            int versionCounter = 0; // version counter
+
             // generate limb specific crafting recipes
-            foreach ( LimbConfiguration limb in comp.InstallationDestinations )
+            foreach ( ProsthesisVersion version in comp.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ) )
             {
                 RecipeDef recipeDef = new RecipeDef();
 
                 RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
 
                 // set all text
-                string limbComparison = comp.LimbLabeller.GetComparisonForLimb( limb );
+                string limbComparison = version.Label;
 
-                recipeDef.defName = "Make_" + prosthesisDef.defName + "_" + limb.UniqueName;
+                recipeDef.defName = "Make_" + prosthesisDef.defName + "_v" + (versionCounter++);
                 recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
                     "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
                 recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label, comp.LimbLabeller.GetRacesForLimb( limb ).ToCommaList( true ) );
+                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label, comp.GetRacesForVersion( version ).ToCommaList( true ) );
                 recipeDef.descriptionHyperlinks = originalRecipe.descriptionHyperlinks;
 
                 // copy other values
@@ -256,11 +259,11 @@ namespace MSE2
                 recipeDef.factionPrerequisiteTags = recipeMaker.factionPrerequisiteTags;
 
                 // set ingredients and work based on combined subparts
-                (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForLimb( prosthesisDef, limb );
+                (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForVersion( prosthesisDef, version );
 
                 // add specific limb modextension
                 if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
-                recipeDef.modExtensions.Add( new TargetLimb( limb ) );
+                recipeDef.modExtensions.Add( new TargetLimb( version ) );
 
                 if ( !recipeDef.ingredients.NullOrEmpty() )
                     yield return recipeDef;

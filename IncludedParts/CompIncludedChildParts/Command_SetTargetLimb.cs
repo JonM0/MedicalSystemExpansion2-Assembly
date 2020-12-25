@@ -30,26 +30,16 @@ namespace MSE2
                 base.ProcessInput( ev );
                 List<FloatMenuOption> options = new List<FloatMenuOption>();
 
-                foreach ( LimbConfiguration possibleTarget in this.comp.Props.InstallationDestinations.Where( t => t != this.comp.TargetLimb ) )
+                foreach ( ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Where( t => t != this.comp.TargetVersion ) )
                 {
                     options.Add( new FloatMenuOption(
-                        this.comp.Props.LimbLabeller.GetComparisonForLimb( possibleTarget ).CapitalizeFirst(),
+                        possibleTarget.Label,
                         () => // click action
                         {
-                            this.comp.TargetLimb = possibleTarget;
+                            this.comp.TargetVersion = possibleTarget;
                         }
                         ) );
                 }
-
-                // Option to set to no target
-                if ( this.comp.targetLimb != null )
-                    options.Add( new FloatMenuOption(
-                        "Command_SetTargetLimb_NoTarget".Translate(),
-                        () => // click action
-                        {
-                            this.comp.TargetLimb = null;
-                        }
-                        ) );
 
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }

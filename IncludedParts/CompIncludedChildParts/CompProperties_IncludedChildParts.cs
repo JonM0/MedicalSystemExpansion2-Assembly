@@ -47,32 +47,23 @@ namespace MSE2
             }
         }
 
-        public bool EverInstallableOn ( LimbConfiguration limb )
-        {
-            return this.InstallationDestinations.Contains( limb );
-        }
-
-        public IEnumerable<(ThingDef, LimbConfiguration)> StandardPartsForLimb ( LimbConfiguration limb )
+        public IEnumerable<(ThingDef, ProsthesisVersion)> StandardPartsForLimb ( LimbConfiguration limb )
         {
             if ( limb == null ) yield break;
-
-            if ( !this.EverInstallableOn( limb ) )
-            {
-                Log.Error( "[MSE2] Tried to get standard parts of " + this.parentDef.defName + " for an incompatible part record (" + limb + ")" );
-                yield break;
-            }
 
             foreach ( LimbConfiguration lc in this.IgnoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ) )
             {
                 // first standard child that can be installed on lc
                 ThingDef thingDef = this.standardChildren
                     .Find( td =>
-                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.InstallationDestinations( td ))
+                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedLimbs ?? IncludedPartsUtilities.InstallationDestinations( td ))
                         .Contains( lc )
                         );
                 if ( thingDef != null )
                 {
-                    yield return (thingDef, lc);
+                    var version = thingDef.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedVersions.Find( v => v.LimbConfigurations.Contains( lc ) );
+
+                    yield return (thingDef, version);
                 }
                 else
                 {
@@ -99,7 +90,8 @@ namespace MSE2
             {
                 // there is no standard child that can be installed on lc
                 if ( !this.standardChildren.Exists( td =>
-                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinations ?? IncludedPartsUtilities.InstallationDestinations( td ))
+                        (td.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedLimbs
+                            ?? IncludedPartsUtilities.InstallationDestinations( td ))
                         .Contains( lc )
                         ) )
                 {
@@ -110,29 +102,52 @@ namespace MSE2
             return true;
         }
 
-        public IEnumerable<ThingDef> AllPartsForLimb ( LimbConfiguration limb )
+        public List<string> GetRacesForVersion ( ProsthesisVersion version )
         {
-            foreach ( (ThingDef thingDef, LimbConfiguration childLimb) in this.StandardPartsForLimb( limb ) )
+            if ( version == null )
             {
-                yield return thingDef;
+                return null;
+            }
 
-                CompProperties_IncludedChildParts comp = thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
+            List<string> outList = new List<string>();
 
-                if ( comp != null )
+            List<ThingDef> pawns = DefDatabase<ThingDef>.AllDefsListForReading;
+            for ( int i = 0; i < pawns.Count; i++ )
+            {
+                ThingDef pawnDef = pawns[i];
+                BodyDef body = pawnDef.race?.body;
+                if ( body != null && version.BodyDefs.Contains( body ) && this.CompatibleBodyDefs.Contains( body ) )
                 {
-                    foreach ( ThingDef item in comp.AllPartsForLimb( childLimb ) )
+                    // if is the only limb from this body
+                    if ( !this.SupportedVersions.Except( version ).Any( l => l.BodyDefs.Contains( body ) ) )
                     {
-                        yield return item;
+                        outList.AddDistinct( pawnDef.label );
+                    }
+                    else
+                    {
+                        foreach ( var bodyPartDef in version.BodyPartDefs )
+                        {
+                            IEnumerable<string> recordUniqueNames = from bpr in version.LimbConfigurations.SelectMany( l => l.AllRecords ).Distinct()
+                                                                    where bpr.body == body
+                                                                    where bpr.def == bodyPartDef
+                                                                    select bpr.Label.Replace( bpr.LabelShort, "" ).Trim();
+
+                            string records = string.Join( ", ", recordUniqueNames );
+
+                            outList.AddDistinct( string.Format( "{0} ({1} {2})", pawnDef.label, records, bodyPartDef.LabelShort ) );
+                        }
                     }
                 }
             }
+
+            return outList;
         }
 
-        private float MarketValueForConfiguration ( LimbConfiguration limb )
+        private float MarketValueForVersion ( ProsthesisVersion version )
         {
             float value = this.parentDef.BaseMarketValue;
 
-            foreach ( ThingDef part in this.AllPartsForLimb( limb ) )
+            foreach ( ThingDef part in version.AllParts )
             {
                 value += part.BaseMarketValue;
             }
@@ -145,21 +160,18 @@ namespace MSE2
             float value = 0;
             int count = 0;
 
-            for ( int i = 0; i < this.InstallationDestinations.Count; i++ )
+            for ( int i = 0; i < this.SupportedVersions.Count; i++ )
             {
-                LimbConfiguration limb = this.InstallationDestinations[i];
-                if ( limb.Bodies.Contains( pawn.RaceProps.body ) )
+                ProsthesisVersion version = this.SupportedVersions[i];
+                if ( version.LimbConfigurations.Exists( l => l.Bodies.Contains( pawn.RaceProps.body ) ) )
                 {
                     count++;
-                    value += this.MarketValueForConfiguration( limb );
+                    value += this.MarketValueForVersion( version );
                 }
             }
 
             return count == 0 ? 0 : value / count;
         }
-
-        [Unsaved]
-        private float cachedAverageValue = -1;
 
         public float AverageValue
         {
@@ -167,35 +179,33 @@ namespace MSE2
             {
                 if ( this.cachedAverageValue == -1f )
                 {
-                    if ( this.cachedInstallationDestinations == null )
+                    if ( this.lazySupportedVersions == null )
                     {
-                        Log.Error( "[MSE2] Tried to calculate min value before valid limbs were set. ThingDef: " + this.parentDef.defName );
+                        Log.Error( "[MSE2] Tried to calculate avg value before valid versions were set. ThingDef: " + this.parentDef.defName );
                     }
                     else
                     {
-                        this.cachedAverageValue = this.InstallationDestinations.Select( this.MarketValueForConfiguration ).Average();
+                        this.cachedAverageValue = this.SupportedVersions.Select( this.MarketValueForVersion ).Average();
                     }
                 }
 
                 return this.cachedAverageValue;
             }
         }
+        [Unsaved]
+        private float cachedAverageValue = -1;
 
         [Unsaved]
         private ThingDef parentDef;
 
+        public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ?? (lazyCompatibleBodyDefs = (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+                                                               from u in s.AllRecipeUsers
+                                                               select u.race.body).ToHashSet());
         [Unsaved]
-        private LimbLabeler lazyLimbLabeller;
+        private HashSet<BodyDef> lazyCompatibleBodyDefs;
 
-        internal LimbLabeler LimbLabeller => lazyLimbLabeller
-            ?? (lazyLimbLabeller = new LimbLabeler( this.InstallationDestinations, this.IgnoredSubparts, (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                                                                          from u in s.AllRecipeUsers
-                                                                                                          select u.race.body).Contains ));
 
-        [Unsaved]
-        private (bool valid, List<BodyPartDef> list) cachedIgnoredSubparts = (false, null);
-
-        public List<BodyPartDef> IgnoredSubparts
+        private List<BodyPartDef> IgnoredSubparts
         {
             get
             {
@@ -214,21 +224,41 @@ namespace MSE2
                 return this.cachedIgnoredSubparts.list;
             }
         }
-
         [Unsaved]
-        private List<LimbConfiguration> cachedInstallationDestinations;
+        private (bool valid, List<BodyPartDef> list) cachedIgnoredSubparts = (false, null);
 
-        public List<LimbConfiguration> InstallationDestinations
+
+        public ProsthesisVersionSegment SegmentVersion => (ProsthesisVersionSegment)SupportedVersions.Find( v => v is ProsthesisVersionSegment );
+        public List<ProsthesisVersion> SupportedVersions
         {
             get
             {
-                if ( this.cachedInstallationDestinations == null )
+                if ( this.lazySupportedVersions == null )
                 {
-                    this.cachedInstallationDestinations = IncludedPartsUtilities.InstallationDestinations( this.parentDef ).Where( LimbIsCompatible ).ToList();
+                    this.lazySupportedVersions = new List<ProsthesisVersion> { new ProsthesisVersionSegment( this ) };
+
+                    foreach ( var limb in IncludedPartsUtilities.InstallationDestinations( this.parentDef ).Where( LimbIsCompatible ) )
+                    {
+                        bool merged = false;
+                        for ( int i = 0; !merged && i < this.lazySupportedVersions.Count; i++ )
+                        {
+                            merged = this.lazySupportedVersions[i].TryAddLimbConfig( limb );
+                        }
+
+                        if ( !merged )
+                        {
+                            this.lazySupportedVersions.Add( new ProsthesisVersion( this, limb ) );
+                        }
+                    }
                 }
-                return this.cachedInstallationDestinations;
+                return this.lazySupportedVersions;
             }
         }
+        [Unsaved]
+        private List<ProsthesisVersion> lazySupportedVersions;
+
+        private IEnumerable<LimbConfiguration> SupportedLimbs => this.SupportedVersions.SelectMany( v => v.LimbConfigurations );
+
 
         // xml def fields
 

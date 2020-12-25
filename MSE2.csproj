@@ -98,6 +98,8 @@
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_AddExistingSubpart.cs" />
+    <Compile Include="IncludedParts\LimbAwareness\ProsthesisVersion.cs" />
+    <Compile Include="IncludedParts\LimbAwareness\ProsthesisVersionSegment.cs" />
     <Compile Include="IncludedParts\FixBulkCraftingValue.cs" />
     <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
@@ -121,7 +123,6 @@
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubParts.cs" />
     <Compile Include="IncludedParts\IgnoreParts\IgnoreSubPartsUtilities.cs" />
     <Compile Include="IncludedParts\HediffHiding\VisibleHediffs_patch.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\LimbLabeler.cs" />
     <Compile Include="IncludedParts\Stats\StatParts\StatsReport_MassOfSubParts.cs" />
     <Compile Include="Modules\Recipe_RemoveModules.cs" />
     <Compile Include="Modules\Hediff_ModuleAbstract.cs" />

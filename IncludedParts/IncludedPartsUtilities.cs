@@ -139,6 +139,24 @@ namespace MSE2
             return false;
         }
 
+        private class Box<T>
+        {
+            public T content;
+
+            public static Box<T> PutInBox ( T item )
+            {
+                return new Box<T> { content = item };
+            }
+        }
+
+        public static bool EnumerableEqualsOutOfOrderBoxed<A, B> ( IEnumerable<A> aEnu, IEnumerable<B> bEnu, Func<A, B, bool> equalityComparer )
+        {
+            return EnumerableEqualsOutOfOrder( 
+                aEnu.Select( Box<A>.PutInBox ).ToArray(), 
+                bEnu.Select( Box<B>.PutInBox ).ToArray(), 
+                ( Box<A> a, Box<B> b ) => equalityComparer( a.content, b.content ) );
+        }
+
         private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
 
         public static IReadOnlyList<LimbConfiguration> InstallationDestinations ( ThingDef parentDef )
@@ -183,23 +201,23 @@ namespace MSE2
             }
         }
 
-        public static bool InstallationCompatibility ( IEnumerable<Thing> things, IEnumerable<LimbConfiguration> limbs )
+        public static bool InstallationCompatibility ( IEnumerable<Thing> things, IEnumerable<ProsthesisVersion> versions )
         {
             //Log.Message( "compat: " + thingDefs.Count() + " " + bodyPartRecords.Count() );
 
-            foreach ( LimbConfiguration limb in limbs )
+            foreach ( ProsthesisVersion version in versions )
             {
                 foreach ( Thing thing in things )
                 {
-                    if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleLimbs.Contains( limb ) ?? // subparts are compatible
-                        InstallationDestinations( thing.def ).Contains( limb )) // has no subparts and is compatible
-                        && InstallationCompatibility( things.ExceptFirst( thing ), limbs.ExceptFirst( limb ) ) ) // all other things check out
+                    if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleVersions.Contains( version ) ?? // subparts are compatible
+                        version == null) // has no subparts and is compatible
+                        && InstallationCompatibility( things.ExceptFirst( thing ), versions.ExceptFirst( version ) ) ) // all other things check out
                     {
                         return true;
                     }
                 }
             }
-            return !limbs.Any();
+            return !versions.Any();
         }
     }
 }

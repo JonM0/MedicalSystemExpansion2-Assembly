@@ -29,17 +29,6 @@ namespace MSE2
         public CompProperties_IncludedChildParts Props => this.props as CompProperties_IncludedChildParts;
 
         // Save / Load
-
-        private void PostLoadInitialization ()
-        {
-            // init the list if it comes up null (loading a map created without MSE2)
-            if ( this.IncludedParts == null )
-            {
-                this.childPartsIncluded = new ThingOwner<Thing>( this );
-                Log.Warning( "[MSE2] Included parts was null during loading." );
-            }
-        }
-
         public override void PostExposeData ()
         {
             base.PostExposeData();
@@ -47,7 +36,7 @@ namespace MSE2
             // Deep save the included Things
 
             Scribe_Deep.Look( ref this.childPartsIncluded, "childPartsIncluded", new object[] { this } );
-            Scribe_LimbConfiguration.Look( ref this.targetLimb, "targetLimb" );
+            Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", this.Props.SupportedVersions.IndexOf( this.Props.SegmentVersion ) );
 
             // compatibility with old version
             if ( this.IncludedParts == null && Scribe.mode == LoadSaveMode.LoadingVars )
@@ -67,7 +56,17 @@ namespace MSE2
                 }
             }
 
-            if ( Scribe.mode == LoadSaveMode.PostLoadInit ) this.PostLoadInitialization();
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                this.UpdateTargetLimbOrRemoveIncludedParts();
+
+                // init the list if it comes up null (loading a map created without MSE2)
+                if ( this.IncludedParts == null )
+                {
+                    this.childPartsIncluded = new ThingOwner<Thing>( this );
+                    Log.Warning( "[MSE2] Included parts was null during loading." );
+                }
+            }
         }
 
         /// <summary>
@@ -82,6 +81,14 @@ namespace MSE2
 
             (this.ParentHolder as CompIncludedChildParts)?.DirtyCache();
         }
+
+        public override bool AllowStackWith ( Thing other )
+        {
+            // disable stacking (would break everything)
+            return false;
+        }
+
+        #region Gizmos
 
         // gizmos for merging and splitting
 
@@ -102,7 +109,7 @@ namespace MSE2
                     defaultLabel = "DEBUG: Make complete",
                     action = delegate ()
                     {
-                        this.InitializeForLimb( this.TargetLimb );
+                        this.InitializeForLimb( this.TargetVersion );
                     }
                 };
             }
@@ -112,14 +119,7 @@ namespace MSE2
             yield break;
         }
 
-        public override bool AllowStackWith ( Thing other )
-        {
-            return false;
-        }
-
-        #region PartHandling
-
-        private readonly List<Thing> tmpThingList = new List<Thing>();
+        #endregion Gizmos
 
         #region Holder
 
@@ -135,6 +135,10 @@ namespace MSE2
 
         #endregion Holder
 
+        #region PartHandling
+
+        private readonly List<Thing> tmpThingList = new List<Thing>();
+
         #region Included parts
 
         private ThingOwner childPartsIncluded;
@@ -147,25 +151,25 @@ namespace MSE2
         public IEnumerable<CompIncludedChildParts> IncludedPartComps =>
             this.IncludedParts.Select( p => p.TryGetComp<CompIncludedChildParts>() ).Where( c => c != null );
 
-        private IEnumerable<(Thing, LimbConfiguration)> IncludedPartsLimbs
-        {
-            get
-            {
-                this.tmpThingList.Clear();
-                this.tmpThingList.AddRange( this.IncludedParts );
+        //private IEnumerable<(Thing, LimbConfiguration)> IncludedPartsVersions
+        //{
+        //    get
+        //    {
+        //        this.tmpThingList.Clear();
+        //        this.tmpThingList.AddRange( this.IncludedParts );
 
-                foreach ( (ThingDef def, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
-                {
-                    Thing thing = this.tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
+        //        foreach ( (ThingDef def, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
+        //        {
+        //            Thing thing = this.tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
 
-                    if ( thing != null )
-                    {
-                        this.tmpThingList.Remove( thing );
-                        yield return (thing, limb);
-                    }
-                }
-            }
-        }
+        //            if ( thing != null )
+        //            {
+        //                this.tmpThingList.Remove( thing );
+        //                yield return (thing, limb);
+        //            }
+        //        }
+        //    }
+        //}
 
         public void AddPart ( Thing part )
         {
@@ -178,7 +182,7 @@ namespace MSE2
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
 
             // prioritize matches of both def and target part
-            var target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetLimb == p.limb) );
+            var target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetVersion == p.limb) );
             // fallback to just matching the def
             if ( target.thingDef == null ) target = this.MissingParts.Find( p => p.thingDef == part.def );
 
@@ -190,7 +194,7 @@ namespace MSE2
 
                 if ( partComp != null )
                 {
-                    partComp.TargetLimb = target.limb;
+                    partComp.TargetVersion = target.limb;
                 }
 
                 if ( part.Spawned )
@@ -223,34 +227,39 @@ namespace MSE2
 
         #region Target Limb
 
-        private LimbConfiguration targetLimb;
+        private int targetVersionIndex;
 
-        public LimbConfiguration TargetLimb
+        public ProsthesisVersion TargetVersion
         {
-            get => this.targetLimb;
+            get => this.Props.SupportedVersions[targetVersionIndex];
             set
             {
-                if ( value != null && !this.Props.EverInstallableOn( value ) )
+                if ( this.TargetVersion != value )
                 {
-                    Log.Error( string.Format( "[MSE2] Tried to set invalid target limb ({0}) on {1}", value.UniqueName, this.parent.Label ) );
+                    int newIndex = this.Props.SupportedVersions.IndexOf( value );
+
+                    if ( newIndex == -1 )
+                    {
+                        Log.Error( string.Format( "[MSE2] Tried to set invalid target version ({0}) on {1}", value, this.parent.Label ) );
+                    }
+                    else
+                    {
+                        this.targetVersionIndex = newIndex;
+                        this.UpdateTargetLimbOrRemoveIncludedParts();
+
+                        this.DirtyCache();
+                    }
                 }
-
-                this.targetLimb = value;
-                this.UpdateTargetLimbOrRemoveIncludedParts();
-
-                this.DirtyCache();
             }
         }
 
-        public string TargetLimbLabel => this.Props.LimbLabeller.GetComparisonForLimb( this.TargetLimb ) ?? "LimbSegment".Translate();
-
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
-            if ( this.TargetLimb == null )
+            if ( this.TargetVersion == this.Props.SegmentVersion )
             {
                 foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
                 {
-                    comp.TargetLimb = null;
+                    comp.TargetVersion = comp.Props.SegmentVersion;
                 }
             }
             else
@@ -259,7 +268,7 @@ namespace MSE2
                 this.tmpThingList.AddRange( this.IncludedParts );
 
                 // update compatible parts
-                foreach ( (ThingDef thingDef, LimbConfiguration limb) in this.StandardPartsForTargetLimb() )
+                foreach ( var (thingDef, version) in this.TargetVersion.Parts )
                 {
                     Thing candidate = this.tmpThingList.Find( t => t.def == thingDef );
                     if ( candidate != null )
@@ -270,14 +279,14 @@ namespace MSE2
 
                         if ( potentialComp != null )
                         {
-                            potentialComp.TargetLimb = limb;
+                            potentialComp.TargetVersion = version;
                         }
                         else
                         {
                             // this will either never happen, or can be checked in standardpartsforlimb
-                            if ( limb != null && !limb.ChildLimbs.EnumerableNullOrEmpty() )
+                            if ( version != null )
                             {
-                                Log.Error( string.Format( "[MSE2] Included thing {0} has no CompIncludedChildParts, but was assigned {1}, which has {2} childlimbs.", candidate.def.defName, limb.UniqueName, limb.ChildLimbs.Count() ) );
+                                Log.Error( string.Format( "[MSE2] Included thing {0} has no CompIncludedChildParts, but was assigned version {1}, which has {2} sub parts.", candidate.def.defName, version.Label, version.Parts.Count() ) );
                             }
                         }
                     }
@@ -291,11 +300,6 @@ namespace MSE2
             }
         }
 
-        public IEnumerable<(ThingDef, LimbConfiguration)> StandardPartsForTargetLimb ()
-        {
-            return this.Props.StandardPartsForLimb( this.targetLimb );
-        }
-
         #endregion Target Limb
 
         #region Standard parts
@@ -306,9 +310,9 @@ namespace MSE2
 
         #region Missing Parts
 
-        private (List<(ThingDef thingDef, LimbConfiguration limb)> list, bool valid) cachedMissingParts = (new List<(ThingDef, LimbConfiguration)>(), false);
+        private (List<(ThingDef thingDef, ProsthesisVersion limb)> list, bool valid) cachedMissingParts = (new List<(ThingDef, ProsthesisVersion)>(), false);
 
-        public List<(ThingDef thingDef, LimbConfiguration limb)> MissingParts
+        public List<(ThingDef thingDef, ProsthesisVersion limb)> MissingParts
         {
             get
             {
@@ -316,9 +320,9 @@ namespace MSE2
                 {
                     this.cachedMissingParts.list.Clear();
 
-                    if ( this.TargetLimb != null )
+                    if ( this.TargetVersion != null )
                     {
-                        this.cachedMissingParts.list.AddRange( this.Props.StandardPartsForLimb( this.TargetLimb ) );
+                        this.cachedMissingParts.list.AddRange( this.TargetVersion.Parts );
 
                         foreach ( Thing thing in this.IncludedParts )
                         {
@@ -326,7 +330,7 @@ namespace MSE2
 
                             this.cachedMissingParts.list.Remove( this.cachedMissingParts.list.Find( c =>
                                  thing.def == c.thingDef
-                                 && (thingComp == null || thingComp.TargetLimb == c.limb) ) );
+                                 && (thingComp == null || thingComp.TargetVersion == c.limb) ) );
                         }
                     }
                     this.cachedMissingParts.valid = true;
@@ -344,22 +348,20 @@ namespace MSE2
 
         #region Compatible limbs
 
-        private (List<LimbConfiguration> list, bool valid) cachedCompatibleLimbs = (new List<LimbConfiguration>(), false);
+        private (List<ProsthesisVersion> list, bool valid) cachedCompatibleLimbs = (new List<ProsthesisVersion>(), false);
 
-        public List<LimbConfiguration> CompatibleLimbs
+        public List<ProsthesisVersion> CompatibleVersions
         {
             get
             {
                 if ( !this.cachedCompatibleLimbs.valid )
                 {
                     this.cachedCompatibleLimbs.list.Clear();
-                    this.cachedCompatibleLimbs.list.AddRange( from lc in this.Props.InstallationDestinations
+                    this.cachedCompatibleLimbs.list.AddRange( from v in this.Props.SupportedVersions
                                                               where IncludedPartsUtilities.InstallationCompatibility(
                                                                   this.childPartsIncluded,
-                                                                  this.Props.IgnoredSubparts == null ?
-                                                                  lc.ChildLimbs :
-                                                                  lc.ChildLimbs.Where( l => !this.Props.IgnoredSubparts.Contains( l.PartDef ) ) )
-                                                              select lc );
+                                                                  v.Parts.Select( p => p.version ) )
+                                                              select v );
                     this.cachedCompatibleLimbs.valid = true;
                 }
                 return this.cachedCompatibleLimbs.list;
@@ -386,7 +388,7 @@ namespace MSE2
             // first add things that match both def and target
             foreach ( Thing availableThing in available.ToArray() )
             {
-                if ( this.MissingParts.Any( mp => mp.thingDef == availableThing.def && mp.limb == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetLimb ) )
+                if ( this.MissingParts.Any( mp => mp.thingDef == availableThing.def && mp.limb == availableThing.TryGetComp<CompIncludedChildParts>()?.TargetVersion ) )
                 {
                     this.AddPart( availableThing );
                     available.Remove( availableThing );
@@ -409,14 +411,14 @@ namespace MSE2
             this.tmpThingList.Clear();
         }
 
-        public void InitializeForLimb ( LimbConfiguration limb )
+        public void InitializeForLimb ( ProsthesisVersion limb )
         {
-            this.TargetLimb = limb;
+            this.TargetVersion = limb;
 
             this.childPartsIncluded.Clear();
             this.DirtyCache();
 
-            foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
+            foreach ( (ThingDef childDef, ProsthesisVersion bpr) in this.TargetVersion.Parts )
             {
                 Thing child = ThingMaker.MakeThing( childDef );
                 child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
@@ -424,93 +426,93 @@ namespace MSE2
             }
         }
 
-        public void InitializeFromSimilar ( CompIncludedChildParts other )
-        {
-            LimbConfiguration otherTarget = other.TargetLimb;
+        //public void InitializeFromSimilar ( CompIncludedChildParts other )
+        //{
+        //    LimbConfiguration otherTarget = other.TargetLimb;
 
-            // null target
-            if ( otherTarget == null )
-            {
-                this.TargetLimb = null;
-                return;
-            }
+        //    // null target
+        //    if ( otherTarget == null )
+        //    {
+        //        this.TargetLimb = null;
+        //        return;
+        //    }
 
-            // same target if possible
-            if ( this.Props.EverInstallableOn( otherTarget ) )
-            {
-                this.TargetLimb = otherTarget;
+        //    // same target if possible
+        //    if ( this.Props.EverInstallableOn( otherTarget ) )
+        //    {
+        //        this.TargetLimb = otherTarget;
 
-                // initialize for that target
-                List<(ThingDef, LimbConfiguration)> otherMissing = other.MissingParts;
-                List<(Thing, LimbConfiguration)> otherIncluded = other.IncludedPartsLimbs.ToList();
+        //        // initialize for that target
+        //        List<(ThingDef, LimbConfiguration)> otherMissing = other.MissingParts;
+        //        List<(Thing, LimbConfiguration)> otherIncluded = other.IncludedPartsVersions.ToList();
 
-                this.childPartsIncluded.Clear();
-                this.DirtyCache();
+        //        this.childPartsIncluded.Clear();
+        //        this.DirtyCache();
 
-                foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
-                {
-                    // add if not missing
-                    if ( !otherMissing.Remove( i => i.Item2 == bpr ) )
-                    {
-                        Thing child = ThingMaker.MakeThing( childDef );
+        //        foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
+        //        {
+        //            // add if not missing
+        //            if ( !otherMissing.Remove( i => i.Item2 == bpr ) )
+        //            {
+        //                Thing child = ThingMaker.MakeThing( childDef );
 
-                        // if it is a limb segment, try to initialize based on similar or limb
-                        if ( bpr != null )
-                        {
-                            CompIncludedChildParts childComp = child.TryGetComp<CompIncludedChildParts>();
+        //                // if it is a limb segment, try to initialize based on similar or limb
+        //                if ( bpr != null )
+        //                {
+        //                    CompIncludedChildParts childComp = child.TryGetComp<CompIncludedChildParts>();
 
-                            // initialize the child comp
-                            if ( childComp != null )
-                            {
-                                // find corresponding
-                                (Thing, LimbConfiguration) otherChild = otherIncluded.Find( i => i.Item2 == bpr );
-                                otherIncluded.Remove( otherChild );
-                                CompIncludedChildParts otherComp = otherChild.Item1?.TryGetComp<CompIncludedChildParts>();
+        //                    // initialize the child comp
+        //                    if ( childComp != null )
+        //                    {
+        //                        // find corresponding
+        //                        (Thing, LimbConfiguration) otherChild = otherIncluded.Find( i => i.Item2 == bpr );
+        //                        otherIncluded.Remove( otherChild );
+        //                        CompIncludedChildParts otherComp = otherChild.Item1?.TryGetComp<CompIncludedChildParts>();
 
-                                if ( otherComp != null )
-                                {
-                                    childComp.InitializeFromSimilar( otherComp );
-                                }
-                                else
-                                {
-                                    childComp.InitializeForLimb( bpr );
-                                }
-                            }
-                        }
+        //                        if ( otherComp != null )
+        //                        {
+        //                            childComp.InitializeFromSimilar( otherComp );
+        //                        }
+        //                        else
+        //                        {
+        //                            childComp.InitializeForLimb( bpr );
+        //                        }
+        //                    }
+        //                }
 
-                        this.AddPart( child );
-                    }
-                }
-                return;
-            }
+        //                this.AddPart( child );
+        //            }
+        //        }
+        //        return;
+        //    }
 
-            // target is parent of other
-            LimbConfiguration goodTarget = this.Props.InstallationDestinations.Find( l => l.ChildLimbs.Contains( otherTarget ) );
-            if ( goodTarget != null )
-            {
-                this.childPartsIncluded.Clear();
-                this.DirtyCache();
+        //    // target is parent of other
+        //    LimbConfiguration goodTarget = this.Props.SupportedVersions.Find( l => l.ChildLimbs.Contains( otherTarget ) );
+        //    if ( goodTarget != null )
+        //    {
+        //        this.childPartsIncluded.Clear();
+        //        this.DirtyCache();
 
-                this.TargetLimb = goodTarget;
+        //        this.TargetLimb = goodTarget;
 
-                foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
-                {
-                    Thing child = ThingMaker.MakeThing( childDef );
+        //        foreach ( (ThingDef childDef, LimbConfiguration bpr) in this.StandardPartsForTargetLimb() )
+        //        {
+        //            Thing child = ThingMaker.MakeThing( childDef );
 
-                    // try to initialize from other on correct child, else just initialize for bpr
-                    if ( bpr == otherTarget )
-                    {
-                        child.TryGetComp<CompIncludedChildParts>()?.InitializeFromSimilar( other );
-                    }
-                    else
-                    {
-                        child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
-                    }
+        //            // try to initialize from other on correct child, else just initialize for bpr
+        //            if ( bpr == otherTarget )
+        //            {
+        //                child.TryGetComp<CompIncludedChildParts>()?.InitializeFromSimilar( other );
+        //            }
+        //            else
+        //            {
+        //                child.TryGetComp<CompIncludedChildParts>()?.InitializeForLimb( bpr );
+        //            }
 
-                    this.AddPart( child );
-                }
-            }
-        }
+        //            this.AddPart( child );
+        //        }
+        //    }
+        //}
 
         public override void PostDestroy ( DestroyMode mode, Map previousMap )
         {
@@ -569,7 +571,7 @@ namespace MSE2
 
                     stringBuilder.Append( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
 
-                    stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetLimbLabel ) );
+                    stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetVersion.Label ) );
                     if ( this.AllMissingParts.Any() )
                     {
                         stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize
@@ -597,8 +599,8 @@ namespace MSE2
         private StatDrawEntry CompatibilityStat => new StatDrawEntry(
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatCompatibility_Label".Translate(),
-            "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleLimbs.Count, this.Props.InstallationDestinations.Count ),
-            this.Props.LimbLabeller.GetCompatibilityReport( this.CompatibleLimbs.Contains ),
+            "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleVersions.Count - 1, this.Props.SupportedVersions.Count - 1 ),
+            this.GetCompatibilityReport(),
             2500 );
 
         private StatDrawEntry MissingPartsStat => new StatDrawEntry(
@@ -616,6 +618,39 @@ namespace MSE2
             yield return this.CompatibilityStat;
             yield return this.MissingPartsStat;
         }
+
+        private string GetCompatibilityReport ()
+        {
+            internalStringBuilder.Clear();
+
+            foreach ( var ver in this.Props.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ) )
+            {
+                internalStringBuilder.AppendFormat( "{0} {1}: {2}",
+                    ver.Label.CapitalizeFirst(),
+                    "LimbVersion".Translate(),
+                    this.CompatibleVersions.Contains( ver )
+                        ? "LimbCompatible".TranslateSimple()
+                        : "LimbIncompatible".TranslateSimple() );
+
+                if ( ver == this.TargetVersion )
+                {
+                    internalStringBuilder.Append( "LimbSelected".Translate() );
+                }
+
+                internalStringBuilder.AppendLine();
+
+                List<string> labels = this.Props.GetRacesForVersion( ver );
+                for ( int l = 0; l < labels.Count; l++ )
+                {
+                    internalStringBuilder.AppendFormat( " - {0}", labels[l].CapitalizeFirst() ).AppendLine();
+                }
+
+                internalStringBuilder.AppendLine();
+            }
+
+            return internalStringBuilder.ToString();
+        }
+        private static readonly StringBuilder internalStringBuilder = new StringBuilder();
 
         #endregion StatsDisplay
 
@@ -651,7 +686,7 @@ namespace MSE2
                 from couple in comp.AllStandardParts
                 select couple );
 
-        public IEnumerable<(ThingDef thingDef, LimbConfiguration limb, CompIncludedChildParts ownerComp)> AllMissingParts => Enumerable.Concat(
+        public IEnumerable<(ThingDef thingDef, ProsthesisVersion limb, CompIncludedChildParts ownerComp)> AllMissingParts => Enumerable.Concat(
 
                 // the standard sub-parts included in this part
                 this.MissingParts.Select( p => (p.thingDef, p.limb, this) ),

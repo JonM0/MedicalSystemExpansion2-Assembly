@@ -12,9 +12,9 @@ namespace MSE2
 {
     public class TargetLimb : DefModExtension
     {
-        public readonly LimbConfiguration targetLimb;
+        public readonly ProsthesisVersion targetLimb;
 
-        public TargetLimb ( LimbConfiguration targetLimb )
+        public TargetLimb ( ProsthesisVersion targetLimb )
         {
             this.targetLimb = targetLimb;
         }
@@ -27,10 +27,6 @@ namespace MSE2
             {
                 yield return "[MSE2] targetLimb is null";
             }
-            else if ( this.targetLimb.RecordExample == null )
-            {
-                yield return "[MSE2] targetLimb contains no records";
-            }
         }
 
         /// <summary>
@@ -38,7 +34,7 @@ namespace MSE2
         /// </summary>
         public bool IsValidThingComp ( CompIncludedChildParts comp )
         {
-            return comp.AllAlwaysIncludedPartsPresent && comp.CompatibleLimbs.Contains( this.targetLimb );
+            return comp.AllAlwaysIncludedPartsPresent && comp.CompatibleVersions.Contains( this.targetLimb );
         }
 
         /// <summary>
@@ -46,12 +42,12 @@ namespace MSE2
         /// </summary>
         public bool IsValidPart ( BodyPartRecord bodyPartRecord )
         {
-            return this.targetLimb.Contains( bodyPartRecord );
+            return this.targetLimb.LimbConfigurations.Exists( l => l.Contains( bodyPartRecord ) );
         }
 
         public override string ToString ()
         {
-            return "TargetLimb=" + this.targetLimb?.UniqueName;
+            return "TargetLimb=" + this.targetLimb?.Label;
         }
     }
 }

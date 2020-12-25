@@ -73,7 +73,7 @@ namespace MSE2.HarmonyPatches
                 CompIncludedChildParts comp = item.TryGetComp<CompIncludedChildParts>();
                 if ( comp != null )
                 {
-                    comp.TargetLimb = LimbConfiguration.LimbConfigForBodyPartRecord( part );
+                    comp.TargetVersion = comp.Props.SupportedVersions.Find( v => v.LimbConfigurations.Contains( LimbConfiguration.LimbConfigForBodyPartRecord( part ) ) );
                     comp.InitializeFromList( subThings );
                 }
 

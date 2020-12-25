@@ -30,7 +30,7 @@ namespace MSE2.HarmonyPatches
                 Thing productToInitialize = products.Find( t => t.TryGetComp<CompIncludedChildParts>() != null );
                 if ( productToInitialize != null )
                 {
-                    productToInitialize.TryGetComp<CompIncludedChildParts>().InitializeFromSimilar( ingredientToUpgrade.TryGetComp<CompIncludedChildParts>() );
+                    //productToInitialize.TryGetComp<CompIncludedChildParts>().InitializeFromSimilar( ingredientToUpgrade.TryGetComp<CompIncludedChildParts>() );
                     Log.Error( "[MSE2] Prosthetic upgrading is not supported." );
                 }
 

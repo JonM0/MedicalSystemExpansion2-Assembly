@@ -25,7 +25,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         internal static void AddSubpartValue ( ref float __result, RecipeDef d )
         {
-            LimbConfiguration target = d.GetModExtension<TargetLimb>()?.targetLimb;
+            ProsthesisVersion target = d.GetModExtension<TargetLimb>()?.targetLimb;
 
             if ( target != null )
             {
@@ -35,7 +35,7 @@ namespace MSE2.HarmonyPatches
 
                     if ( thingDefCountClass.count == 1 && compProp != null )
                     {
-                        foreach ( ThingDef includedPart in compProp.AllPartsForLimb( target ) )
+                        foreach ( var (includedPart, _) in target.Parts )
                         {
                             __result += includedPart.GetStatValueAbstract( StatDefOf.MarketValue );
                         }
