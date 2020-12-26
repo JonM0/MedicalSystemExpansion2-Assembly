@@ -33,32 +33,32 @@ namespace MSE2
 
         public virtual IEnumerable<StatDrawEntry> SpecialDisplayStats ( StatRequest req )
         {
-            yield return this.cachedCompatibleModulesStat ?? (this.cachedCompatibleModulesStat = this.CompatibleModulesStatFactory());
+            yield return this.cachedModuleSlotsStat ?? (this.cachedModuleSlotsStat = this.ModuleSlotsStatFactory());
         }
 
-        private StatDrawEntry cachedCompatibleModulesStat;
+        private StatDrawEntry cachedModuleSlotsStat;
 
-        private StatDrawEntry CompatibleModulesStatFactory ()
+        private StatDrawEntry ModuleSlotsStatFactory ()
         {
             List<BodyPartDef> destinations = IncludedPartsUtilities.SurgeryToInstall( this.parentDef ).SelectMany( s => s.appliedOnFixedBodyParts ).ToList();
 
-            List<ThingDef> compat =
+            List<ThingDef> compatibleModules =
                 (from r in DefDatabase<RecipeDef>.AllDefs
                  where typeof( Recipe_InstallModule ).IsAssignableFrom( r.workerClass )
                      && (r.appliedOnFixedBodyParts.Count == 0 || r.appliedOnFixedBodyParts.Exists( destinations.Contains ))
                      && r.addsHediff?.spawnThingOnRemoved != null
                  select r.addsHediff.spawnThingOnRemoved).ToList();
 
-            compat.RemoveDuplicates();
+            compatibleModules.RemoveDuplicates();
 
             return new StatDrawEntry(
                 StatCategoryDefOf.Basics,
                 "ModuleHolder_Compatible_Label".Translate(),
-                compat.Count.ToString(),
+                this.maxModules.ToString(),
                 "ModuleHolder_Compatible_ReportText".Translate(),
                 4060,
                 null,
-                compat.Select( m => new Dialog_InfoCard.Hyperlink( m ) ) );
+                compatibleModules.Select( m => new Dialog_InfoCard.Hyperlink( m ) ) );
         }
 
         public int maxModules = 1;
