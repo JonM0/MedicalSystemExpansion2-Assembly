@@ -185,12 +185,12 @@ namespace MSE2
             }
         }
 
-        public static IEnumerable<T> ExceptFirst<T> ( this IEnumerable<T> lhs, T rhs ) where T : class
+        public static IEnumerable<T> ExceptFirst<T> ( this IEnumerable<T> lhs, T rhs )
         {
             bool removed = false;
             foreach ( T t in lhs )
             {
-                if ( !removed && t == rhs )
+                if ( !removed && t.Equals( rhs ) )
                 {
                     removed = true;
                 }
@@ -201,23 +201,22 @@ namespace MSE2
             }
         }
 
-        public static bool InstallationCompatibility ( IEnumerable<Thing> things, IEnumerable<ProsthesisVersion> versions )
+        public static bool InstallationCompatibility ( IEnumerable<Thing> things, IEnumerable<(ThingDef thingDef, ProsthesisVersion version)> parts )
         {
-            //Log.Message( "compat: " + thingDefs.Count() + " " + bodyPartRecords.Count() );
-
-            foreach ( ProsthesisVersion version in versions )
+            foreach ( (ThingDef thingDef, ProsthesisVersion version) part in parts )
             {
                 foreach ( Thing thing in things )
                 {
-                    if ( (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleVersions.Contains( version ) ?? // subparts are compatible
-                        version == null) // has no subparts and is compatible
-                        && InstallationCompatibility( things.ExceptFirst( thing ), versions.ExceptFirst( version ) ) ) // all other things check out
+                    if ( thing.def == part.thingDef
+                        && (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleVersions.Contains( part.version ) ?? // subparts are compatible
+                        part.version == null) // has no subparts and is compatible
+                        && InstallationCompatibility( things.ExceptFirst( thing ), parts.ExceptFirst( part ) ) ) // all other things check out
                     {
                         return true;
                     }
                 }
             }
-            return !versions.Any();
+            return !parts.Any();
         }
     }
 }

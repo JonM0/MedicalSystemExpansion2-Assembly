@@ -46,7 +46,8 @@ namespace MSE2
 
         private bool IncludesOtherVersion ( ProsthesisVersion other )
         {
-            return this == other || this.AllPartsCount.TrueForAll( p => other.AllPartsCount.Find( op => op.part == p.part ).count <= p.count );
+            return this == other 
+                || other.AllPartsCount.TrueForAll( op => this.AllPartsCount.Find( p => p.part == op.part ).count >= op.count );
         }
 
         private string GenerateLabel ()
@@ -111,7 +112,12 @@ namespace MSE2
                     }
                 }
             }
-            return builder.ToString();
+            if ( builder.Length > 0 )
+            {
+                return builder.ToString();
+            }
+
+            return "LimbSimple".Translate();
         }
 
 

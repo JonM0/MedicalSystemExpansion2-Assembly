@@ -361,7 +361,7 @@ namespace MSE2
                     this.cachedCompatibleVersions.list.AddRange( from v in this.Props.SupportedVersions
                                                                  where IncludedPartsUtilities.InstallationCompatibility(
                                                                      this.childPartsIncluded,
-                                                                     v.Parts.Select( p => p.version ) )
+                                                                     v.Parts )
                                                                  select v );
                     this.cachedCompatibleVersions.valid = true;
                 }

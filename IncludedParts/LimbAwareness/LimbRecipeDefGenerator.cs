@@ -223,7 +223,7 @@ namespace MSE2
             int versionCounter = 0; // version counter
 
             // generate limb specific crafting recipes
-            foreach ( ProsthesisVersion version in comp.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ) )
+            foreach ( ProsthesisVersion version in comp.SupportedVersions.Where( v => v.Parts.Any() ) )
             {
                 RecipeDef recipeDef = new RecipeDef();
 
