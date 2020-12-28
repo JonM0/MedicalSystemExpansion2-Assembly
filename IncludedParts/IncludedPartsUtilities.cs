@@ -170,10 +170,10 @@ namespace MSE2
                 IEnumerable<LimbConfiguration> allFromSurgeries =
                     (from s in SurgeryToInstall( parentDef )
                      from u in s.AllRecipeUsers
-                     let b = u.race.body
+                     where u.race?.body != null
                      from bpd in s.appliedOnFixedBodyParts
-                     where b.AllParts.Any( bpr => bpr.def == bpd )
-                     from lc in LimbConfiguration.LimbConfigsMatchingBodyAndPart( b, bpd )
+                     where u.race.body.AllParts.Any( bpr => bpr.def == bpd )
+                     from lc in LimbConfiguration.LimbConfigsMatchingBodyAndPart( u.race.body, bpd )
                      select lc)
                      .Distinct();
 

@@ -92,7 +92,7 @@ namespace MSE2
                         .Where(
                             l =>
                             l.BodyPartDefs.Any( surgery.appliedOnFixedBodyParts.Contains )
-                            && surgery.AllRecipeUsers.Any( ru => l.BodyDefs.Contains( ru.race.body ) )
+                            && surgery.AllRecipeUsers.Any( ru => ru.race?.body != null && l.BodyDefs.Contains( ru.race.body ) )
                         )
                     );
 

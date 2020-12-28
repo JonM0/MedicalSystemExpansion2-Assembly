@@ -199,8 +199,8 @@ namespace MSE2
         private ThingDef parentDef;
 
         public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ?? (lazyCompatibleBodyDefs = (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                               from u in s.AllRecipeUsers
-                                                               select u.race.body).ToHashSet());
+                                                                                                           from u in s.AllRecipeUsers
+                                                                                                           select u.race?.body).Where(b => b != null).ToHashSet());
         [Unsaved]
         private HashSet<BodyDef> lazyCompatibleBodyDefs;
 
