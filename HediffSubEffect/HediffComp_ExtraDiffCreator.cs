@@ -124,7 +124,7 @@ namespace MSE2
         {
             return bodyPart != null
                 && (this.Props.maxDistance < 0 || distance <= this.Props.maxDistance)
-                && this.Pawn.health.hediffSet.hediffs.Find( h => h.Part == bodyPart && h is Hediff_AddedPart ) != null;
+                && this.Pawn.health.hediffSet.hediffs.Exists( h => h.Part == bodyPart && h is Hediff_AddedPart );
         }
 
         private void AddExtraToPart ( BodyPartRecord bodyPart, int distance )

@@ -98,7 +98,7 @@ namespace MSE2.HarmonyPatches
                     float parentEff = PawnCapacityUtility.CalculatePartEfficiency( diffSet, part.parent, ignoreAddedParts, null );
                     __result *= parentEff;
                     // add current part as impactor if parent had different eff
-                    if ( impactors != null && parentEff != 1f && impactors.Find( i => (i as PawnCapacityUtility.CapacityImpactorHediff)?.hediff == hd ) == null )
+                    if ( impactors != null && parentEff != 1f && !impactors.Exists( i => (i as PawnCapacityUtility.CapacityImpactorHediff)?.hediff == hd ) )
                     {
                         impactors.Add( new PawnCapacityUtility.CapacityImpactorHediff
                         {
