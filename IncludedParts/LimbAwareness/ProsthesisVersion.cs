@@ -135,7 +135,7 @@ namespace MSE2
             }
             else
             {
-                if ( IncludedPartsUtilities.EnumerableEqualsOutOfOrderBoxed( this.parts, this.compProp.StandardPartsForLimb( limbConfiguration ).ToList(), ( a, b ) => a == b ) )
+                if ( IncludedPartsUtilities.EnumerableEqualsOutOfOrder( this.parts, this.compProp.StandardPartsForLimb( limbConfiguration ).ToList(), ( a, b ) => a == b ) )
                 {
                     this.limbConfigurations.AddDistinct( limbConfiguration );
 

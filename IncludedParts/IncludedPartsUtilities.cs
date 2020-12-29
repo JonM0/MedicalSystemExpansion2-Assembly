@@ -110,8 +110,6 @@ namespace MSE2
         }
 
         public static bool EnumerableEqualsOutOfOrder<A, B> ( IEnumerable<A> aEnu, IEnumerable<B> bEnu, Func<A, B, bool> equalityComparer )
-            where A : class
-            where B : class
         {
             if ( aEnu == bEnu )
             {
@@ -137,24 +135,6 @@ namespace MSE2
                 }
             }
             return false;
-        }
-
-        private class Box<T>
-        {
-            public T content;
-
-            public static Box<T> PutInBox ( T item )
-            {
-                return new Box<T> { content = item };
-            }
-        }
-
-        public static bool EnumerableEqualsOutOfOrderBoxed<A, B> ( IEnumerable<A> aEnu, IEnumerable<B> bEnu, Func<A, B, bool> equalityComparer )
-        {
-            return EnumerableEqualsOutOfOrder( 
-                aEnu.Select( Box<A>.PutInBox ).ToArray(), 
-                bEnu.Select( Box<B>.PutInBox ).ToArray(), 
-                ( Box<A> a, Box<B> b ) => equalityComparer( a.content, b.content ) );
         }
 
         private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
@@ -207,7 +187,7 @@ namespace MSE2
             {
                 foreach ( Thing thing in things )
                 {
-                    if ( thing.def == part.thingDef
+                    if ( thing.def == part.thingDef // same def
                         && (thing.TryGetComp<CompIncludedChildParts>()?.CompatibleVersions.Contains( part.version ) ?? // subparts are compatible
                         part.version == null) // has no subparts and is compatible
                         && InstallationCompatibility( things.ExceptFirst( thing ), parts.ExceptFirst( part ) ) ) // all other things check out
