@@ -42,10 +42,11 @@ namespace MSE2
 
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
         {
-            bool partIsClean = MedicalRecipesUtility.IsClean( pawn, part );
-            bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
             if ( billDoer != null )
             {
+                bool partIsClean = MedicalRecipesUtility.IsClean( pawn, part );
+                bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
+
                 if ( base.CheckSurgeryFail( billDoer, pawn, ingredients, part, bill ) )
                 {
                     foreach ( var ingredient in ingredients )
@@ -96,6 +97,9 @@ namespace MSE2
                     compProp.RecursiveDefInstallation( pawn, part );
                 }
             }
+
+            foreach ( var ingredient in ingredients )
+                if ( !ingredient.Destroyed ) ingredient.Destroy();
         }
     }
 }
