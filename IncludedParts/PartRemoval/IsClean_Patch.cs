@@ -8,7 +8,7 @@ using Verse;
 
 namespace MSE2.HarmonyPatches
 {
-    // makes it so parts with implants are considered clean
+    // part is clean only if all its children are clean
 
     [HarmonyPatch( typeof( MedicalRecipesUtility ) )]
     [HarmonyPatch( nameof( MedicalRecipesUtility.IsClean ) )]
@@ -17,13 +17,17 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         public static void PostFix ( ref bool __result, Pawn pawn, BodyPartRecord part )
         {
-            // pawn is alive and the part doesn't have any diff that is not an implant
-            __result =
-                __result ||
-                !pawn.Dead && !(from x in pawn.health.hediffSet.hediffs
-                                where x.Part == part
-                                where !(x is Hediff_Implant) || x is Hediff_AddedPart || x is Hediff_ModuleAbstract
-                                select x).Any();
+            __result = __result && CleanRecurse( pawn, part );
+        }
+
+        private static bool CleanRecurse ( Pawn pawn, BodyPartRecord part )
+        {
+            bool result = true;
+            for ( int i = 0; result && i < part.parts.Count; i++ )
+            {
+                result = MedicalRecipesUtility.IsClean( pawn, part.parts[i] ) && CleanRecurse( pawn, part.parts[i] );
+            }
+            return result;
         }
     }
 }
