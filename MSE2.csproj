@@ -86,6 +86,8 @@
     <Compile Include="Assets.cs" />
     <Compile Include="AutoRecipeUser\AutoRecipeUsers.cs" />
     <Compile Include="AutoRecipeUser\AutoRecipeUserUtilities.cs" />
+    <Compile Include="BackCompatibility\PostLoad.cs" />
+    <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
     <Compile Include="GenList.cs" />
     <Compile Include="HediffCompPropWithStats\AddSpecialDisplayStatsForHediffComps.cs" />
@@ -115,7 +117,7 @@
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisComplete.cs" />
     <Compile Include="IncludedParts\Stats\StatParts\StatsReport_ValueOfSubParts.cs" />
     <Compile Include="DebugTools\ApplySurgery.cs" />
-    <Compile Include="DebugTools\GlobalProthesisFix.cs" />
+    <Compile Include="DebugTools\GlobalProthesisFixAction.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculateImmediatePartEfficiencyAndRecord_Patch.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CacheMissingPartsCommonAncestors_Patch.cs" />
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\LimbEfficiencyFix.cs" />

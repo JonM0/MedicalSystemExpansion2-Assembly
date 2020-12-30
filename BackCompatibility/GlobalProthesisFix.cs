@@ -8,31 +8,20 @@ using RimWorld;
 
 using Verse;
 
-namespace MSE2.DebugTools
+namespace MSE2.BackCompatibility
 {
     public static class GlobalProthesisFix
     {
-
-        [DebugAction( "Pawns", "Fix all prostheses in the world", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.Playing )]
-        private static void Apply ()
+        public static void Apply ( bool messageResult = false )
         {
-            int countFixedParts = 0;
-            int countFixedPawns = 0;
-
-            Log.Message( "Starting global prosthesis fix operation" );
-
-            foreach ( Pawn pawn in Find.WorldPawns.AllPawnsAlive.Where( p => p != null ) )
+            try
             {
-                int c = RestorePawnProstheses( pawn );
-                if ( c > 0 )
-                {
-                    countFixedPawns++;
-                    countFixedParts += c;
-                }
-            }
-            foreach ( Map map in Find.Maps )
-            {
-                foreach ( Pawn pawn in map.mapPawns.AllPawns.Where( p => p != null ) )
+                Log.Message( "[MSE2] Starting global prosthesis fix operation" );
+
+                int countFixedParts = 0;
+                int countFixedPawns = 0;
+
+                foreach ( Pawn pawn in Find.WorldPawns.AllPawnsAlive.Where( p => p != null ) )
                 {
                     int c = RestorePawnProstheses( pawn );
                     if ( c > 0 )
@@ -41,10 +30,28 @@ namespace MSE2.DebugTools
                         countFixedParts += c;
                     }
                 }
-            }
+                foreach ( Map map in Find.Maps )
+                {
+                    foreach ( Pawn pawn in map.mapPawns.AllPawns.Where( p => p != null ) )
+                    {
+                        int c = RestorePawnProstheses( pawn );
+                        if ( c > 0 )
+                        {
+                            countFixedPawns++;
+                            countFixedParts += c;
+                        }
+                    }
+                }
 
-            Log.Message( "Global prosthesis fix operation complete: fixed " + countFixedParts + " in " + countFixedPawns + " pawns" );
-            Messages.Message( new Message( "Global prosthesis fix operation complete: fixed " + countFixedParts + " in " + countFixedPawns + " pawns.", MessageTypeDefOf.NeutralEvent ), false );
+                var result = "Global prosthesis fix operation complete: fixed " + countFixedParts + " in " + countFixedPawns + " pawns.";
+
+                Log.Message( result );
+                if ( messageResult ) Messages.Message( new Message( result, MessageTypeDefOf.NeutralEvent ), false );
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception while applying global prosthesis fix operation: " + ex );
+            }
         }
 
         private static int RestorePawnProstheses ( Pawn pawn )
