@@ -19,6 +19,7 @@ namespace MSE2.HarmonyPatches
         private static readonly StringBuilder internalStringBuilder = new StringBuilder();
 
         [HarmonyPostfix]
+        [HarmonyPriority( Priority.VeryLow )]
         private static void SortAndGroup ( ref string __result )
         {
             string[] lines = __result.Split( '\n' );
