@@ -86,6 +86,8 @@ namespace MSE2
                 {
                     compChildParts.RecursiveInstallation( pawn, part );
                 }
+                foreach ( var ingredient in ingredients )
+                    if ( !ingredient.Destroyed ) ingredient.Destroy();
             }
             else
             {
@@ -98,8 +100,6 @@ namespace MSE2
                 }
             }
 
-            foreach ( var ingredient in ingredients )
-                if ( !ingredient.Destroyed ) ingredient.Destroy();
         }
     }
 }
