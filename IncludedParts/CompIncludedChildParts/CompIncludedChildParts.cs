@@ -60,8 +60,6 @@ namespace MSE2
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
-                this.UpdateTargetLimbOrRemoveIncludedParts();
-
                 // init the list if it comes up null (loading a map created without MSE2)
                 if ( this.IncludedParts == null )
                 {
@@ -69,6 +67,8 @@ namespace MSE2
                     Log.Warning( "[MSE2] Included parts was null during loading." );
                     this.InitializeForVersion(this.Props.SupportedVersionsNoSegment.FirstOrDefault());
                 }
+
+                this.UpdateTargetLimbOrRemoveIncludedParts();
             }
         }
 
