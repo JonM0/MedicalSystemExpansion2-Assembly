@@ -185,7 +185,7 @@ namespace MSE2
                     }
                     else
                     {
-                        this.cachedAverageValue = this.SupportedVersions.Select( this.MarketValueForVersion ).Average();
+                        this.cachedAverageValue = this.SupportedVersionsNoSegment.Select( this.MarketValueForVersion ).Average();
                     }
                 }
 
@@ -229,6 +229,9 @@ namespace MSE2
 
 
         public ProsthesisVersionSegment SegmentVersion => (ProsthesisVersionSegment)SupportedVersions.Find( v => v is ProsthesisVersionSegment );
+
+        public IEnumerable<ProsthesisVersion> SupportedVersionsNoSegment => SupportedVersions.Where( v => !v.LimbConfigurations.NullOrEmpty() );
+
         public List<ProsthesisVersion> SupportedVersions
         {
             get
