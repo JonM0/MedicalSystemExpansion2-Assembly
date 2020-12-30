@@ -67,6 +67,7 @@ namespace MSE2
                 {
                     this.childPartsIncluded = new ThingOwner<Thing>( this );
                     Log.Warning( "[MSE2] Included parts was null during loading." );
+                    this.InitializeForVersion(this.Props.SupportedVersionsNoSegment.FirstOrDefault());
                 }
             }
         }
@@ -152,26 +153,6 @@ namespace MSE2
 
         public IEnumerable<CompIncludedChildParts> IncludedPartComps =>
             this.IncludedParts.Select( p => p.TryGetComp<CompIncludedChildParts>() ).Where( c => c != null );
-
-        //private IEnumerable<(Thing, LimbConfiguration)> IncludedPartsVersions
-        //{
-        //    get
-        //    {
-        //        this.tmpThingList.Clear();
-        //        this.tmpThingList.AddRange( this.IncludedParts );
-
-        //        foreach ( (ThingDef def, LimbConfiguration limb) in this.Props.StandardPartsForLimb( this.TargetLimb ) )
-        //        {
-        //            Thing thing = this.tmpThingList.Find( t => t.def == def && (t.TryGetComp<CompIncludedChildParts>() == null || t.TryGetComp<CompIncludedChildParts>().TargetLimb == limb) );
-
-        //            if ( thing != null )
-        //            {
-        //                this.tmpThingList.Remove( thing );
-        //                yield return (thing, limb);
-        //            }
-        //        }
-        //    }
-        //}
 
         public void AddPart ( Thing part )
         {
