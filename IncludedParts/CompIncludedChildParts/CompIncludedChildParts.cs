@@ -162,12 +162,8 @@ namespace MSE2
                 return;
             }
 
+            part = part.SplitOff( 1 );
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
-
-            if(partComp == null) // else it cannot stack anyway
-            {
-                part = part.SplitOff( 1 );
-            }
 
             // prioritize matches of both def and target part
             var target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetVersion == p.limb) );
