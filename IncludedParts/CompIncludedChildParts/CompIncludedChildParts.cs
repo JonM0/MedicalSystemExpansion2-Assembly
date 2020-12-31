@@ -164,26 +164,29 @@ namespace MSE2
 
             CompIncludedChildParts partComp = part.TryGetComp<CompIncludedChildParts>();
 
+            if(partComp == null) // else it cannot stack anyway
+            {
+                part = part.SplitOff( 1 );
+            }
+
             // prioritize matches of both def and target part
             var target = this.MissingParts.Find( p => p.thingDef == part.def && (partComp == null || partComp.TargetVersion == p.limb) );
             // fallback to just matching the def
             if ( target.thingDef == null ) target = this.MissingParts.Find( p => p.thingDef == part.def );
 
             // found a match (part is actually missing)
-            if ( target.thingDef != null )
+
+            this.IncludedParts.TryAdd( part, false );
+            this.DirtyCache();
+
+            if ( partComp != null )
             {
-                this.IncludedParts.TryAdd( part.SplitOff( 1 ), false );
-                this.DirtyCache();
+                partComp.TargetVersion = target.limb;
+            }
 
-                if ( partComp != null )
-                {
-                    partComp.TargetVersion = target.limb;
-                }
-
-                if ( part.Spawned )
-                {
-                    part.DeSpawn();
-                }
+            if ( part.Spawned )
+            {
+                part.DeSpawn();
             }
         }
 
