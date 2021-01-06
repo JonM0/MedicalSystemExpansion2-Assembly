@@ -24,7 +24,7 @@ namespace MSE2.HarmonyPatches
 
             if ( comp != null )
             {
-                comp.InitializeForVersion( comp.Props.SupportedVersionsNoSegment.RandomElement() );
+                comp.InitializeForVersion( comp.Props.SupportedVersionsNoSegment.RandomElementWithFallback(comp.Props.SegmentVersion) );
             }
         }
     }
