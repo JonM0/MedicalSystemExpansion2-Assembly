@@ -23,7 +23,7 @@ namespace MSE2.HarmonyPatches
             if ( stat == StatDefOf.MarketValue )
             {
                 CompProperties_IncludedChildParts compProp = __instance.thing.GetCompProperties<CompProperties_IncludedChildParts>();
-                if ( compProp != null )
+                if ( compProp != null && compProp.SupportedVersionsNoSegment.Any() )
                 {
                     __result = compProp.AverageValue;
                     return false;
