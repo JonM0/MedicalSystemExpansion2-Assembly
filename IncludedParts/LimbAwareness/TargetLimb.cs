@@ -12,6 +12,7 @@ namespace MSE2
 {
     public class TargetLimb : DefModExtension
     {
+        [Unsaved]
         public readonly ProsthesisVersion targetLimb;
 
         public TargetLimb ( ProsthesisVersion targetLimb )
