@@ -12,7 +12,7 @@ namespace MSE2
 {
     public class ProsthesisVersion
     {
-        private CompProperties_IncludedChildParts compProp;
+        private readonly CompProperties_IncludedChildParts compProp;
 
         public ProsthesisVersion ( CompProperties_IncludedChildParts compProp )
         {
@@ -119,7 +119,6 @@ namespace MSE2
 
             return "LimbSimple".Translate();
         }
-
 
         public virtual bool TryAddLimbConfig ( LimbConfiguration limbConfiguration )
         {
