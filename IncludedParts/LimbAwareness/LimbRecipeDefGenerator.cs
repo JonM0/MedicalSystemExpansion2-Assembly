@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -25,7 +26,7 @@ namespace MSE2
                 foreach ( RecipeDef def in ImpliedLimbRecipeDefs() )
                 {
                     def.ResolveReferences();
-                    DefGenerator.AddImpliedDef<RecipeDef>( def );
+                    DefGenerator.AddImpliedDef( def );
                     HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
                     defsToCheck.Add( def );
                 }
@@ -41,7 +42,7 @@ namespace MSE2
                 foreach ( RecipeDef def in ExtraLimbSurgeryRecipeDefs() )
                 {
                     def.ResolveReferences();
-                    DefGenerator.AddImpliedDef<RecipeDef>( def );
+                    DefGenerator.AddImpliedDef( def );
                     HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
                     defsToCheck.Add( def );
                 }
@@ -69,6 +70,15 @@ namespace MSE2
                 {
                     Log.Error( "[MSE2] Exception in ConfigErrors() of " + def.defName + ": " + ex );
                 }
+            }
+
+            try
+            {
+                UpdateCachedWorkTables( defsToCheck );
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception doing " + nameof( UpdateCachedWorkTables ) + ": " + ex );
             }
         }
 
@@ -251,7 +261,7 @@ namespace MSE2
                 recipeDef.workSkillLearnFactor = recipeMaker.workSkillLearnPerTick;
                 recipeDef.requiredGiverWorkType = recipeMaker.requiredGiverWorkType;
                 recipeDef.unfinishedThingDef = recipeMaker.unfinishedThingDef;
-                recipeDef.recipeUsers = recipeMaker.recipeUsers.ListFullCopyOrNull<ThingDef>();
+                recipeDef.recipeUsers = originalRecipe.AllRecipeUsers.ToList();
                 recipeDef.effectWorking = recipeMaker.effectWorking;
                 recipeDef.soundWorking = recipeMaker.soundWorking;
                 recipeDef.researchPrerequisite = recipeMaker.researchPrerequisite;
@@ -267,6 +277,49 @@ namespace MSE2
 
                 if ( !recipeDef.ingredients.NullOrEmpty() )
                     yield return recipeDef;
+            }
+        }
+
+        internal static void UpdateCachedWorkTables ( List<RecipeDef> recipeDefs )
+        {
+            FieldInfo ThingDef_allRecipesCached = typeof( ThingDef ).GetField( "allRecipesCached", BindingFlags.Instance | BindingFlags.NonPublic );
+
+            foreach ( var thingDef in DefDatabase<ThingDef>.AllDefs.Where( d => d.IsWorkTable ) )
+            {
+                List<RecipeDef> cachedRecipes = (List<RecipeDef>)ThingDef_allRecipesCached.GetValue( thingDef );
+
+                if ( cachedRecipes != null )
+                {
+                    foreach ( var recipeDef in recipeDefs )
+                    {
+                        if ( recipeDef.recipeUsers != null && recipeDef.recipeUsers.Contains( thingDef ) && !cachedRecipes.Contains( recipeDef ) )
+                        {
+                            int insertionindex;
+
+                            if ( recipeDef.addsHediff != null )
+                            {
+                                insertionindex = cachedRecipes.FindLastIndex( r => r.addsHediff == recipeDef.addsHediff );
+                            }
+                            else if ( recipeDef.ProducedThingDef != null )
+                            {
+                                insertionindex = cachedRecipes.FindLastIndex( r => r.ProducedThingDef == recipeDef.ProducedThingDef );
+                            }
+                            else
+                            {
+                                insertionindex = -1;
+                            }
+
+                            if(insertionindex == -1)
+                            {
+                                cachedRecipes.Add( recipeDef );
+                            }
+                            else
+                            {
+                                cachedRecipes.Insert( insertionindex + 1, recipeDef );
+                            }
+                        }
+                    }
+                }
             }
         }
     }
