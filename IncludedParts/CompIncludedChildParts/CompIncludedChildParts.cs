@@ -140,8 +140,6 @@ namespace MSE2
 
         #region PartHandling
 
-        private readonly List<Thing> tmpThingList = new List<Thing>();
-
         #region Included parts
 
         private ThingOwner childPartsIncluded;
@@ -245,16 +243,15 @@ namespace MSE2
             }
             else
             {
-                this.tmpThingList.Clear();
-                this.tmpThingList.AddRange( this.IncludedParts );
+                List<Thing> unneededParts = this.IncludedParts.ToList();
 
                 // update compatible parts
                 foreach ( var (thingDef, version) in this.TargetVersion.Parts )
                 {
-                    Thing candidate = this.tmpThingList.Find( t => t.def == thingDef );
+                    Thing candidate = unneededParts.Find( t => t.def == thingDef );
                     if ( candidate != null )
                     {
-                        this.tmpThingList.Remove( candidate );
+                        unneededParts.Remove( candidate );
 
                         CompIncludedChildParts potentialComp = candidate.TryGetComp<CompIncludedChildParts>();
 
@@ -274,7 +271,7 @@ namespace MSE2
                 }
 
                 // remove the others
-                foreach ( Thing thing in this.tmpThingList )
+                foreach ( Thing thing in unneededParts )
                 {
                     this.RemoveAndSpawnPart( thing );
                 }
@@ -363,9 +360,6 @@ namespace MSE2
 
         public void AddMissingFromList ( List<Thing> available )
         {
-            this.tmpThingList.Clear();
-            this.tmpThingList.AddRange( available );
-
             // first add things that match both def and target
             foreach ( Thing availableThing in available.ToArray() )
             {
@@ -376,9 +370,6 @@ namespace MSE2
                 }
             }
 
-            this.tmpThingList.Clear();
-            this.tmpThingList.AddRange( available );
-
             // then just match thingdef
             foreach ( Thing availableThing in available.ToArray() )
             {
@@ -388,8 +379,6 @@ namespace MSE2
                     available.Remove( availableThing );
                 }
             }
-
-            this.tmpThingList.Clear();
         }
 
         public void InitializeForVersion ( ProsthesisVersion version )
@@ -602,11 +591,11 @@ namespace MSE2
 
         private string GetCompatibilityReport ()
         {
-            internalStringBuilder.Clear();
+            StringBuilder stringBuilder = new StringBuilder();
 
             foreach ( var ver in this.Props.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ) )
             {
-                internalStringBuilder.AppendFormat( "{0} {1}: {2}",
+                stringBuilder.AppendFormat( "{0} {1}: {2}",
                     ver.Label.CapitalizeFirst(),
                     "LimbVersion".Translate(),
                     this.CompatibleVersions.Contains( ver )
@@ -615,23 +604,22 @@ namespace MSE2
 
                 if ( ver == this.TargetVersion )
                 {
-                    internalStringBuilder.Append( "LimbSelected".Translate() );
+                    stringBuilder.Append( "LimbSelected".Translate() );
                 }
 
-                internalStringBuilder.AppendLine();
+                stringBuilder.AppendLine();
 
                 List<string> labels = this.Props.GetRacesForVersion( ver );
                 for ( int l = 0; l < labels.Count; l++ )
                 {
-                    internalStringBuilder.AppendFormat( " - {0}", labels[l].CapitalizeFirst() ).AppendLine();
+                    stringBuilder.AppendFormat( " - {0}", labels[l].CapitalizeFirst() ).AppendLine();
                 }
 
-                internalStringBuilder.AppendLine();
+                stringBuilder.AppendLine();
             }
 
-            return internalStringBuilder.ToString();
+            return stringBuilder.ToString();
         }
-        private static readonly StringBuilder internalStringBuilder = new StringBuilder();
 
         #endregion StatsDisplay
 
