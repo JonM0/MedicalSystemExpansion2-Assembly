@@ -113,15 +113,14 @@ namespace MSE2.HarmonyPatches
                     .GetMethod( nameof( SingleLimbCalc ), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static ) );
         }
 
-        private static readonly List<BodyPartRecord> internalBodyPartRecords = new List<BodyPartRecord>();
         internal static void SingleLimbCalc ( BodyPartRecord limbCore, HediffSet diffSet, BodyPartTagDef limbSegmentTag, BodyPartTagDef limbDigitTag,
             float appendageWeight, List<PawnCapacityUtility.CapacityImpactor> impactors, ref float totLimbEff, ref int totLimbs, ref int functionalLimbs )
         {
             // segments
-            List<BodyPartRecord> segments = internalBodyPartRecords;
-
-            segments.Clear();
-            segments.Add( limbCore );
+            List<BodyPartRecord> segments = new List<BodyPartRecord>
+            {
+                limbCore
+            };
             segments.AddRange( limbCore.GetConnectedParts( limbSegmentTag ) );
 
             // remove parts to ignore
