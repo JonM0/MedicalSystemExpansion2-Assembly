@@ -43,6 +43,6 @@ namespace MSE2
         public override string ToString ()
         {
             return "ModuleAdded_" + this.def.defName + "_" + this.Part;
-        }
+        }        
     }
 }
