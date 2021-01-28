@@ -160,7 +160,8 @@ namespace MSE2
 
         internal static (List<IngredientCount>, float) AllIngredientsWorkForVersion ( ThingDef thingDef, ProsthesisVersion version )
         {
-            //Log.Message( "Calculating ingredients of " + thingDef.defName );
+            _ = thingDef ?? throw new ArgumentNullException( nameof( thingDef ) );
+            _ = version ?? throw new ArgumentNullException( nameof( version ) );
 
             if ( thingDef.costList == null )
             {
@@ -171,14 +172,13 @@ namespace MSE2
             float work = 0f;
 
             // all the actual segments the part will include
-            List<ThingDefCountClass> allParts = new List<ThingDefCountClass>();
-            allParts.Add( new ThingDefCountClass( thingDef, 1 ) );
-            CompProperties_IncludedChildParts comp = thingDef.GetCompProperties<CompProperties_IncludedChildParts>();
-            if ( comp != null )
+            List<ThingDefCountClass> allParts = new List<ThingDefCountClass>
             {
-                // add the rest grouped by thingdef
-                allParts.AddRange( version.AllParts.GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
-            }
+                new ThingDefCountClass( thingDef, 1 )
+            };
+
+            // add the rest grouped by thingdef
+            allParts.AddRange( version.AllParts.GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
 
             // the ingredients to make the segments, not grouped by thingdef
             List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
@@ -309,7 +309,7 @@ namespace MSE2
                                 insertionindex = -1;
                             }
 
-                            if(insertionindex == -1)
+                            if ( insertionindex == -1 )
                             {
                                 cachedRecipes.Add( recipeDef );
                             }
