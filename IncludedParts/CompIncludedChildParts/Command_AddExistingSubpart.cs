@@ -23,6 +23,7 @@ namespace MSE2
                 // use same icon as thing it belongs to
                 this.icon = comp.parent.def.uiIcon;
                 this.iconAngle = comp.parent.def.uiIconAngle;
+                this.defaultIconColor = comp.parent.def.uiIconColor;
 
                 this.defaultLabel = "CommandAddExistingSubpart_Label".Translate();
                 this.defaultDesc = "CommandAddExistingSubpart_Description".Translate();

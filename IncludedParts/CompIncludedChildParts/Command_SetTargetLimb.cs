@@ -20,6 +20,7 @@ namespace MSE2
                 // use same icon as thing it belongs to
                 this.icon = comp.parent.def.uiIcon;
                 this.iconAngle = comp.parent.def.uiIconAngle;
+                this.defaultIconColor = comp.parent.def.uiIconColor;
 
                 this.defaultLabel = "Command_SetTargetLimb_Label".Translate();
                 this.defaultDesc = "Command_SetTargetLimb_Description".Translate();
