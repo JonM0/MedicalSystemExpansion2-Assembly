@@ -45,6 +45,8 @@ namespace MSE2
                 IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
 
                 LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
+
+                IncludedPartsUtilities.PrintIncompatibleVersionsReport();
             }
             catch ( Exception ex )
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
+using System.Text;
 
 using RimWorld;
 
@@ -102,6 +103,41 @@ namespace MSE2
             return true;
         }
 
+        public bool IncompatibleLimbsReport ( StringBuilder stringBuilder )
+        {
+            var incompatibles = IncludedPartsUtilities.InstallationDestinations( this.parentDef ).Where( l => !this.LimbIsCompatible( l ) );
+
+            if ( incompatibles.Any() )
+            {
+                var pawns = DefDatabase<ThingDef>.AllDefs.Where( t => t.race?.body != null ).ToList();
+
+                stringBuilder.AppendLine().Append( ">" ).Append( this.parentDef.defName ).Append( ":" );
+
+                foreach ( var incLimb in incompatibles )
+                {
+                    stringBuilder.AppendLine()
+                        .Append( " - " )
+                        .Append( incLimb.PartDef.defName ).AppendLine()
+                        .Append( "    " )
+                        .Append( pawns.Where( p => incLimb.Bodies.Contains( p.race.body ) ).Select( p => p.defName ).ToCommaList() ).AppendLine()
+                        .Append( "    " )
+                        .Append( 
+                            (this.IgnoredSubparts.NullOrEmpty() ? incLimb.ChildLimbs : incLimb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ))
+                            .Where( lc => !this.standardChildren.Exists( td => 
+                                (td.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedLimbs
+                                ?? IncludedPartsUtilities.InstallationDestinations( td )).Contains( lc ) ) )
+                            .Select( lc => lc.PartDef.defName ).ToCommaList() ).AppendLine();
+                }
+
+                stringBuilder.AppendLine();
+
+                return true;
+            }
+
+            return false;
+        }
+
+
         public List<string> GetRacesForVersion ( ProsthesisVersion version )
         {
             if ( version == null )
@@ -200,7 +236,7 @@ namespace MSE2
 
         public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ?? (lazyCompatibleBodyDefs = (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
                                                                                                            from u in s.AllRecipeUsers
-                                                                                                           select u.race?.body).Where(b => b != null).ToHashSet());
+                                                                                                           select u.race?.body).Where( b => b != null ).ToHashSet());
         [Unsaved]
         private HashSet<BodyDef> lazyCompatibleBodyDefs;
 

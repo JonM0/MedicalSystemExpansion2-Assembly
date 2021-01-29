@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -33,6 +34,48 @@ namespace MSE2
                 }
             }
         }
+
+        public static void PrintIncompatibleVersionsReport ()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            try
+            {
+
+                StringBuilder builder = new StringBuilder();
+                int errors = 0;
+
+
+                foreach ( var comp in DefDatabase<ThingDef>.AllDefs.Select( d => d.GetCompProperties<CompProperties_IncludedChildParts>() ).Where( p => p != null ) )
+                {
+                    if ( comp.IncompatibleLimbsReport( builder ) )
+                    {
+                        errors++;
+                    }
+                }
+
+                stopwatch.Stop();
+
+                builder.AppendLine().AppendLine().Append( "elapsed time " ).Append( stopwatch.Elapsed );
+
+                if ( errors > 0 )
+                {
+                    Log.Warning( "[MSE2] " + errors + " prostheses with limb incompatibilities detected: \n" + builder );
+                }
+
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception doing " + nameof( PrintIncompatibleVersionsReport ) + ": " + ex );
+            }
+            finally
+            {
+                stopwatch.Stop();
+            }
+
+        }
+
 
         private static void CacheParentOfChildren ( this HediffDef parent )
         {
@@ -157,8 +200,7 @@ namespace MSE2
                      select lc)
                      .Distinct();
 
-                List<LimbConfiguration> newVal = /*parentDef.GetCompProperties<CompProperties_IncludedChildParts>()?.InstallationDestinationsFilter( allFromSurgeries ).ToList()
-                    ?? */allFromSurgeries.ToList();
+                List<LimbConfiguration> newVal = allFromSurgeries.ToList();
 
                 cachedInstallationDestinations.Add( parentDef, newVal );
                 return newVal;
