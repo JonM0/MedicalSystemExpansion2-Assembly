@@ -37,10 +37,23 @@ namespace MSE2
             Scribe_Deep.Look( ref this.childPartsIncluded, "childPartsIncluded", new object[] { this } );
 
             // save target version index
-            Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", this.Props.SupportedVersions.IndexOf( this.Props.SegmentVersion ) );
+            Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", -1);
+            if( Scribe.mode == LoadSaveMode.LoadingVars && this.targetVersionIndex < 0 || this.targetVersionIndex >= this.Props.SupportedVersions.Count )
+            {
+                this.targetVersionIndex = this.Props.SupportedVersions.IndexOf( this.Props.SegmentVersion );
+            }
 
+            this.BackCompatibilityExposeData();
 
-            // compatibility with old version
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                this.UpdateTargetLimbOrRemoveIncludedParts();
+            }
+        }
+
+        private void BackCompatibilityExposeData ()
+        {
+            // compatibility with old included parts storage
             if ( this.IncludedParts == null && Scribe.mode == LoadSaveMode.LoadingVars )
             {
                 List<Thing> oldThings = null;
@@ -68,8 +81,13 @@ namespace MSE2
                     this.InitializeForVersion( this.Props.SupportedVersionsNoSegment.FirstOrDefault() );
                 }
 
-                this.UpdateTargetLimbOrRemoveIncludedParts();
+                // compatibility with old prosthetic arm
+                if ( this.parent.def.defName == "SimpleProstheticArm" && this.IncludedParts.Any( p => p.def.defName == "SimpleProstheticHand" ) )
+                {
+                    this.InitializeForVersion( this.TargetVersion );
+                }
             }
+
         }
 
         /// <summary>
