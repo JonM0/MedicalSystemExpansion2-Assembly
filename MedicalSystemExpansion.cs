@@ -9,6 +9,7 @@ using System.Threading;
 using HarmonyLib;
 
 using HugsLib;
+using HugsLib.Settings;
 
 using RimWorld;
 
@@ -47,6 +48,13 @@ namespace MSE2
                 LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
 
                 IncludedPartsUtilities.PrintIncompatibleVersionsReport();
+
+                // load settings
+                this.hediffHideModeSetting = Settings.GetHandle( "hediffHideMode", 
+                    "HediffHideModeSetting_Title".Translate(),
+                    "HediffHideModeSetting_Description".Translate(), 
+                    HediffHideMode.Clean, null, 
+                    "HediffHideModeSetting_" );
             }
             catch ( Exception ex )
             {
@@ -64,5 +72,17 @@ namespace MSE2
         public override string ModIdentifier => "MSE2";
 
         public static MedicalSystemExpansion Instance { get; private set; }
+
+
+        // settings
+
+        public enum HediffHideMode { Always, Never, Clean }
+        private SettingHandle<HediffHideMode> hediffHideModeSetting;
+        public HediffHideMode HediffHideModeSetting => this.hediffHideModeSetting;
+
+
+
+
+
     }
 }
