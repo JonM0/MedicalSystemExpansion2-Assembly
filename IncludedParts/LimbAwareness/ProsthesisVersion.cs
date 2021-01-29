@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Verse;
-
 using RimWorld;
+
+using Verse;
 
 namespace MSE2
 {
@@ -25,7 +25,7 @@ namespace MSE2
         }
 
         private string lazyLabel;
-        public virtual string Label => lazyLabel ?? (lazyLabel = GenerateLabel().CapitalizeFirst());
+        public virtual string Label => this.lazyLabel ?? (this.lazyLabel = this.GenerateLabel().CapitalizeFirst());
 
         private List<(ThingDef, int)> VersionDifference ()
         {
@@ -46,7 +46,7 @@ namespace MSE2
 
         private bool IncludesOtherVersion ( ProsthesisVersion other )
         {
-            return this == other 
+            return this == other
                 || other.AllPartsCount.TrueForAll( op => this.AllPartsCount.Find( p => p.part == op.part ).count >= op.count );
         }
 
@@ -153,12 +153,12 @@ namespace MSE2
         }
 
         protected List<LimbConfiguration> limbConfigurations;
-        public virtual List<LimbConfiguration> LimbConfigurations { get => this.limbConfigurations; }
+        public virtual List<LimbConfiguration> LimbConfigurations => this.limbConfigurations;
 
-        public IEnumerable<BodyPartDef> BodyPartDefs => LimbConfigurations.Select( l => l.PartDef );
+        public IEnumerable<BodyPartDef> BodyPartDefs => this.LimbConfigurations.Select( l => l.PartDef );
 
         protected List<(ThingDef thingDef, ProsthesisVersion version)> parts;
-        public virtual List<(ThingDef thingDef, ProsthesisVersion version)> Parts { get => this.parts; }
+        public virtual List<(ThingDef thingDef, ProsthesisVersion version)> Parts => this.parts;
 
         public IEnumerable<ThingDef> AllParts
         {
@@ -181,8 +181,8 @@ namespace MSE2
 
         private List<(ThingDef part, int count)> lazyAllPartsCount;
         private List<(ThingDef part, int count)> AllPartsCount =>
-            lazyAllPartsCount ?? (lazyAllPartsCount = this.AllParts.GroupBy( p => p ).Select( g => (g.Key, g.Count()) ).ToList());
+            this.lazyAllPartsCount ?? (this.lazyAllPartsCount = this.AllParts.GroupBy( p => p ).Select( g => (g.Key, g.Count()) ).ToList());
 
-        public IEnumerable<BodyDef> BodyDefs => LimbConfigurations.SelectMany( l => l.Bodies ).Where(this.compProp.CompatibleBodyDefs.Contains);
+        public IEnumerable<BodyDef> BodyDefs => this.LimbConfigurations.SelectMany( l => l.Bodies ).Where( this.compProp.CompatibleBodyDefs.Contains );
     }
 }
