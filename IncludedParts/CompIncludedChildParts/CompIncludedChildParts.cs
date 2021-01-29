@@ -18,7 +18,7 @@ namespace MSE2
         {
             base.Initialize( props );
 
-            childPartsIncluded = new ThingOwner<Thing>( this );
+            this.childPartsIncluded = new ThingOwner<Thing>( this );
 
             // Create the needed command gizmos
             this.command_SetTargetLimb = new Command_SetTargetLimb( this );
@@ -65,7 +65,7 @@ namespace MSE2
                 {
                     this.childPartsIncluded = new ThingOwner<Thing>( this );
                     Log.Warning( "[MSE2] Included parts was null during loading." );
-                    this.InitializeForVersion(this.Props.SupportedVersionsNoSegment.FirstOrDefault());
+                    this.InitializeForVersion( this.Props.SupportedVersionsNoSegment.FirstOrDefault() );
                 }
 
                 this.UpdateTargetLimbOrRemoveIncludedParts();
@@ -144,10 +144,7 @@ namespace MSE2
 
         private ThingOwner childPartsIncluded;
 
-        public ThingOwner IncludedParts
-        {
-            get => this.childPartsIncluded;
-        }
+        public ThingOwner IncludedParts => this.childPartsIncluded;
 
         public IEnumerable<CompIncludedChildParts> IncludedPartComps =>
             this.IncludedParts.Select( p => p.TryGetComp<CompIncludedChildParts>() ).Where( c => c != null );
@@ -210,7 +207,7 @@ namespace MSE2
 
         public ProsthesisVersion TargetVersion
         {
-            get => this.Props.SupportedVersions[targetVersionIndex];
+            get => this.Props.SupportedVersions[this.targetVersionIndex];
             set
             {
                 if ( this.TargetVersion != value )
@@ -288,7 +285,7 @@ namespace MSE2
 
         #region Missing Parts
 
-        private (List<(ThingDef thingDef, ProsthesisVersion limb)> list, bool valid) cachedMissingParts = (new List<(ThingDef, ProsthesisVersion)>(), false);
+        private (List<(ThingDef thingDef, ProsthesisVersion limb)> list, bool valid, object lockObj) cachedMissingParts = (new List<(ThingDef, ProsthesisVersion)>(), false, new object());
 
         public List<(ThingDef thingDef, ProsthesisVersion limb)> MissingParts
         {
@@ -296,22 +293,28 @@ namespace MSE2
             {
                 if ( !this.cachedMissingParts.valid )
                 {
-                    this.cachedMissingParts.list.Clear();
-
-                    if ( this.TargetVersion != null )
+                    lock ( this.cachedMissingParts.lockObj )
                     {
-                        this.cachedMissingParts.list.AddRange( this.TargetVersion.Parts );
-
-                        foreach ( Thing thing in this.IncludedParts )
+                        if ( !this.cachedMissingParts.valid )
                         {
-                            CompIncludedChildParts thingComp = thing.TryGetComp<CompIncludedChildParts>();
+                            this.cachedMissingParts.list.Clear();
 
-                            this.cachedMissingParts.list.Remove( this.cachedMissingParts.list.Find( c =>
-                                 thing.def == c.thingDef
-                                 && (thingComp == null || thingComp.TargetVersion == c.limb) ) );
+                            if ( this.TargetVersion != null )
+                            {
+                                this.cachedMissingParts.list.AddRange( this.TargetVersion.Parts );
+
+                                foreach ( Thing thing in this.IncludedParts )
+                                {
+                                    CompIncludedChildParts thingComp = thing.TryGetComp<CompIncludedChildParts>();
+
+                                    this.cachedMissingParts.list.Remove( this.cachedMissingParts.list.Find( c =>
+                                         thing.def == c.thingDef
+                                         && (thingComp == null || thingComp.TargetVersion == c.limb) ) );
+                                }
+                            }
+                            this.cachedMissingParts.valid = true;
                         }
                     }
-                    this.cachedMissingParts.valid = true;
                 }
 
                 return this.cachedMissingParts.list;
@@ -326,7 +329,7 @@ namespace MSE2
 
         #region Compatible limbs
 
-        private (List<ProsthesisVersion> list, bool valid) cachedCompatibleVersions = (new List<ProsthesisVersion>(), false);
+        private (List<ProsthesisVersion> list, bool valid, object lockObj) cachedCompatibleVersions = (new List<ProsthesisVersion>(), false, new object());
 
         public List<ProsthesisVersion> CompatibleVersions
         {
@@ -334,13 +337,19 @@ namespace MSE2
             {
                 if ( !this.cachedCompatibleVersions.valid )
                 {
-                    this.cachedCompatibleVersions.list.Clear();
-                    this.cachedCompatibleVersions.list.AddRange( from v in this.Props.SupportedVersions
-                                                                 where IncludedPartsUtilities.InstallationCompatibility(
-                                                                     this.childPartsIncluded,
-                                                                     v.Parts )
-                                                                 select v );
-                    this.cachedCompatibleVersions.valid = true;
+                    lock ( this.cachedCompatibleVersions.lockObj )
+                    {
+                        if ( !this.cachedCompatibleVersions.valid )
+                        {
+                            this.cachedCompatibleVersions.list.Clear();
+                            this.cachedCompatibleVersions.list.AddRange( from v in this.Props.SupportedVersions
+                                                                         where IncludedPartsUtilities.InstallationCompatibility(
+                                                                             this.childPartsIncluded,
+                                                                             v.Parts )
+                                                                         select v );
+                            this.cachedCompatibleVersions.valid = true;
+                        }
+                    }
                 }
                 return this.cachedCompatibleVersions.list;
             }
