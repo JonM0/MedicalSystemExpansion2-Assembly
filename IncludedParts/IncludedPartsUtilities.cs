@@ -49,6 +49,18 @@ namespace MSE2
 
                 foreach ( var comp in DefDatabase<ThingDef>.AllDefs.Select( d => d.GetCompProperties<CompProperties_IncludedChildParts>() ).Where( p => p != null ) )
                 {
+                    try
+                    {
+                        foreach ( string item in comp.PostLoadedConfigErrors() )
+                        {
+                            Log.Error( string.Concat( "[MSE2] Config error in ", comp, ": ", item ) );
+                        }
+                    }
+                    catch ( Exception ex )
+                    {
+                        Log.Error( "[MSE2] Exception in " + nameof( CompProperties_IncludedChildParts.PostLoadedConfigErrors ) + " of " + comp + ": " + ex );
+                    }
+
                     if ( comp.IncompatibleLimbsReport( builder ) )
                     {
                         errors++;
@@ -75,7 +87,6 @@ namespace MSE2
             }
 
         }
-
 
         private static void CacheParentOfChildren ( this HediffDef parent )
         {

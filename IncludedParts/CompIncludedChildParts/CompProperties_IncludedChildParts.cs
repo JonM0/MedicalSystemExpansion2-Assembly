@@ -48,6 +48,14 @@ namespace MSE2
             }
         }
 
+        public IEnumerable<string> PostLoadedConfigErrors ()
+        {
+            if ( this.SupportedLimbs.EnumerableNullOrEmpty() )
+            {
+                yield return " prosthesis is not installable anywhere.";
+            }
+        }
+
         public IEnumerable<(ThingDef, ProsthesisVersion)> StandardPartsForLimb ( LimbConfiguration limb )
         {
             if ( limb == null ) yield break;
@@ -297,6 +305,11 @@ namespace MSE2
         private List<ProsthesisVersion> lazySupportedVersions;
 
         private IEnumerable<LimbConfiguration> SupportedLimbs => this.SupportedVersions.SelectMany( v => v.LimbConfigurations );
+
+        public override string ToString ()
+        {
+            return (this.parentDef?.defName ?? "???") + "." + nameof( CompProperties_IncludedChildParts );
+        }
 
 
         // xml def fields
