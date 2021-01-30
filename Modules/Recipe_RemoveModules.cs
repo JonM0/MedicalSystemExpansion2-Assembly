@@ -18,7 +18,7 @@ namespace MSE2
 
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
         {
-            bool isViolation = !PawnGenerator.IsBeingGenerated( pawn ) && this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
+            bool isViolation = this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
 
             if ( billDoer != null )
             {
@@ -29,7 +29,7 @@ namespace MSE2
                 } );
                 if ( isViolation )
                 {
-                    base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_NeedlesslyInstalledWorseBodyPart".Translate( this.recipe.addsHediff.label ) );
+                    base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_RemovedMSE2Module".Translate() );
                 }
             }
 
