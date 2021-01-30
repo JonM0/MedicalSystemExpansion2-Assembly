@@ -31,7 +31,7 @@ namespace MSE2
                 base.ProcessInput( ev );
                 List<FloatMenuOption> options = new List<FloatMenuOption>();
 
-                foreach ( ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Where( t => t != this.comp.TargetVersion ) )
+                foreach ( ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Except( this.comp.TargetVersion ) )
                 {
                     options.Add( new FloatMenuOption(
                         possibleTarget.Label,
