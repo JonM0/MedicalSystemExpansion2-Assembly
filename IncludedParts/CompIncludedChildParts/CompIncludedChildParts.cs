@@ -576,12 +576,15 @@ namespace MSE2
                 {
                     StringBuilder stringBuilder = new StringBuilder();
 
-                    stringBuilder.Append( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
-
-                    stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetVersion.Label ) );
+                    stringBuilder.Append( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetVersion.Label ) );
                     if ( this.AllMissingParts.Any() )
                     {
-                        stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) ); // maybe optimize
+                        stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) );
+                    }
+
+                    if(!(this.TargetVersion is ProsthesisVersionSegment) || this.IncludedParts.Count > 0 )
+                    {
+                        stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
                     }
 
                     this.cachedInspectString = stringBuilder.ToString();
