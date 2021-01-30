@@ -37,8 +37,8 @@ namespace MSE2
             Scribe_Deep.Look( ref this.childPartsIncluded, "childPartsIncluded", new object[] { this } );
 
             // save target version index
-            Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", -1);
-            if( Scribe.mode == LoadSaveMode.LoadingVars && this.targetVersionIndex < 0 || this.targetVersionIndex >= this.Props.SupportedVersions.Count )
+            Scribe_Values.Look( ref this.targetVersionIndex, "targetVersion", -1 );
+            if ( Scribe.mode == LoadSaveMode.LoadingVars && this.targetVersionIndex < 0 || this.targetVersionIndex >= this.Props.SupportedVersions.Count )
             {
                 this.targetVersionIndex = this.Props.SupportedVersions.IndexOf( this.Props.SegmentVersion );
             }
@@ -249,11 +249,21 @@ namespace MSE2
 
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
-            if ( this.TargetVersion == this.Props.SegmentVersion )
+            if ( this.TargetVersion is ProsthesisVersionSegment )
             {
-                foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
+                if ( MedicalSystemExpansion.Instance.RemoveAllFromSegmentSetting )
                 {
-                    comp.TargetVersion = comp.Props.SegmentVersion;
+                    while(this.IncludedParts.Count > 0)
+                    {
+                        this.RemoveAndSpawnPart( this.IncludedParts[0] );
+                    }
+                }
+                else
+                {
+                    foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
+                    {
+                        comp.TargetVersion = comp.Props.SegmentVersion;
+                    }
                 }
             }
             else

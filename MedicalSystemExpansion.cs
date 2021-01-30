@@ -49,12 +49,8 @@ namespace MSE2
 
                 IncludedPartsUtilities.PrintIncompatibleVersionsReport();
 
-                // load settings
-                this.hediffHideModeSetting = Settings.GetHandle( "hediffHideMode", 
-                    "HediffHideModeSetting_Title".Translate(),
-                    "HediffHideModeSetting_Description".Translate(), 
-                    HediffHideMode.Clean, null, 
-                    "HediffHideModeSetting_" );
+
+                this.SetupSettingHandles();
             }
             catch ( Exception ex )
             {
@@ -76,11 +72,27 @@ namespace MSE2
 
         // settings
 
+        private void SetupSettingHandles ()
+        {
+            this.hediffHideModeSetting = Settings.GetHandle( "hediffHideMode",
+                "HediffHideModeSetting_Title".Translate(),
+                "HediffHideModeSetting_Description".Translate(),
+                HediffHideMode.Clean, null,
+                "HediffHideModeSetting_" );
+
+            this.removeAllFromSegmentSetting = Settings.GetHandle( "removeAllFromSegment",
+                "RemoveAllFromSegmentSetting_Title".Translate(),
+                "RemoveAllFromSegmentSetting_Description".Translate(),
+                false );
+        }
+
         public enum HediffHideMode { Always, Never, Clean }
         private SettingHandle<HediffHideMode> hediffHideModeSetting;
         public HediffHideMode HediffHideModeSetting => this.hediffHideModeSetting;
 
 
+        private SettingHandle<bool> removeAllFromSegmentSetting;
+        public bool RemoveAllFromSegmentSetting { get => this.removeAllFromSegmentSetting; }
 
 
 
