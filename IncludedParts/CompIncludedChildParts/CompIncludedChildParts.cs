@@ -234,7 +234,7 @@ namespace MSE2
 
                     if ( newIndex == -1 )
                     {
-                        Log.Error( string.Format( "[MSE2] Tried to set invalid target version ({0}) on {1}", value, this.parent.Label ) );
+                        Log.Error( string.Format( "[MSE2] Tried to set invalid target version ({0}) on {1}", value, this.parent ) );
                     }
                     else
                     {
@@ -249,21 +249,11 @@ namespace MSE2
 
         private void UpdateTargetLimbOrRemoveIncludedParts ()
         {
-            if ( this.TargetVersion is ProsthesisVersionSegment )
+            if ( this.TargetVersion is ProsthesisVersionSegment && !MedicalSystemExpansion.Instance.RemoveAllFromSegmentSetting )
             {
-                if ( MedicalSystemExpansion.Instance.RemoveAllFromSegmentSetting )
+                foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
                 {
-                    while(this.IncludedParts.Count > 0)
-                    {
-                        this.RemoveAndSpawnPart( this.IncludedParts[0] );
-                    }
-                }
-                else
-                {
-                    foreach ( CompIncludedChildParts comp in this.IncludedPartComps )
-                    {
-                        comp.TargetVersion = comp.Props.SegmentVersion;
-                    }
+                    comp.TargetVersion = comp.Props.SegmentVersion;
                 }
             }
             else
@@ -582,7 +572,7 @@ namespace MSE2
                         stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) );
                     }
 
-                    if(!(this.TargetVersion is ProsthesisVersionSegment) || this.IncludedParts.Count > 0 )
+                    if ( !(this.TargetVersion is ProsthesisVersionSegment) || this.IncludedParts.Count > 0 )
                     {
                         stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
                     }
