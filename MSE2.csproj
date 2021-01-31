@@ -90,12 +90,12 @@
     <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
     <Compile Include="GenList.cs" />
-    <Compile Include="HediffCompPropWithStats\AddSpecialDisplayStatsForHediffComps.cs" />
+    <Compile Include="UI\AddSpecialDisplayStatsForHediffComps.cs" />
     <Compile Include="HediffSubEffect\HediffCompProperties_ExtraDiffCreator.cs" />
     <Compile Include="HediffSubEffect\HediffComp_ExtraDiffCreator.cs" />
     <Compile Include="HediffSubEffect\HediffExtraDiff.cs" />
     <Compile Include="HediffSubEffect\PastAddHediffCheckForEffectors.cs" />
-    <Compile Include="HediffCompPropWithStats\IHediffCompWithStats.cs" />
+    <Compile Include="UI\IHediffCompWithStats.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SetTargetLimb.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
     <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
@@ -153,12 +153,10 @@
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
-    <Compile Include="RemoveStatDrawDuplicates.cs" />
-    <Compile Include="SortAndGroupPawnCapacityTip.cs" />
+    <Compile Include="UI\RemoveStatDrawDuplicates.cs" />
+    <Compile Include="UI\SortAndGroupPawnCapacityTip.cs" />
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
