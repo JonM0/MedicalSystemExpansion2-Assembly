@@ -153,9 +153,12 @@
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
+    <Compile Include="RemoveStatDrawDuplicates.cs" />
     <Compile Include="SortAndGroupPawnCapacityTip.cs" />
     <Compile Include="ThoughtFixCountParts.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="UI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
