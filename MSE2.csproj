@@ -90,6 +90,7 @@
     <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
     <Compile Include="GenList.cs" />
+    <Compile Include="ModPatches\Empire\EmpireTitheGeneration.cs" />
     <Compile Include="UI\AddSpecialDisplayStatsForHediffComps.cs" />
     <Compile Include="HediffSubEffect\HediffCompProperties_ExtraDiffCreator.cs" />
     <Compile Include="HediffSubEffect\HediffComp_ExtraDiffCreator.cs" />
