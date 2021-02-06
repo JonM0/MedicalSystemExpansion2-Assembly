@@ -230,6 +230,7 @@ namespace MSE2
                     else
                     {
                         this.cachedAverageValue = this.SupportedVersionsNoSegment.Select( this.MarketValueForVersion ).Average();
+                        this.cachedAverageValue = GenMath.RoundTo( this.cachedAverageValue, 5 );
                     }
                 }
 
