@@ -24,9 +24,17 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         public static void AddSubparts ( ref Thing __result, RecipeDef recipeDef )
         {
-            if ( recipeDef.HasModExtension<TargetLimb>() && __result.TryGetComp<CompIncludedChildParts>() != null )
+            var comp = __result.TryGetComp<CompIncludedChildParts>();
+            if ( comp != null )
             {
-                __result.TryGetComp<CompIncludedChildParts>().InitializeForVersion( recipeDef.GetModExtension<TargetLimb>().targetLimb );
+                if ( recipeDef.HasModExtension<TargetLimb>())
+                {
+                    comp.InitializeForVersion( recipeDef.GetModExtension<TargetLimb>().targetLimb );
+                }
+                else
+                {
+                    comp.InitializeForVersion( comp.Props.SupportedVersionsNoSegment.First() );
+                }
             }
         }
     }

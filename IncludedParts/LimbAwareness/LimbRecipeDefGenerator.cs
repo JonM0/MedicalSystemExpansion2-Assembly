@@ -228,6 +228,8 @@ namespace MSE2
             if ( originalRecipe != null )
             {
                 originalRecipe.label = "RecipeMakeSegment".Translate( prosthesisDef.label );
+                if ( originalRecipe.modExtensions == null ) originalRecipe.modExtensions = new List<DefModExtension>();
+                originalRecipe.modExtensions.Add( new TargetLimb( comp.SegmentVersion ) );
             }
 
             int versionCounter = 0; // version counter

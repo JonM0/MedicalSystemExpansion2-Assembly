@@ -34,7 +34,7 @@ namespace MSE2.HarmonyPatches
                     Log.Error( "[MSE2] Prosthetic upgrading is not supported." );
                 }
 
-                __result = products;
+                //__result = products;
             }
         }
     }
