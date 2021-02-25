@@ -52,72 +52,19 @@ namespace MSE2
 
         private string GenerateLabel ()
         {
-            if ( this.compProp.SupportedVersions.Count == 2 )
+            if ( this.compProp.SupportedVersionsNoSegment.Count() == 1
+                || this.compProp.SupportedVersions.TrueForAll( this.IncludesOtherVersion ) )
             {
                 return "LimbComplete".Translate();
+            }
+
+            if( this.BodyDefs.Distinct().Count() == 1 )
+            {
+                return this.BodyDefs.First().label;
             }
 
             var races = this.compProp.GetRacesForVersion( this );
-            if ( races.Count == 1 )
-            {
-                return races[0];
-            }
-
-            if ( this.compProp.SupportedVersions.TrueForAll( this.IncludesOtherVersion ) )
-            {
-                return "LimbComplete".Translate();
-            }
-
-            var builder = new StringBuilder();
-
-            List<(ThingDef, int)> diffLimbs = this.VersionDifference();
-            for ( int i = 0; i < diffLimbs.Count; i++ )
-            {
-                (ThingDef part, int count) = diffLimbs[i];
-
-                if ( count > 0 )
-                {
-                    builder.AppendWithComma( count.ToStringCached() );
-                    builder.Append( " " );
-                    if ( count > 1 )
-                    {
-                        builder.Append( Find.ActiveLanguageWorker.Pluralize( part.label ) );
-                    }
-                    else
-                    {
-                        builder.Append( part.label );
-                    }
-                }
-            }
-            if ( builder.Length > 0 )
-            {
-                return builder.ToString();
-            }
-
-            for ( int i = 0; i < this.AllPartsCount.Count; i++ )
-            {
-                (ThingDef part, int count) = this.AllPartsCount[i];
-
-                if ( count > 0 )
-                {
-                    builder.AppendWithComma( count.ToStringCached() );
-                    builder.Append( " " );
-                    if ( count > 1 )
-                    {
-                        builder.Append( Find.ActiveLanguageWorker.Pluralize( part.label ) );
-                    }
-                    else
-                    {
-                        builder.Append( part.label );
-                    }
-                }
-            }
-            if ( builder.Length > 0 )
-            {
-                return builder.ToString();
-            }
-
-            return "LimbSimple".Translate();
+            return races[0];
         }
 
         public virtual bool TryAddLimbConfig ( LimbConfiguration limbConfiguration )
