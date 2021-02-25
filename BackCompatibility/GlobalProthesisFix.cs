@@ -24,6 +24,7 @@ namespace MSE2.BackCompatibility
                 foreach ( Pawn pawn in Find.WorldPawns.AllPawnsAlive.Where( p => p != null ) )
                 {
                     int c = RestorePawnProstheses( pawn );
+                    c += FixPawnModules( pawn );
                     if ( c > 0 )
                     {
                         countFixedPawns++;
@@ -35,6 +36,7 @@ namespace MSE2.BackCompatibility
                     foreach ( Pawn pawn in map.mapPawns.AllPawns.Where( p => p != null ) )
                     {
                         int c = RestorePawnProstheses( pawn );
+                        c += FixPawnModules( pawn );
                         if ( c > 0 )
                         {
                             countFixedPawns++;
@@ -43,7 +45,7 @@ namespace MSE2.BackCompatibility
                     }
                 }
 
-                var result = "Global prosthesis fix operation complete: fixed " + countFixedParts + " in " + countFixedPawns + " pawns.";
+                var result = "Global prosthesis fix operation complete: fixed " + countFixedParts + " parts in total across " + countFixedPawns + " pawns.";
 
                 Log.Message( result );
                 if ( messageResult ) Messages.Message( new Message( result, MessageTypeDefOf.NeutralEvent ), false );
@@ -83,6 +85,49 @@ namespace MSE2.BackCompatibility
             }
 
             return countFixedParts;
+        }
+
+        private static int FixPawnModules ( Pawn pawn )
+        {
+            int countFixedModules = 0;
+
+            var brokenModules = pawn.health.hediffSet.hediffs.FindAll( h => h is Hediff_ModuleAdded m && m.ModuleHolder == null );
+
+            foreach ( var module in brokenModules )
+            {
+                BodyPartRecord part = module.Part;
+                pawn.health.RestorePart( part );
+
+                if ( DefDatabase<RecipeDef>.AllDefsListForReading.FindAll( r => // out of all recipes
+                    r.IsSurgery && r.addsHediff != null  // take installation surgeries
+                    && r.addsHediff.HasComp( typeof( HediffComp_ModuleHolder ) )  // for parts that support modules
+                    && r.AllRecipeUsers.Contains( pawn.def )  // installable on the pawn
+                    && r.Worker.GetPartsToApplyOn( pawn, r ).Contains( part ) // in the correct part
+                    ).TryMinBy( r => r.addsHediff.spawnThingOnRemoved?.BaseMarketValue, out var compatibleHolderSurgery ) ) // take the least valuable
+                {
+                    Log.Message( "Fixing " + module.Label + " on " + pawn.Name );
+
+                    compatibleHolderSurgery.Worker.ApplyOnPawn( pawn, part, null, null, null );
+
+                    pawn.health.hediffSet.AddDirect( module );
+
+                    countFixedModules++;
+                }
+                else
+                {
+                    Log.Warning( "Could not find a holder part to fix " + module.Label + " on " + pawn.Name );
+
+                    if ( module.def.spawnThingOnRemoved != null && pawn.Map != null && pawn.IsColonistPlayerControlled )
+                    {
+                        GenPlace.TryPlaceThing( ThingMaker.MakeThing( module.def.spawnThingOnRemoved ), pawn.Position, pawn.Map, ThingPlaceMode.Near );
+                    }
+
+                }
+
+            }
+
+            return countFixedModules;
+
         }
     }
 }
