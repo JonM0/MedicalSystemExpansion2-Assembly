@@ -86,6 +86,7 @@
     <Compile Include="Assets.cs" />
     <Compile Include="AutoRecipeUser\AutoRecipeUsers.cs" />
     <Compile Include="AutoRecipeUser\AutoRecipeUserUtilities.cs" />
+    <Compile Include="BackCompatibility\HediffClassLoading.cs" />
     <Compile Include="BackCompatibility\PostLoad.cs" />
     <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
