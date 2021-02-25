@@ -10,20 +10,20 @@ using HarmonyLib;
 
 namespace MSE2.BackCompatibility
 {
-    [HarmonyPatch(typeof(Verse.BackCompatibility))]
-    [HarmonyPatch(nameof(Verse.BackCompatibility.PostLoadSavegame))]
+    [HarmonyPatch( typeof( Game ), nameof( Game.FinalizeInit ) )]
     internal static class PostLoad
     {
         [HarmonyPostfix]
-        internal static void FixProstheses()
+        internal static void FixProstheses ()
         {
             if ( ScribeMetaHeaderUtility.loadedModIdsList != null && !ScribeMetaHeaderUtility.loadedModIdsList.Contains( "mse2.core" ) )
             {
-                Log.Message( "[MSE2] Detected savegame created without MSE2, applying compatibility fixes." );
+                LongEventHandler.ExecuteWhenFinished( delegate
+                {
+                    Log.Message( "[MSE2] Detected savegame created without MSE2, applying compatibility fixes." );
 
-                Log.Message( string.Join( ", ", ScribeMetaHeaderUtility.loadedModIdsList ) );
-
-                GlobalProthesisFix.Apply();
+                    GlobalProthesisFix.Apply();
+                } );
             }
         }
     }
