@@ -16,7 +16,7 @@ namespace MSE2
             }
             else
             {
-                Log.Error( "[MSE2] " + this + " could not find a slot to install into" );
+                Log.Warning( "[MSE2] " + this + " could not find a slot to install into" );
             }
         }
 
