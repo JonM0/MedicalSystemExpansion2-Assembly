@@ -24,18 +24,35 @@ namespace MSE2.BackCompatibility
         {
             if ( Scribe.mode == LoadSaveMode.ResolvingCrossRefs )
             {
-                var brokenHediffs = __instance.hediffs.FindAll( h => h.GetType() != h.def.hediffClass );
-                if ( brokenHediffs.Count > 0 )
+                try
                 {
-                    Log.Warning( "Reinstalling Hediffs with wrong type: " + string.Join( ", ", brokenHediffs ) );
-                    __instance.hediffs.RemoveAll( brokenHediffs.Contains );
-
-                    __instance.DirtyCache();
-
-                    foreach ( var bh in brokenHediffs )
+                    var brokenHediffs = __instance.hediffs.FindAll( h => h.GetType() != h.def.hediffClass && h.def.hediffClass.GetConstructors().Any( c => c.GetParameters().EnumerableNullOrEmpty() ) );
+                    if ( brokenHediffs.Count > 0 )
                     {
-                        __instance.AddDirect( HediffMaker.MakeHediff( bh.def, bh.pawn, bh.Part ) );
+                        Log.Warning( "[MSE2] Reinstalling Hediffs with wrong type: " + string.Join( ", ", brokenHediffs ) ); 
+                        __instance.hediffs.RemoveAll( brokenHediffs.Contains );
+
+                        __instance.DirtyCache();
+
+                        foreach ( var bh in brokenHediffs )
+                        {
+                            try
+                            {
+                                __instance.AddDirect( HediffMaker.MakeHediff( bh.def, bh.pawn, bh.Part ) );
+                            }
+                            catch ( Exception ex )
+                            {
+                                Log.Error( string.Format( "[MSE2] Exception reinstalling hediff {0}: {1}", bh, ex ) );
+                            }
+                        }
+
+                        __instance.DirtyCache();
                     }
+
+                }
+                catch ( Exception ex )
+                {
+                    Log.Error( "[MSE2] Exception reinstalling wrongly typed hediffs: {0}" + ex );
                 }
             }
         }
