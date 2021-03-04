@@ -237,47 +237,56 @@ namespace MSE2
             // generate limb specific crafting recipes
             foreach ( ProsthesisVersion version in comp.SupportedVersions.Where( v => v.Parts.Any() ) )
             {
-                RecipeDef recipeDef = new RecipeDef();
+                RecipeDef recipeDef = null;
+                try
+                {
+                    recipeDef = new RecipeDef();
 
-                RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
+                    RecipeMakerProperties recipeMaker = prosthesisDef.recipeMaker;
 
-                // set all text
-                string limbComparison = version.Label;
+                    // set all text
+                    string limbComparison = version.Label;
 
-                recipeDef.defName = "Make_" + prosthesisDef.defName + "_v" + (versionCounter++);
-                recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
-                    "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
-                recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
-                recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label, comp.GetRacesForVersion( version ).ToCommaList( true ) );
-                recipeDef.descriptionHyperlinks = originalRecipe.descriptionHyperlinks;
+                    recipeDef.defName = "Make_" + prosthesisDef.defName + "_v" + (versionCounter++);
+                    recipeDef.label = (limbComparison == "LimbComplete".Translate() ?
+                        "RecipeMakeForLimbNoComparison" : "RecipeMakeForLimb").Translate( prosthesisDef.label, limbComparison );
+                    recipeDef.jobString = "RecipeMakeForLimbJobString".Translate( prosthesisDef.label, limbComparison );
+                    recipeDef.description = "RecipeMakeForLimbDescription".Translate( limbComparison, prosthesisDef.label, comp.GetRacesForVersion( version ).ToCommaList( true ) );
+                    recipeDef.descriptionHyperlinks = originalRecipe.descriptionHyperlinks;
 
-                // copy other values
-                recipeDef.modContentPack = prosthesisDef.modContentPack;
-                recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
-                recipeDef.efficiencyStat = recipeMaker.efficiencyStat;
-                recipeDef.defaultIngredientFilter = recipeMaker.defaultIngredientFilter;
-                recipeDef.products.Add( new ThingDefCountClass( prosthesisDef, recipeMaker.productCount ) );
-                recipeDef.targetCountAdjustment = recipeMaker.targetCountAdjustment;
-                recipeDef.skillRequirements = recipeMaker.skillRequirements.ListFullCopyOrNull<SkillRequirement>();
-                recipeDef.workSkill = recipeMaker.workSkill;
-                recipeDef.workSkillLearnFactor = recipeMaker.workSkillLearnPerTick;
-                recipeDef.requiredGiverWorkType = recipeMaker.requiredGiverWorkType;
-                recipeDef.unfinishedThingDef = recipeMaker.unfinishedThingDef;
-                recipeDef.recipeUsers = originalRecipe.AllRecipeUsers.ToList();
-                recipeDef.effectWorking = recipeMaker.effectWorking;
-                recipeDef.soundWorking = recipeMaker.soundWorking;
-                recipeDef.researchPrerequisite = recipeMaker.researchPrerequisite;
-                recipeDef.researchPrerequisites = recipeMaker.researchPrerequisites;
-                recipeDef.factionPrerequisiteTags = recipeMaker.factionPrerequisiteTags;
+                    // copy other values
+                    recipeDef.modContentPack = prosthesisDef.modContentPack;
+                    recipeDef.workSpeedStat = recipeMaker.workSpeedStat;
+                    recipeDef.efficiencyStat = recipeMaker.efficiencyStat;
+                    recipeDef.defaultIngredientFilter = recipeMaker.defaultIngredientFilter;
+                    recipeDef.products.Add( new ThingDefCountClass( prosthesisDef, recipeMaker.productCount ) );
+                    recipeDef.targetCountAdjustment = recipeMaker.targetCountAdjustment;
+                    recipeDef.skillRequirements = recipeMaker.skillRequirements.ListFullCopyOrNull<SkillRequirement>();
+                    recipeDef.workSkill = recipeMaker.workSkill;
+                    recipeDef.workSkillLearnFactor = recipeMaker.workSkillLearnPerTick;
+                    recipeDef.requiredGiverWorkType = recipeMaker.requiredGiverWorkType;
+                    recipeDef.unfinishedThingDef = recipeMaker.unfinishedThingDef;
+                    recipeDef.recipeUsers = originalRecipe.AllRecipeUsers.ToList();
+                    recipeDef.effectWorking = recipeMaker.effectWorking;
+                    recipeDef.soundWorking = recipeMaker.soundWorking;
+                    recipeDef.researchPrerequisite = recipeMaker.researchPrerequisite;
+                    recipeDef.researchPrerequisites = recipeMaker.researchPrerequisites;
+                    recipeDef.factionPrerequisiteTags = recipeMaker.factionPrerequisiteTags;
 
-                // set ingredients and work based on combined subparts
-                (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForVersion( prosthesisDef, version );
+                    // set ingredients and work based on combined subparts
+                    (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForVersion( prosthesisDef, version );
 
-                // add specific limb modextension
-                if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
-                recipeDef.modExtensions.Add( new TargetLimb( version ) );
+                    // add specific limb modextension
+                    if ( recipeDef.modExtensions == null ) recipeDef.modExtensions = new List<DefModExtension>();
+                    recipeDef.modExtensions.Add( new TargetLimb( version ) );
 
-                if ( !recipeDef.ingredients.NullOrEmpty() )
+                }
+                catch(Exception ex)
+                {
+                    Log.Error( "[MSE2] Failed to generate crafting recipe for " + prosthesisDef.defName + ", " + version.Label + ". Exception: " + ex );
+                    continue;
+                }
+                if ( (!recipeDef?.ingredients.NullOrEmpty()) ?? false )
                     yield return recipeDef;
             }
         }
