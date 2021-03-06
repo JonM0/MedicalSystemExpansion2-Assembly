@@ -69,7 +69,9 @@ namespace MSE2
 
         public void AddSlot ()
         {
-            Hediff_ModuleSlot slot = (Hediff_ModuleSlot)this.parent.pawn.health.AddHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.parent.Part );
+            Hediff_ModuleSlot slot = (Hediff_ModuleSlot)HediffMaker.MakeHediff( MSE_HediffDefOf.MSE_ModuleSlot, this.Pawn, this.parent.Part );
+            this.Pawn.health.hediffSet.AddDirect( slot );
+
             slot.ModuleHolder = this;
             this.moduleSlots.Add( slot );
         }
