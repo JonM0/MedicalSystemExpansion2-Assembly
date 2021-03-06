@@ -58,31 +58,42 @@ namespace MSE2.BackCompatibility
 
         private static int RestorePawnProstheses ( Pawn pawn )
         {
-            int countFixedParts = 0;
+            int countFixedParts = 0, tries = 0;
 
-            foreach ( Hediff hediff in pawn.health.hediffSet.GetHediffs<Hediff_AddedPart>() )
+            HashSet<Hediff> unfixables = new HashSet<Hediff>();
+
+            Hediff hediff = null;
+            while (
+                (hediff = pawn.health.hediffSet.hediffs.Find( h =>
+                  h is Hediff_AddedPart
+                  && h.Part.parts.Any( p => pawn.health.hediffSet.PartIsMissing( p ) && !pawn.health.hediffSet.PartShouldBeIgnored( p )
+                  && !unfixables.Contains( hediff ) ) )
+                ) != null && tries++ < 100 )
             {
-                if ( hediff.Part.parts.Any( p => !pawn.health.hediffSet.HasDirectlyAddedPartFor( p ) && !pawn.health.hediffSet.PartShouldBeIgnored( p ) ) )
+                RecipeDef recipeDef = DefDatabase<RecipeDef>.AllDefsListForReading.Find( r => r.IsSurgery && r.addsHediff == hediff.def );
+
+                if ( recipeDef != null )
                 {
-                    RecipeDef recipeDef = DefDatabase<RecipeDef>.AllDefsListForReading.Find( r => r.IsSurgery && r.addsHediff == hediff.def );
+                    Log.Message( "Fixing " + hediff.Label + " on " + pawn.Name );
 
-                    if ( recipeDef != null )
-                    {
-                        Log.Message( "Fixing " + hediff.Label + " on " + pawn.Name );
+                    BodyPartRecord part = hediff.Part;
+                    pawn.health.RestorePart( part );
 
-                        BodyPartRecord part = hediff.Part;
-                        pawn.health.RestorePart( part );
+                    recipeDef.Worker.ApplyOnPawn( pawn, part, null, null, null );
 
-                        recipeDef.Worker.ApplyOnPawn( pawn, part, null, null, null );
-
-                        countFixedParts++;
-                    }
-                    else
-                    {
-                        Log.Warning( "Could not find a recipe to fix " + hediff.Label + " on " + pawn.Name );
-                    }
+                    countFixedParts++;
+                }
+                else
+                {
+                    unfixables.Add( hediff );
+                    Log.Warning( "Could not find a recipe to fix " + hediff.Label + " on " + pawn.Name );
                 }
             }
+            if ( tries > 100 )
+            {
+                Log.Warning( "Reached max fix attempts on " + pawn.Name );
+            }
+
 
             return countFixedParts;
         }
