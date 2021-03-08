@@ -21,7 +21,10 @@ namespace MSE2.BackCompatibility
                 int countFixedParts = 0;
                 int countFixedPawns = 0;
 
-                foreach ( Pawn pawn in Find.WorldPawns.AllPawnsAlive.Where( p => p != null ) )
+                foreach ( Pawn pawn in 
+                    Find.WorldPawns.AllPawnsAlive // take world pawns
+                    .Concat( Find.Maps.SelectMany(m => m.mapPawns.AllPawns) ) // and pawns from all maps
+                    .Where( p => p != null ).ToArray() ) // that are not null
                 {
                     int c = RestorePawnProstheses( pawn );
                     c += FixPawnModules( pawn );
@@ -29,19 +32,6 @@ namespace MSE2.BackCompatibility
                     {
                         countFixedPawns++;
                         countFixedParts += c;
-                    }
-                }
-                foreach ( Map map in Find.Maps )
-                {
-                    foreach ( Pawn pawn in map.mapPawns.AllPawns.Where( p => p != null ) )
-                    {
-                        int c = RestorePawnProstheses( pawn );
-                        c += FixPawnModules( pawn );
-                        if ( c > 0 )
-                        {
-                            countFixedPawns++;
-                            countFixedParts += c;
-                        }
                     }
                 }
 
@@ -61,33 +51,36 @@ namespace MSE2.BackCompatibility
             int countFixedParts = 0, tries = 0;
 
             HashSet<Hediff> unfixables = new HashSet<Hediff>();
+            (HediffDef, BodyPartRecord) lastTried = (null, null);
 
             Hediff hediff = null;
             while (
                 (hediff = pawn.health.hediffSet.hediffs.Find( h =>
-                  h is Hediff_AddedPart
-                  && h.Part.parts.Any( p => pawn.health.hediffSet.PartIsMissing( p ) && !pawn.health.hediffSet.PartShouldBeIgnored( p )
-                  && !unfixables.Contains( hediff ) ) )
+                  h is Hediff_AddedPart // only fix added parts
+                  && h.Part.parts.Any( p => pawn.health.hediffSet.PartIsMissing( p ) && !pawn.health.hediffSet.PartShouldBeIgnored( p )) // has subparts that are missing
+                  && !unfixables.Contains( h ) // has not already failed an installation
+                  && (h.def, h.Part) != lastTried ) // did not try this last time
                 ) != null && tries++ < 100 )
             {
                 RecipeDef recipeDef = DefDatabase<RecipeDef>.AllDefsListForReading.Find( r => r.IsSurgery && r.addsHediff == hediff.def );
+
+                pawn.health.RestorePart( hediff.Part, checkStateChange: false );
 
                 if ( recipeDef != null )
                 {
                     Log.Message( "Fixing " + hediff.Label + " on " + pawn.Name );
 
-                    BodyPartRecord part = hediff.Part;
-                    pawn.health.RestorePart( part );
-
-                    recipeDef.Worker.ApplyOnPawn( pawn, part, null, null, null );
+                    recipeDef.Worker.ApplyOnPawn( pawn, hediff.Part, null, null, null );
 
                     countFixedParts++;
                 }
                 else
                 {
-                    unfixables.Add( hediff );
                     Log.Warning( "Could not find a recipe to fix " + hediff.Label + " on " + pawn.Name );
+
+                    unfixables.Add( hediff );
                 }
+                lastTried = (hediff.def, hediff.Part);
             }
             if ( tries > 100 )
             {
@@ -133,6 +126,7 @@ namespace MSE2.BackCompatibility
                         GenPlace.TryPlaceThing( ThingMaker.MakeThing( module.def.spawnThingOnRemoved ), pawn.Position, pawn.Map, ThingPlaceMode.Near );
                     }
 
+                    pawn.health.RestorePart( part, checkStateChange: false );
                 }
 
             }
