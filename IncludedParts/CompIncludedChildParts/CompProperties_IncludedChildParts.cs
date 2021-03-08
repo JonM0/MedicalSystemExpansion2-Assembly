@@ -129,9 +129,9 @@ namespace MSE2
                         .Append( "    " )
                         .Append( pawns.Where( p => incLimb.Bodies.Contains( p.race.body ) ).Select( p => p.defName ).ToCommaList() ).AppendLine()
                         .Append( "    " )
-                        .Append( 
+                        .Append(
                             (this.IgnoredSubparts.NullOrEmpty() ? incLimb.ChildLimbs : incLimb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ))
-                            .Where( lc => !this.standardChildren.Exists( td => 
+                            .Where( lc => !this.standardChildren.Exists( td =>
                                 (td.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedLimbs
                                 ?? IncludedPartsUtilities.InstallationDestinations( td )).Contains( lc ) ) )
                             .Select( lc => lc.PartDef.defName ).ToCommaList() ).AppendLine();
@@ -260,6 +260,12 @@ namespace MSE2
                     {
                         throw new ApplicationException( "[MSE2] Tried to find IgnoredSubparts before DefDatabase was loaded." );
                     }
+                    if ( !IgnoreSubPartsUtilities.FinishedIgnoring )
+                    {
+                        throw new ApplicationException( "[MSE2] Tried to find IgnoredSubparts before auto ignorings were created." );
+                    }
+
+
                     this.cachedIgnoredSubparts.list = DefDatabase<HediffDef>.AllDefsListForReading
                                                     .Find( h => h.spawnThingOnRemoved == this.parentDef )
                                                     ?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
