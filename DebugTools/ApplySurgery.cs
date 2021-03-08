@@ -28,7 +28,15 @@ namespace MSE2.DebugTools
                     Pawn pawn = Find.CurrentMap.thingGrid.ThingsAt( UI.MouseCell() ).OfType<Pawn>().FirstOrDefault<Pawn>();
                     if ( pawn != null )
                     {
-                        Find.WindowStack.Add( new Dialog_DebugOptionListLister( Options_ApplySurgery_BodyParts( pawn, recipe ) ) );
+                        var options = Options_ApplySurgery_BodyParts( pawn, recipe );
+                        if ( options.Count > 0 )
+                        {
+                            Find.WindowStack.Add( new Dialog_DebugOptionListLister( options ) );
+                        }
+                        else
+                        {
+                            Messages.Message( new Message( "No destination available on selected pawn", MessageTypeDefOf.RejectInput ), false );
+                        }
                     }
                 } ) );
             }
@@ -39,7 +47,7 @@ namespace MSE2.DebugTools
         {
             if ( pawn == null )
             {
-                throw new ArgumentNullException( nameof(pawn) );
+                throw new ArgumentNullException( nameof( pawn ) );
             }
             List<DebugMenuOption> list = new List<DebugMenuOption>();
 
