@@ -265,11 +265,22 @@ namespace MSE2
                         throw new ApplicationException( "[MSE2] Tried to find IgnoredSubparts before auto ignorings were created." );
                     }
 
+                    var hediffs = DefDatabase<HediffDef>.AllDefsListForReading.FindAll( h => h.spawnThingOnRemoved == this.parentDef );
 
-                    this.cachedIgnoredSubparts.list = DefDatabase<HediffDef>.AllDefsListForReading
-                                                    .FindAll( h => h.spawnThingOnRemoved == this.parentDef )
-                                                    .Select( h => h?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts )
-                                                    .Where( l => l != null ).SelectMany( l => l ).ToList();
+                    if ( hediffs.Count == 0 )
+                    {
+                        throw new ApplicationException( string.Format( "[MSE2] Prosthesis ThingDef {0} has no corresponding HediffDef", this.parentDef?.defName ) );
+                    }
+                    else if ( hediffs.Count == 1 )
+                    {
+                        this.cachedIgnoredSubparts.list = hediffs[0]?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
+                    }
+                    else
+                    {
+                        this.cachedIgnoredSubparts.list = hediffs
+                                                        .Select( h => h?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts )
+                                                        .Where( l => l != null ).SelectMany( l => l ).ToList();
+                    }
 
                     this.cachedIgnoredSubparts.valid = true;
                 }
