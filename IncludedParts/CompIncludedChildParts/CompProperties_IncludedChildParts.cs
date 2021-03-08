@@ -60,7 +60,7 @@ namespace MSE2
         {
             if ( limb == null ) yield break;
 
-            foreach ( LimbConfiguration lc in this.IgnoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ) )
+            foreach ( LimbConfiguration lc in this.NotIgnoredChildLimbs( limb ) )
             {
                 // first standard child that can be installed on lc
                 ThingDef thingDef = this.standardChildren
@@ -95,7 +95,7 @@ namespace MSE2
         {
             if ( limb == null ) return true;
 
-            foreach ( LimbConfiguration lc in this.IgnoredSubparts.NullOrEmpty() ? limb.ChildLimbs : limb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ) )
+            foreach ( LimbConfiguration lc in this.NotIgnoredChildLimbs( limb ) )
             {
                 // there is no standard child that can be installed on lc
                 if ( !this.standardChildren.Exists( td =>
@@ -130,7 +130,7 @@ namespace MSE2
                         .Append( pawns.Where( p => incLimb.Bodies.Contains( p.race.body ) ).Select( p => p.defName ).ToCommaList() ).AppendLine()
                         .Append( "    " )
                         .Append(
-                            (this.IgnoredSubparts.NullOrEmpty() ? incLimb.ChildLimbs : incLimb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) ))
+                            (this.NotIgnoredChildLimbs( incLimb ))
                             .Where( lc => !this.standardChildren.Exists( td =>
                                 (td.GetCompProperties<CompProperties_IncludedChildParts>()?.SupportedLimbs
                                 ?? IncludedPartsUtilities.InstallationDestinations( td )).Contains( lc ) ) )
@@ -267,8 +267,9 @@ namespace MSE2
 
 
                     this.cachedIgnoredSubparts.list = DefDatabase<HediffDef>.AllDefsListForReading
-                                                    .Find( h => h.spawnThingOnRemoved == this.parentDef )
-                                                    ?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts;
+                                                    .FindAll( h => h.spawnThingOnRemoved == this.parentDef )
+                                                    .Select( h => h?.GetModExtension<IgnoreSubParts>()?.ignoredSubParts )
+                                                    .Where( l => l != null ).SelectMany( l => l ).ToList();
 
                     this.cachedIgnoredSubparts.valid = true;
                 }
@@ -278,6 +279,10 @@ namespace MSE2
         [Unsaved]
         private (bool valid, List<BodyPartDef> list) cachedIgnoredSubparts = (false, null);
 
+        private IEnumerable<LimbConfiguration> NotIgnoredChildLimbs ( LimbConfiguration limb ) =>
+            this.IgnoredSubparts.NullOrEmpty()
+            ? limb.ChildLimbs
+            : limb.ChildLimbs.Where( p => !this.IgnoredSubparts.Contains( p.PartDef ) );
 
         public ProsthesisVersionSegment SegmentVersion => (ProsthesisVersionSegment)SupportedVersions.Find( v => v is ProsthesisVersionSegment );
 
