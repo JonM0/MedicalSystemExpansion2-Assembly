@@ -45,6 +45,8 @@ namespace MSE2
 
                 IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
 
+                IgnoreSubPartsUtilities.IgnoreUnsupportedSubparts();
+
                 LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
 
                 IncludedPartsUtilities.PrintIncompatibleVersionsReport();

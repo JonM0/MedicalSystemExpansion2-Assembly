@@ -37,7 +37,7 @@ namespace MSE2
             yield break;
         }
 
-        private static List<BodyPartDef> AllChildPartDefs ( this BodyPartDef bodyPartDef, IEnumerable<BodyDef> bodies = null )
+        private static List<BodyPartDef> AllChildPartDefs ( this BodyPartDef bodyPartDef, IEnumerable<BodyDef> bodies = null, bool recursive = true )
         {
             List<BodyPartDef> list = new List<BodyPartDef>();
 
@@ -48,14 +48,21 @@ namespace MSE2
                     if ( partRecord.def == bodyPartDef )
                     {
                         list.AddRange(
-                            partRecord.AllChildParts()
+                            (recursive ? partRecord.AllChildParts() : partRecord.parts)
                             .Select( r => r.def )
                             .Where( d => !list.Contains( d ) ) );
                     }
                 }
             }
 
+            list.RemoveDuplicates();
+
             return list;
+        }
+
+        public static bool NullOrEmpty<T>(this ICollection<T> c)
+        {
+            return c == null || c.Count == 0;
         }
 
         /// <summary>
@@ -131,7 +138,7 @@ namespace MSE2
 
                 if ( brokenMods.Count > 0 )
                 {
-                    Log.Warning( string.Format( "[MSE2] Some prostheses that have not been patched were detected in mods: {0}. They will default to vanilla behaviour.\n\n{1}", string.Join( ", ", brokenMods ), unpatchedDefs ) );
+                    Log.Message( string.Format( "[MSE2] Some prostheses that have not been patched were detected in mods: {0}. They will default to vanilla behaviour.\n\n{1}", string.Join( ", ", brokenMods ), unpatchedDefs ) );
                 }
             }
             catch ( Exception ex )
@@ -139,5 +146,74 @@ namespace MSE2
                 Log.Error( "[MSE2] Exception applying IgnoreAllNonCompedSubparts: " + ex );
             }
         }
+
+        /// <summary>
+        /// Adds IgnoreSubParts to ignore subparts that dont have an installable standard subpart on prostheses with CompProperties_IncludedChildParts
+        /// </summary>
+        public static void IgnoreUnsupportedSubparts ()
+        {
+            try
+            {
+                StringBuilder logMessage = new StringBuilder();
+                int protCount = 0;
+
+                logMessage.AppendLine( "[MSE2] Ignoring unsupported sub-parts:" );
+
+                foreach ( var (comp, hediff) in from t in DefDatabase<ThingDef>.AllDefs
+                                                let c = t.GetCompProperties<CompProperties_IncludedChildParts>()
+                                                where c != null
+                                                from h in DefDatabase<HediffDef>.AllDefs
+                                                where h.spawnThingOnRemoved == t
+                                                select (c, h) )
+                {
+                    var standardPartDests = comp.standardChildren
+                        .SelectMany( IncludedPartsUtilities.InstallationDestinations )
+                        .Select(l => l.PartDef)
+                        .ToHashSet();
+
+                    var hediffParts = IncludedPartsUtilities.SurgeryToInstall( hediff )
+                        .SelectMany(s => s.appliedOnFixedBodyParts)
+                        .SelectMany(p => p.AllChildPartDefs(comp.CompatibleBodyDefs, recursive: false))
+                        .ToList();
+
+                    hediffParts.RemoveAll( standardPartDests.Contains );
+
+                    if(hediffParts.Count > 0)
+                    {
+                        // add modextensions
+                        if ( hediff.modExtensions == null )
+                            hediff.modExtensions = new List<DefModExtension>();
+                        // add IgnoreSubParts
+                        if ( hediff.GetModExtension<IgnoreSubParts>() == null )
+                            hediff.modExtensions.Add( new IgnoreSubParts() );
+
+                        // add the ignored parts
+                        var me = hediff.GetModExtension<IgnoreSubParts>();
+                        if ( me.ignoredSubParts == null )
+                            me.ignoredSubParts = hediffParts;
+                        else
+                            me.ignoredSubParts.AddRange( hediffParts );
+
+                        // log
+                        logMessage.AppendFormat( "{0}: {1}", hediff.defName, string.Join(", ", hediffParts)).AppendLine();
+                        protCount++;
+                    }
+
+                }
+
+                if( protCount > 0)
+                {
+                    Log.Message( logMessage.ToString() );
+                }
+
+                FinishedIgnoring = true;
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( "[MSE2] Exception applying IgnoreUnsupportedSubparts: " + ex );
+            }
+        }
+
+        public static bool FinishedIgnoring { get; private set; } = false;
     }
 }
