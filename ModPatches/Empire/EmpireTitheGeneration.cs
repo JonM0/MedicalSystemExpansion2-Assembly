@@ -19,7 +19,7 @@ namespace MSE2.HarmonyPatches
         internal static IEnumerable<MethodBase> TargetMethods ()
         {
             yield return AppDomain.CurrentDomain.GetAssemblies().Reverse()
-                .Select( d => d.GetType( "FactionColonies.settlementWindowFC" ) )
+                .Select( d => d.GetType( "FactionColonies.SettlementWindowFc" ) )
                 .First( t => t != null ).GetMethod( "DrawProductionHeaderLower" );
 
             yield return AppDomain.CurrentDomain.GetAssemblies().Reverse()
