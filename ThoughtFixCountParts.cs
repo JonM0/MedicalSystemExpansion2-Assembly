@@ -27,7 +27,7 @@ namespace MSE2.HarmonyPatches
             List<Hediff> hediffs = hs.hediffs;
             for ( int i = 0; i < hediffs.Count; i++ )
             {
-                if ( hediffs[i].def.countsAsAddedPartOrImplant && !hs.AncestorHasDirectlyAddedParts( hediffs[i].Part ) )
+                if ( hediffs[i].def.countsAsAddedPartOrImplant && NullOrAncestorHasNoAddedParts(hs, hediffs[i].Part ) )
                 {
                     num++;
                 }
@@ -66,11 +66,16 @@ namespace MSE2.HarmonyPatches
             if ( partGetter == null ) throw new ApplicationException( "Could not find hediff part getter" );
             yield return new CodeInstruction( OpCodes.Callvirt, partGetter );
 
-            System.Reflection.MethodInfo ancHasPart = typeof( HediffSet ).GetMethod( nameof( HediffSet.AncestorHasDirectlyAddedParts ) );
-            if ( ancHasPart == null ) throw new ApplicationException( "Could not find HediffSet.AncestorHasDirectlyAddedParts" );
-            yield return new CodeInstruction( OpCodes.Callvirt, ancHasPart );
+            System.Reflection.MethodInfo ancHasPart = typeof( ThoughtFixCountParts ).GetMethod( nameof( NullOrAncestorHasNoAddedParts ), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static );
+            if ( ancHasPart == null ) throw new ApplicationException( "Could not find ThoughtFixCountParts.NullOrAncestorHasNoAddedParts" );
+            yield return new CodeInstruction( OpCodes.Call, ancHasPart );
 
-            yield return new CodeInstruction( OpCodes.Brtrue_S, branchTarget );
+            yield return new CodeInstruction( OpCodes.Brfalse, branchTarget );
+        }
+
+        private static bool NullOrAncestorHasNoAddedParts(HediffSet hediffSet, BodyPartRecord bodyPartRecord)
+        {
+            return bodyPartRecord == null || !hediffSet.AncestorHasDirectlyAddedParts( bodyPartRecord );
         }
     }
 }
