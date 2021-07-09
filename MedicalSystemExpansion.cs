@@ -1,21 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime;
-using System.Threading;
-
-using HarmonyLib;
 
 using HugsLib;
 using HugsLib.Settings;
-
-using RimWorld;
-
-using UnityEngine;
-
-using UnityEngineInternal;
 
 using Verse;
 
@@ -23,9 +9,9 @@ namespace MSE2
 {
     public class MedicalSystemExpansion : ModBase
     {
-        public override void StaticInitialize ()
+        public override void Initialize ()
         {
-            base.StaticInitialize();
+            base.Initialize();
             Instance = this;
         }
 
@@ -51,7 +37,6 @@ namespace MSE2
 
                 IncludedPartsUtilities.PrintIncompatibleVersionsReport();
 
-
                 this.SetupSettingHandles();
             }
             catch ( Exception ex )
@@ -66,6 +51,9 @@ namespace MSE2
             }
 #endif
         }
+
+
+
 
         public override string ModIdentifier => "MSE2";
 

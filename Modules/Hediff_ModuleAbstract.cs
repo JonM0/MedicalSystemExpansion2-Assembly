@@ -24,7 +24,7 @@ namespace MSE2
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit && this.ModuleHolder == null )
             {
-                Log.Error( "[MSE2] " + this.Label + " on " + this.pawn.Name + " has null holder after loading, removing.", false );
+                Log.Error( "[MSE2] " + this.Label + " on " + this.pawn.Name + " has null holder after loading, removing." );
                 this.pawn.health.RemoveHediff( this );
                 if ( this.def.spawnThingOnRemoved != null && this.pawn?.Map != null && this.pawn.IsColonistPlayerControlled )
                 {

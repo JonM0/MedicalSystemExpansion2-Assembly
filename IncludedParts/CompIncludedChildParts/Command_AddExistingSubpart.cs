@@ -51,7 +51,7 @@ namespace MSE2
                         // icon
                         thingCandidate.def,
                         MenuOptionPriority.DisabledOption,
-                        () => // mouse over action
+                        (_) => // mouse over action
                         {
                             if ( Current.ProgramState == ProgramState.Playing )
                             {
@@ -81,19 +81,16 @@ namespace MSE2
                                                                                    where u.thingDef == t.def
                                                                                    select (t, u.ownerComp);
 
-            public override GizmoResult GizmoOnGUI ( Vector2 loc, float maxWidth )
+            protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
             {
-                GizmoResult result = base.GizmoOnGUI( loc, maxWidth );
+                base.DrawIcon( rect, buttonMat, parms );
 
                 // add plus sign in the top right of the gizmo texture
                 if ( Assets.WidgetPlusSign != null )
                 {
-                    Rect rect = new Rect( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
                     Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
                     GUI.DrawTexture( position, Assets.WidgetPlusSign );
                 }
-
-                return result;
             }
         }
     }

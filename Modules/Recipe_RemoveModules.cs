@@ -29,7 +29,7 @@ namespace MSE2
                 } );
                 if ( isViolation )
                 {
-                    base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_RemovedMSE2Module".Translate() );
+                    base.ReportViolation( pawn, billDoer, pawn.HomeFaction, -70 );
                 }
             }
 

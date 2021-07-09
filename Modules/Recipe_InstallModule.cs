@@ -33,7 +33,7 @@ namespace MSE2
 
                 if ( isViolation )
                 {
-                    base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_NeedlesslyInstalledWorseBodyPart".Translate( this.recipe.addsHediff.label ) );
+                    base.ReportViolation( pawn, billDoer, pawn.HomeFaction, -70 );
                 }
             }
 

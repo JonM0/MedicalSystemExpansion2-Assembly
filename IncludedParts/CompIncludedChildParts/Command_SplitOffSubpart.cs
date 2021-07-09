@@ -52,19 +52,16 @@ namespace MSE2
                 Find.WindowStack.Add( new FloatMenu( list ) );
             }
 
-            public override GizmoResult GizmoOnGUI ( Vector2 loc, float maxWidth )
+            protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
             {
-                GizmoResult result = base.GizmoOnGUI( loc, maxWidth );
+                base.DrawIcon( rect, buttonMat, parms );
 
                 // add minus sign in the top right of the gizmo texture
                 if ( Assets.WidgetMinusSign != null )
                 {
-                    Rect rect = new Rect( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
                     Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
                     GUI.DrawTexture( position, Assets.WidgetMinusSign );
                 }
-
-                return result;
             }
         }
     }

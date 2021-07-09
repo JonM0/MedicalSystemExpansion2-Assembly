@@ -57,11 +57,11 @@ namespace MSE2
                 MedicalRecipesUtility.RestorePartAndSpawnAllPreviousParts( pawn, part, billDoer.Position, billDoer.Map );
                 if ( partIsClean && isViolation && part.def.spawnThingOnRemoved != null )
                 {
-                    ThoughtUtility.GiveThoughtsForPawnOrganHarvested( pawn );
+                    ThoughtUtility.GiveThoughtsForPawnOrganHarvested( pawn, billDoer );
                 }
                 if ( isViolation )
                 {
-                    base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_NeedlesslyInstalledWorseBodyPart".Translate( this.recipe.addsHediff.label ) );
+                    base.ReportViolation( pawn, billDoer, pawn.HomeFaction, -70 );
                 }
             }
             else if ( pawn.Map != null )
