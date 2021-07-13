@@ -109,6 +109,20 @@ namespace MSE2
             return false;
         }
 
+        public override void PostSplitOff ( Thing piece )
+        {
+            if ( !this.IsComplete )
+            {
+                Log.Warning( string.Format( "[MSE2] Splitting off from incomplete prosthesis {0}. {1} parts are missing. The split off item will be complete.", this.parent, this.AllMissingParts.Count() ) );
+            }
+            
+            base.PostSplitOff( piece );
+
+            var pieceComp = piece.TryGetComp<CompIncludedChildParts>();
+
+            pieceComp.InitializeForVersion( this.TargetVersion );
+        }
+
         #region Gizmos
 
         // gizmos for merging and splitting
