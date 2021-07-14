@@ -105,22 +105,26 @@ namespace MSE2
 
         public override bool AllowStackWith ( Thing other )
         {
-            // disable stacking (would break everything)
-            return false;
+            // only stack with complete
+            var otherComp = other.TryGetComp<CompIncludedChildParts>();
+            return otherComp.TargetVersion == this.TargetVersion && this.IsComplete && otherComp.IsComplete;
         }
 
         public override void PostSplitOff ( Thing piece )
         {
-            if ( !this.IsComplete )
-            {
-                Log.Warning( string.Format( "[MSE2] Splitting off from incomplete prosthesis {0}. {1} parts are missing. The split off item will be complete.", this.parent, this.AllMissingParts.Count() ) );
-            }
-            
             base.PostSplitOff( piece );
 
-            var pieceComp = piece.TryGetComp<CompIncludedChildParts>();
+            if ( piece != this.parent )
+            {
+                if ( !this.IsComplete )
+                {
+                    Log.Warning( string.Format( "[MSE2] Splitting off from incomplete prosthesis {0}. {1} parts are missing. The split off item will be complete.", this.parent, this.AllMissingParts.Count() ) );
+                }
 
-            pieceComp.InitializeForVersion( this.TargetVersion );
+                var pieceComp = piece.TryGetComp<CompIncludedChildParts>();
+
+                pieceComp.InitializeForVersion( this.TargetVersion );
+            }
         }
 
         #region Gizmos
