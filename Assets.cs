@@ -13,8 +13,12 @@ namespace MSE2
     [StaticConstructorOnStartup]
     internal static class Assets
     {
-        public static readonly Texture2D WidgetMinusSign = ContentFinder<Texture2D>.Get( "UI/Widgets/MinusSign", true );
+        public static readonly Texture2D WidgetMinusSign = ContentFinder<Texture2D>.Get( "UI/Buttons/Minus", true );
 
-        public static readonly Texture2D WidgetPlusSign = ContentFinder<Texture2D>.Get( "UI/Widgets/PlusSign", true );
+        public static readonly Texture2D WidgetPlusSign = ContentFinder<Texture2D>.Get( "UI/Buttons/Plus", true );
+
+        public static readonly Texture2D WidgetComplete = ContentFinder<Texture2D>.Get( "UI/Widgets/Complete", true );
+
+        public static readonly Texture2D WidgetPartial = ContentFinder<Texture2D>.Get( "UI/Widgets/Partial", true );
     }
 }

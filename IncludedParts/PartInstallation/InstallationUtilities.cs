@@ -42,12 +42,11 @@ namespace MSE2
         /// <param name="compChildParts">Where to get the parts to install</param>
         public static void RecursiveInstallation ( this CompIncludedChildParts compChildParts, Pawn pawn, BodyPartRecord part )
         {
-            List<BodyPartRecord> partsToConsider = new List<BodyPartRecord>( part.GetDirectChildParts().Append( part ) );
+            List<BodyPartRecord> partsToConsider = new List<BodyPartRecord>( part.GetDirectChildParts() );
 
             // iterate over included child things
             foreach ( Thing childThing in compChildParts.IncludedParts.ToList() )
             {
-                Log.Message( "installing " + childThing );
                 if ( TryGetRecipeAndPart( pawn, childThing.def, partsToConsider.Contains, out RecipeDef recipe, out BodyPartRecord bpr ) )
                 {
                     // apply the recipe

@@ -36,22 +36,6 @@ namespace MSE2
                 Log.Error( "[MSE2] Exception adding ImpliedLimbRecipeDefs: " + ex );
             }
 
-            try
-            {
-                // duplicate ambiguous installation surgeries
-                foreach ( RecipeDef def in ExtraLimbSurgeryRecipeDefs() )
-                {
-                    def.ResolveReferences();
-                    DefGenerator.AddImpliedDef( def );
-                    HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef( def, typeof( RecipeDef ) );
-                    defsToCheck.Add( def );
-                }
-            }
-            catch ( Exception ex )
-            {
-                Log.Error( "[MSE2] Exception adding ExtraLimbSurgeryRecipeDefs: " + ex );
-            }
-
             foreach ( var def in defsToCheck )
             {
                 try
@@ -79,73 +63,6 @@ namespace MSE2
             catch ( Exception ex )
             {
                 Log.Error( "[MSE2] Exception doing " + nameof( UpdateCachedWorkTables ) + ": " + ex );
-            }
-        }
-
-        internal static IEnumerable<RecipeDef> ExtraLimbSurgeryRecipeDefs ()
-        {
-            List<ProsthesisVersion> tmpVersionsItCanTargetList = new List<ProsthesisVersion>();
-
-            // iterate over thingDefs with child parts
-            foreach ( (ThingDef thingDef, CompProperties_IncludedChildParts comp) in
-                DefDatabase<ThingDef>.AllDefs
-                .Select( t => (t, t.GetCompProperties<CompProperties_IncludedChildParts>()) )
-                .Where( c => c.Item2 != null ) )
-            {
-                // iterate over the surgeries to install them
-                foreach ( RecipeDef surgery in IncludedPartsUtilities.SurgeryToInstall( thingDef ).ToArray() )
-                {
-                    // take the limbs that the thing can be installed on that this recipe targets
-                    tmpVersionsItCanTargetList.Clear();
-                    tmpVersionsItCanTargetList.AddRange(
-                        comp.SupportedVersions
-                        .Where(
-                            l =>
-                            l.BodyPartDefs.Any( surgery.appliedOnFixedBodyParts.Contains )
-                            && surgery.AllRecipeUsers.Any( ru => ru.race?.body != null && l.BodyDefs.Contains( ru.race.body ) )
-                        )
-                    );
-
-                    int count = 0;
-                    foreach ( ProsthesisVersion version in tmpVersionsItCanTargetList )
-                    {
-                        if ( count == 0 )
-                        {
-                            // put the first limb on the preexisting surgery
-                            if ( surgery.modExtensions == null ) surgery.modExtensions = new List<DefModExtension>();
-
-                            surgery.modExtensions.Add( new TargetLimb( version ) );
-                        }
-                        else
-                        {
-                            // clone the surgery for the other limbs
-                            RecipeDef surgeryClone = (RecipeDef)typeof( RecipeDef ).GetMethod( "MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance ).Invoke( surgery, new object[0] );
-                            if ( surgeryClone == surgery ) Log.Error( "WTF" );
-
-                            surgeryClone.defName = string.Copy( surgery.defName ) + count;
-
-                            surgeryClone.label = string.Copy( surgery.label )/* + " " + count*/;
-
-                            surgeryClone.modExtensions = new List<DefModExtension>( surgery.modExtensions );
-                            surgeryClone.modExtensions.Remove( surgery.GetModExtension<TargetLimb>() );
-                            surgeryClone.modExtensions.Add( new TargetLimb( version ) );
-
-                            typeof( RecipeDef ).GetField( "workerInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-                            typeof( RecipeDef ).GetField( "workerCounterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-                            typeof( RecipeDef ).GetField( "ingredientValueGetterInt", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( surgeryClone, null );
-
-                            surgeryClone.shortHash = 0;
-
-                            yield return surgeryClone;
-                        }
-                        count++;
-                    }
-
-                    //if ( count > 1 )
-                    //{
-                    //    surgery.label += " 0";
-                    //}
-                }
             }
         }
 
