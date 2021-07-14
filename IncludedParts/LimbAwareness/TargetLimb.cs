@@ -30,22 +30,6 @@ namespace MSE2
             }
         }
 
-        /// <summary>
-        /// Determines whether a <c>Thing</c> with the given <paramref name="comp"/> can be used as an ingredient
-        /// </summary>
-        public bool IsValidThingComp ( CompIncludedChildParts comp )
-        {
-            return comp.AllAlwaysIncludedPartsPresent && comp.CompatibleVersions.Contains( this.targetLimb );
-        }
-
-        /// <summary>
-        /// Determines whether a surgery with this <c>ModExtension</c> can operate on the given <paramref name="bodyPartRecord"/>
-        /// </summary>
-        public bool IsValidPart ( BodyPartRecord bodyPartRecord )
-        {
-            return this.targetLimb.LimbConfigurations.Exists( l => l.Contains( bodyPartRecord ) );
-        }
-
         public override string ToString ()
         {
             return "TargetLimb=" + this.targetLimb?.Label;

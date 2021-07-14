@@ -82,6 +82,8 @@
     <Compile Include="BackCompatibility\PostLoad.cs" />
     <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
+    <Compile Include="IncludedParts\PartInstallation\Bill_MedicalLimbAware.cs" />
+    <Compile Include="IncludedParts\PartInstallation\MakeSurgeryBillLimbAware.cs" />
     <Compile Include="ModPatches\Empire\EmpireTitheGeneration.cs" />
     <Compile Include="UI\AddSpecialDisplayStatsForHediffComps.cs" />
     <Compile Include="HediffSubEffect\HediffCompProperties_ExtraDiffCreator.cs" />
@@ -130,7 +132,7 @@
     <Compile Include="IncludedParts\PartInstallation\InstallationUtilities.cs" />
     <Compile Include="IncludedParts\PartRemoval\SpawnThingsFromHediffs.cs" />
     <Compile Include="MedicalSystemExpansion.cs" />
-    <Compile Include="MSE_HediffDefOf.cs" />
+    <Compile Include="DefOf.cs" />
     <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterCreation.cs" />
     <Compile Include="IncludedParts\LimbAwareness\LimbRecipeDefGenerator.cs" />
     <Compile Include="Modules\Hediff_ModuleAdded.cs" />
@@ -140,9 +142,7 @@
     <Compile Include="IncludedParts\Stats\EfficiencyCalculation\MultiplyByParent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Recipe_InstallModule.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Installing\Bill_IsFixedOrAllowedIngredient.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Installing\MedicalRecipesUtility_GetFixedPartsToApplyOn.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Installing\RecipeDef_PotentiallyMissingIngredients.cs" />
+    <Compile Include="IncludedParts\PartInstallation\BillCheckLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
     <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
     <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />

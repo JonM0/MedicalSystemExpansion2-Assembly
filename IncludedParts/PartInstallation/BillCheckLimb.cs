@@ -20,14 +20,15 @@ namespace MSE2.HarmonyPatches
         // this makes the ingredient check for bill limb aware
 
         [HarmonyPostfix]
-        internal static void CheckForTargetLimb ( ref Bill __instance, ref bool __result, Thing thing )
+        internal static void CheckForTargetLimb ( Bill __instance, ref bool __result, Thing thing )
         {
-            if ( __result )
+            if ( __result && __instance is Bill_MedicalLimbAware bill )
             {
                 CompIncludedChildParts comp = thing.TryGetComp<CompIncludedChildParts>();
-                TargetLimb recipeTargetLimb = __instance.recipe?.GetModExtension<TargetLimb>();
 
-                __result = comp == null || recipeTargetLimb == null || recipeTargetLimb.IsValidThingComp( comp );
+                __result = comp == null
+                    || bill.AllowIncomplete
+                    || comp.CompatibleVersions.Exists( v => v.LimbConfigurations.Contains( LimbConfiguration.LimbConfigForBodyPartRecord( bill.Part ) ) );
             }
         }
     }
