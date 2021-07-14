@@ -187,7 +187,7 @@ namespace MSE2
 
         public void AddPart ( Thing part )
         {
-            if ( !this.StandardParts.Contains( part.def ) && !(this.Props.alwaysInclude?.Contains( part.def ) ?? false) )
+            if ( !this.StandardParts.Contains( part.def ) )
             {
                 Log.Error( "[MSE2] " + part.Label + " is not a valid subpart for " + this.parent.Label );
                 return;
@@ -358,8 +358,6 @@ namespace MSE2
         }
 
         public bool IsComplete => this.MissingParts.Count == 0 && this.IncludedPartComps.All( c => c.IsComplete );
-
-        public bool AllAlwaysIncludedPartsPresent => this.Props.alwaysInclude?.TrueForAll( p => this.IncludedParts.Any( t => t.def == p ) ) ?? true;
 
         #endregion Missing Parts
 
