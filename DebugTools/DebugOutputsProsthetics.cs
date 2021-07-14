@@ -92,17 +92,6 @@ namespace MSE2.DebugTools
                             Q.Enqueue( child );
                         }
                     }
-
-                    if ( comp.alwaysInclude != null )
-                    {
-                        foreach ( ThingDef child in comp.alwaysInclude )
-                        {
-                            if ( allThings.Add( child ) )
-                            {
-                                Q.Enqueue( child );
-                            }
-                        }
-                    }
                 }
             }
 

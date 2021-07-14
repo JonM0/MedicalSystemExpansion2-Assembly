@@ -80,15 +80,6 @@ namespace MSE2
                         "\nIgnored parts: " + (this.IgnoredSubparts?.Select( p => p.defName ).ToCommaList() ?? "none") );
                 }
             }
-
-            // always included parts
-            if ( this.alwaysInclude != null )
-            {
-                for ( int i = 0; i < this.alwaysInclude.Count; i++ )
-                {
-                    yield return (this.alwaysInclude[i], null);
-                }
-            }
         }
 
         private bool LimbIsCompatible ( LimbConfiguration limb )
@@ -338,7 +329,5 @@ namespace MSE2
         // xml def fields
 
         public List<ThingDef> standardChildren;
-
-        public List<ThingDef> alwaysInclude;
     }
 }
