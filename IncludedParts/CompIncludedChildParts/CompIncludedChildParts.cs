@@ -12,7 +12,7 @@ using Verse;
 
 namespace MSE2
 {
-    public partial class CompIncludedChildParts : ThingComp, IThingHolder
+    public class CompIncludedChildParts : ThingComp, IThingHolder
     {
         public override void Initialize ( CompProperties props )
         {
@@ -28,7 +28,8 @@ namespace MSE2
 
         public CompProperties_IncludedChildParts Props => this.props as CompProperties_IncludedChildParts;
 
-        // Save / Load
+        #region save / load
+
         public override void PostExposeData ()
         {
             base.PostExposeData();
@@ -90,6 +91,8 @@ namespace MSE2
 
         }
 
+        #endregion save / load
+
         /// <summary>
         /// Resets the cache for MissingParts, MissingValue and strings
         /// </summary>
@@ -102,6 +105,8 @@ namespace MSE2
 
             (this.ParentHolder as CompIncludedChildParts)?.DirtyCache();
         }
+
+        #region stacking
 
         public override bool AllowStackWith ( Thing other )
         {
@@ -126,6 +131,8 @@ namespace MSE2
                 pieceComp.InitializeForVersion( this.TargetVersion );
             }
         }
+
+        #endregion stacking
 
         #region Gizmos
 

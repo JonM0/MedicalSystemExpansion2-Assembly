@@ -10,32 +10,30 @@ using Verse;
 
 namespace MSE2
 {
-    public partial class CompIncludedChildParts
+    internal class Command_AddExistingSubpart : Command
     {
-        private class Command_AddExistingSubpart : Command
+        private readonly CompIncludedChildParts comp;
+
+        public Command_AddExistingSubpart ( CompIncludedChildParts comp )
         {
-            private readonly CompIncludedChildParts comp;
+            this.comp = comp;
 
-            public Command_AddExistingSubpart ( CompIncludedChildParts comp )
-            {
-                this.comp = comp;
+            // use same icon as thing it belongs to
+            this.icon = comp.parent.def.uiIcon;
+            this.iconAngle = comp.parent.def.uiIconAngle;
+            this.defaultIconColor = comp.parent.def.uiIconColor;
 
-                // use same icon as thing it belongs to
-                this.icon = comp.parent.def.uiIcon;
-                this.iconAngle = comp.parent.def.uiIconAngle;
-                this.defaultIconColor = comp.parent.def.uiIconColor;
+            this.defaultLabel = "CommandAddExistingSubpart_Label".Translate();
+            this.defaultDesc = "CommandAddExistingSubpart_Description".Translate();
+        }
 
-                this.defaultLabel = "CommandAddExistingSubpart_Label".Translate();
-                this.defaultDesc = "CommandAddExistingSubpart_Description".Translate();
-            }
+        public override bool Visible => this.comp.AllMissingParts.Any();
 
-            public override bool Visible => this.comp.AllMissingParts.Any();
+        public override void ProcessInput ( Event ev )
+        {
+            base.ProcessInput( ev );
 
-            public override void ProcessInput ( Event ev )
-            {
-                base.ProcessInput( ev );
-
-                List<FloatMenuOption> options = new List<FloatMenuOption>();
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
 
                 foreach ( (Thing thingCandidate, CompIncludedChildParts compDestination) in this.PossibleThings )
                 {
@@ -57,41 +55,40 @@ namespace MSE2
                             {
                                 // draw arrow pointing to item
                                 TargetHighlighter.Highlight( new GlobalTargetInfo( thingCandidate ) );
-                            }
                         }
-                    ) );
-                }
-
-                // only draw the menu if there are things it can add
-                if ( options.Any() )
-                {
-                    Find.WindowStack.Add( new FloatMenu( options ) );
-                }
-                else
-                {
-                    Messages.Message( "CommandAddExistingSubpart_CouldNotFindPart".Translate(), MessageTypeDefOf.RejectInput );
-                }
+                    }
+                ) );
             }
 
-            /// <summary>
-            /// Returns all things on the map that could be added to this part, and the comp that can accept them
-            /// </summary>
-            private IEnumerable<(Thing, CompIncludedChildParts)> PossibleThings => from t in this.comp.parent.Map.listerThings.AllThings
-                                                                                   from u in this.comp.AllMissingParts.Distinct()
-                                                                                   where u.thingDef == t.def
-                                                                                   select (t, u.ownerComp);
-
-            protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
+            // only draw the menu if there are things it can add
+            if ( options.Any() )
             {
-                base.DrawIcon( rect, buttonMat, parms );
-
-                // add plus sign in the top right of the gizmo texture
-                if ( Assets.WidgetPlusSign != null )
-                {
-                    Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
-                    GUI.DrawTexture( position, Assets.WidgetPlusSign );
-                }
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
+            else
+            {
+                Messages.Message( "CommandAddExistingSubpart_CouldNotFindPart".Translate(), MessageTypeDefOf.RejectInput );
             }
         }
+
+        /// <summary>
+        /// Returns all things on the map that could be added to this part, and the comp that can accept them
+        /// </summary>
+        private IEnumerable<(Thing, CompIncludedChildParts)> PossibleThings => from t in this.comp.parent.Map.listerThings.AllThings
+                                                                               from u in this.comp.AllMissingParts.Distinct()
+                                                                               where u.thingDef == t.def
+                                                                               select (t, u.ownerComp);
+
+        protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
+        {
+            base.DrawIcon( rect, buttonMat, parms );
+
+            // add plus sign in the top right of the gizmo texture
+            if ( Assets.WidgetPlusSign != null )
+            {
+                Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
+                GUI.DrawTexture( position, Assets.WidgetPlusSign );
+            }
+        }        
     }
 }
