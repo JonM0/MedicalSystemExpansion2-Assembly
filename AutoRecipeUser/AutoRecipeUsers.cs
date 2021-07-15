@@ -32,9 +32,9 @@ namespace MSE2
         {
             var errors = base.ConfigErrors();
 
-            if ( bodySizeRange.max < bodySizeRange.min ) errors.Append( "Invalid bodySizeRange: " + bodySizeRange );
+            if ( bodySizeRange.max < bodySizeRange.min ) errors = errors.Append( "Invalid bodySizeRange: " + bodySizeRange );
 
-            if ( maxIntelligence < minIntelligence ) errors.Append( "Invalid intelligence range: " + minIntelligence + " to " + maxIntelligence );
+            if ( maxIntelligence < minIntelligence ) errors = errors.Append( "Invalid intelligence range: " + minIntelligence + " to " + maxIntelligence );
 
             return errors;
         }
