@@ -30,7 +30,8 @@ namespace MSE2.HarmonyPatches
         [HarmonyPrepare]
         internal static bool Prepare( MethodBase original )
         {
-            return ModLister.AllInstalledMods.Any( m => m.PackageId.EqualsIgnoreCase( "Saakra.Empire" ) && m.Active );
+            return original != null 
+                || ModLister.AllInstalledMods.Any( m => m.PackageId.EqualsIgnoreCase( "Saakra.Empire" ) && m.Active );
         }
 
         // replace cost for prosthetics with the average complete value
@@ -38,9 +39,11 @@ namespace MSE2.HarmonyPatches
         [HarmonyTranspiler]
         internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
+            var propGetBaseMarketValue = AccessTools.PropertyGetter( typeof( ThingDef ), nameof( ThingDef.BaseMarketValue ) );
+
             foreach ( CodeInstruction instruction in instructions )
             {
-                if ( instruction.Calls( AccessTools.PropertyGetter( typeof( ThingDef ), nameof( ThingDef.BaseMarketValue ) ) ) )
+                if ( instruction.Calls( propGetBaseMarketValue ) )
                 {
                     yield return new CodeInstruction( OpCodes.Call, AccessTools.Method( typeof( EmpireTitheGeneration ), nameof( AvgMarketValue ) ) );
                 }
