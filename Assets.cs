@@ -17,8 +17,8 @@ namespace MSE2
 
         public static readonly Texture2D WidgetPlusSign = ContentFinder<Texture2D>.Get( "UI/Buttons/Plus", true );
 
-        public static readonly Texture2D WidgetComplete = ContentFinder<Texture2D>.Get( "UI/Widgets/Complete", true );
+        public static readonly Texture2D WidgetComplete = ContentFinder<Texture2D>.Get( "UI/Widgets/FullHand", true );
 
-        public static readonly Texture2D WidgetPartial = ContentFinder<Texture2D>.Get( "UI/Widgets/Partial", true );
+        public static readonly Texture2D WidgetPartial = ContentFinder<Texture2D>.Get( "UI/Widgets/HalfHand", true );
     }
 }
