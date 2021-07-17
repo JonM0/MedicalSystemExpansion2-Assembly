@@ -35,7 +35,7 @@ namespace MSE2
             {
                 (ThingDef, int) item = this.AllPartsCount[i];
 
-                if ( !this.compProp.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ).All( v => v.AllPartsCount.Contains( item ) ) )
+                if ( !this.compProp.SupportedVersions.Where( v => v is not ProsthesisVersionSegment ).All( v => v.AllPartsCount.Contains( item ) ) )
                 {
                     difference.Add( item );
                 }

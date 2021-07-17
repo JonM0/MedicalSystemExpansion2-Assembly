@@ -28,7 +28,7 @@ namespace MSE2.HarmonyPatches
             {
                 __result = from h in __result
                            where
-                            !(h is Hediff_AddedPart)
+                            h is not Hediff_AddedPart
                             || !h.IsParentStandard()
                             || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.Clean 
                                 && pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible ).Except( h ).Any())

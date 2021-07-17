@@ -595,7 +595,7 @@ namespace MSE2
                         stringBuilder.Append( "CompIncludedChildParts_InspectStringMissing".Translate( this.AllMissingParts.Count() ) );
                     }
 
-                    if ( !(this.TargetVersion is ProsthesisVersionSegment) || this.IncludedParts.Count > 0 )
+                    if ( this.TargetVersion is not ProsthesisVersionSegment || this.IncludedParts.Count > 0 )
                     {
                         stringBuilder.AppendInNewLine( "CompIncludedChildParts_InspectStringIncludes".Translate( this.IncludedParts.Count ) );
                     }
