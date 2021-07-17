@@ -12,19 +12,19 @@ namespace MSE2
     {
         public override bool AlwaysMatches ( ThingDef def )
         {
-            return def.GetCompProperties<CompProperties_IncludedChildParts>() == null;
+            return false;
         }
 
         public override bool CanEverMatch ( ThingDef def )
         {
-            return true;
+            return def.GetCompProperties<CompProperties_IncludedChildParts>() != null;
         }
 
         public override bool Matches ( Thing t )
         {
             CompIncludedChildParts comp = t.TryGetComp<CompIncludedChildParts>();
 
-            return comp == null || comp.IsComplete;
+            return comp != null && comp.IsComplete;
         }
     }
 }
