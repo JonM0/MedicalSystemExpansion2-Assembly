@@ -117,7 +117,7 @@ namespace MSE2.HarmonyPatches
             float appendageWeight, List<PawnCapacityUtility.CapacityImpactor> impactors, ref float totLimbEff, ref int totLimbs, ref int functionalLimbs )
         {
             // segments
-            List<BodyPartRecord> segments = new List<BodyPartRecord>
+            List<BodyPartRecord> segments = new()
             {
                 limbCore
             };

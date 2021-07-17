@@ -47,7 +47,7 @@ namespace MSE2.HarmonyPatches
             }
 
             /// Things that can be made from all subPart hediffs
-            List<Thing> subThings = new List<Thing>();
+            List<Thing> subThings = new();
 
             foreach ( BodyPartRecord subPart in part.GetDirectChildParts() ) // for each subpart
             {
@@ -61,7 +61,7 @@ namespace MSE2.HarmonyPatches
             }
 
             // for every thing makeable from hediffs on this part: add subparts if possible then return it
-            List<Thing> items = new List<Thing>();
+            List<Thing> items = new();
             foreach ( ThingDef spawnableFromPart in from h in pawn.health.hediffSet.hediffs
                                                     where h.def.spawnThingOnRemoved != null
                                                     where h.Part == part

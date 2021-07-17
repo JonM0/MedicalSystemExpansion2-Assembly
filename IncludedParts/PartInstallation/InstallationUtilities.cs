@@ -42,7 +42,7 @@ namespace MSE2
         /// <param name="compChildParts">Where to get the parts to install</param>
         public static void RecursiveInstallation ( this CompIncludedChildParts compChildParts, Pawn pawn, BodyPartRecord part )
         {
-            List<BodyPartRecord> partsToConsider = new List<BodyPartRecord>( part.GetDirectChildParts() );
+            List<BodyPartRecord> partsToConsider = new( part.GetDirectChildParts() );
 
             // iterate over included child things
             foreach ( Thing childThing in compChildParts.IncludedParts.ToList() )
@@ -75,7 +75,7 @@ namespace MSE2
         /// <param name="part">The parent part of the parts to consider</param>
         public static void RecursiveDefInstallation ( this CompProperties_IncludedChildParts compProp, Pawn pawn, BodyPartRecord part )
         {
-            List<BodyPartRecord> partsToConsider = new List<BodyPartRecord>( part.GetDirectChildParts().Append( part ) );
+            List<BodyPartRecord> partsToConsider = new( part.GetDirectChildParts().Append( part ) );
 
             // iterate over included child things
             foreach ( (ThingDef childThingDef, _) in compProp.StandardPartsForLimb( LimbConfiguration.LimbConfigForBodyPartRecord( part ) ) )

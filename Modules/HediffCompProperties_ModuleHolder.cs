@@ -15,6 +15,7 @@ namespace MSE2
             this.compClass = typeof( HediffComp_ModuleHolder );
         }
 
+        [Unsaved]
         private HediffDef parentDef;
 
         public override IEnumerable<string> ConfigErrors ( HediffDef parentDef )
@@ -33,9 +34,10 @@ namespace MSE2
 
         public virtual IEnumerable<StatDrawEntry> SpecialDisplayStats ( StatRequest req )
         {
-            yield return this.cachedModuleSlotsStat ?? (this.cachedModuleSlotsStat = this.ModuleSlotsStatFactory());
+            yield return this.cachedModuleSlotsStat ??= this.ModuleSlotsStatFactory();
         }
 
+        [Unsaved]
         private StatDrawEntry cachedModuleSlotsStat;
 
         private StatDrawEntry ModuleSlotsStatFactory ()

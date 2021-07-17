@@ -13,7 +13,7 @@ namespace MSE2
     /// </summary>
     internal class MSE_cachedStandardParents : DefModExtension
     {
-        private readonly List<HediffDef> standardParents = new List<HediffDef>();
+        private readonly List<HediffDef> standardParents = new();
 
         public override IEnumerable<string> ConfigErrors ()
         {

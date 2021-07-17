@@ -587,7 +587,7 @@ namespace MSE2
             {
                 if ( this.cachedInspectString == null )
                 {
-                    StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder stringBuilder = new();
 
                     stringBuilder.Append( "CompIncludedChildParts_InspectStringTarget".Translate( this.TargetVersion.Label ) );
                     if ( this.AllMissingParts.Any() )
@@ -609,7 +609,7 @@ namespace MSE2
         }
 
         // Stat entries
-        private StatDrawEntry IncluededPartsStat => new StatDrawEntry(
+        private StatDrawEntry IncluededPartsStat => new(
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatIncludedParts_Label".Translate(),
             this.IncludedParts.Count.ToString(),
@@ -619,14 +619,14 @@ namespace MSE2
             this.IncludedParts.Select( p => new Dialog_InfoCard.Hyperlink( p ) ),
             false );
 
-        private StatDrawEntry CompatibilityStat => new StatDrawEntry(
+        private StatDrawEntry CompatibilityStat => new(
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatCompatibility_Label".Translate(),
             "CompIncludedChildParts_StatCompatibility_Value".Translate( this.CompatibleVersions.Count - 1, this.Props.SupportedVersions.Count - 1 ),
             this.GetCompatibilityReport(),
             2500 );
 
-        private StatDrawEntry MissingPartsStat => new StatDrawEntry(
+        private StatDrawEntry MissingPartsStat => new(
             StatCategoryDefOf.Basics,
             "CompIncludedChildParts_StatMissing_Label".Translate(),
             this.AllMissingParts.Count().ToString(),
@@ -644,7 +644,7 @@ namespace MSE2
 
         private string GetCompatibilityReport ()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
 
             foreach ( var ver in this.Props.SupportedVersions.Where( v => !(v is ProsthesisVersionSegment) ) )
             {

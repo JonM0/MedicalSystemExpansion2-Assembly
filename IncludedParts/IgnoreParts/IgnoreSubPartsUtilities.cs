@@ -39,7 +39,7 @@ namespace MSE2
 
         private static List<BodyPartDef> AllChildPartDefs ( this BodyPartDef bodyPartDef, IEnumerable<BodyDef> bodies = null, bool recursive = true )
         {
-            List<BodyPartDef> list = new List<BodyPartDef>();
+            List<BodyPartDef> list = new();
 
             foreach ( BodyDef bodyDef in bodies ?? DefDatabase<BodyDef>.AllDefs )
             {
@@ -72,9 +72,9 @@ namespace MSE2
         {
             try
             {
-                List<string> brokenMods = new List<string>();
+                List<string> brokenMods = new();
 
-                StringBuilder unpatchedDefs = new StringBuilder();
+                StringBuilder unpatchedDefs = new();
 
                 foreach ( (RecipeDef recipeDef, IgnoreSubParts oldME) in
                     from r in DefDatabase<RecipeDef>.AllDefs
@@ -154,7 +154,7 @@ namespace MSE2
         {
             try
             {
-                StringBuilder logMessage = new StringBuilder();
+                StringBuilder logMessage = new();
                 int protCount = 0;
 
                 logMessage.AppendLine( "[MSE2] Ignoring unsupported sub-parts:" );

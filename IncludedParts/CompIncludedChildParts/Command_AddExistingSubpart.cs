@@ -33,7 +33,7 @@ namespace MSE2
         {
             base.ProcessInput( ev );
 
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            List<FloatMenuOption> options = new();
 
                 foreach ( (Thing thingCandidate, CompIncludedChildParts compDestination) in this.PossibleThings )
                 {

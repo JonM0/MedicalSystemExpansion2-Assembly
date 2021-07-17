@@ -142,8 +142,8 @@ namespace MSE2
         public int CurrentModules => this.moduleAddeds.Count;
         public int RemainingSlots => this.moduleSlots.Count;
 
-        private List<Hediff_ModuleSlot> moduleSlots = new List<Hediff_ModuleSlot>();
-        private List<Hediff_ModuleAdded> moduleAddeds = new List<Hediff_ModuleAdded>();
+        private List<Hediff_ModuleSlot> moduleSlots = new();
+        private List<Hediff_ModuleAdded> moduleAddeds = new();
 
         public override string ToString ()
         {

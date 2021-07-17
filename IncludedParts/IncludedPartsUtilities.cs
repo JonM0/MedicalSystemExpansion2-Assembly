@@ -37,13 +37,13 @@ namespace MSE2
 
         public static void PrintIncompatibleVersionsReport ()
         {
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
 
             try
             {
 
-                StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new();
                 int errors = 0;
 
 
@@ -191,7 +191,7 @@ namespace MSE2
             return false;
         }
 
-        private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new Dictionary<ThingDef, List<LimbConfiguration>>();
+        private static readonly Dictionary<ThingDef, List<LimbConfiguration>> cachedInstallationDestinations = new();
 
         public static IReadOnlyList<LimbConfiguration> InstallationDestinations ( ThingDef parentDef )
         {

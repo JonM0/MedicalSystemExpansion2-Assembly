@@ -16,7 +16,7 @@ namespace MSE2.HarmonyPatches
     [HarmonyPatch( nameof( HealthCardUtility.GetPawnCapacityTip ) )]
     internal static class SortAndGroupPawnCapacityTip
     {
-        private static readonly StringBuilder internalStringBuilder = new StringBuilder();
+        private static readonly StringBuilder internalStringBuilder = new();
 
         [HarmonyPostfix]
         [HarmonyPriority( Priority.VeryLow )]

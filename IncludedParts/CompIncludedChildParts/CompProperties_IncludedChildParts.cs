@@ -144,7 +144,7 @@ namespace MSE2
                 return null;
             }
 
-            List<string> outList = new List<string>();
+            List<string> outList = new();
 
             List<ThingDef> pawns = DefDatabase<ThingDef>.AllDefsListForReading;
             for ( int i = 0; i < pawns.Count; i++ )
@@ -234,9 +234,9 @@ namespace MSE2
         [Unsaved]
         private ThingDef parentDef;
 
-        public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ?? (lazyCompatibleBodyDefs = (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
-                                                                                                           from u in s.AllRecipeUsers
-                                                                                                           select u.race?.body).Where( b => b != null ).ToHashSet());
+        public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ??= (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
+                                                                                  from u in s.AllRecipeUsers
+                                                                                  select u.race?.body).Where( b => b != null ).ToHashSet();
         [Unsaved]
         private HashSet<BodyDef> lazyCompatibleBodyDefs;
 
