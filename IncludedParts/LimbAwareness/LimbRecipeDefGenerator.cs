@@ -89,7 +89,7 @@ namespace MSE2
             float work = 0f;
 
             // all the actual segments the part will include
-            List<ThingDefCountClass> allParts = new List<ThingDefCountClass>
+            List<ThingDefCountClass> allParts = new()
             {
                 new ThingDefCountClass( thingDef, 1 )
             };
@@ -98,7 +98,7 @@ namespace MSE2
             allParts.AddRange( version.AllParts.GroupBy( t => t ).Select( g => new ThingDefCountClass( g.Key, g.Count() ) ) );
 
             // the ingredients to make the segments, not grouped by thingdef
-            List<ThingDefCountClass> intermediateIngredients = new List<ThingDefCountClass>();
+            List<ThingDefCountClass> intermediateIngredients = new();
             foreach ( ThingDefCountClass partCount in allParts )
             {
                 int recipeProductCount = partCount.thingDef.recipeMaker.productCount;
@@ -122,12 +122,12 @@ namespace MSE2
                 }
             }
 
-            List<IngredientCount> ingredients = new List<IngredientCount>();
+            List<IngredientCount> ingredients = new();
             foreach ( ThingDefCountClass thingDefCountClass in from i in intermediateIngredients
                                                                group i by i.thingDef into g
                                                                select new ThingDefCountClass( g.Key, g.Select( tdcc => tdcc.count ).Sum() ) )
             {
-                IngredientCount ingredientCount = new IngredientCount();
+                IngredientCount ingredientCount = new();
                 ingredientCount.SetBaseCount( (float)(thingDefCountClass.count) );
                 ingredientCount.filter.SetAllow( thingDefCountClass.thingDef, true );
                 ingredients.Add( ingredientCount );
@@ -198,7 +198,7 @@ namespace MSE2
                     recipeDef.modExtensions.Add( new TargetLimb( version ) );
 
                 }
-                catch(Exception ex)
+                catch ( Exception ex )
                 {
                     Log.Error( "[MSE2] Failed to generate crafting recipe for " + prosthesisDef.defName + ", " + version.Label + ". Exception: " + ex );
                     continue;

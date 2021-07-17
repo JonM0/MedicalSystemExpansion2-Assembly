@@ -20,7 +20,7 @@ namespace MSE2.DebugTools
 
         private static List<DebugMenuOption> Options_ApplySurgery ()
         {
-            List<DebugMenuOption> list = new List<DebugMenuOption>();
+            List<DebugMenuOption> list = new();
             foreach ( RecipeDef recipe in DefDatabase<RecipeDef>.AllDefs.Where( r => r.IsSurgery ) )
             {
                 list.Add( new DebugMenuOption( recipe.LabelCap, DebugMenuOptionMode.Tool, delegate ()
@@ -49,7 +49,7 @@ namespace MSE2.DebugTools
             {
                 throw new ArgumentNullException( nameof( pawn ) );
             }
-            List<DebugMenuOption> list = new List<DebugMenuOption>();
+            List<DebugMenuOption> list = new();
 
             if ( recipe.AllRecipeUsers.Select( ru => ru.race.body ).Contains( pawn.RaceProps.body ) )
             {

@@ -13,7 +13,7 @@ namespace MSE2
 {
     public class LimbConfiguration
     {
-        protected HashSet<BodyPartRecord> allRecords = new HashSet<BodyPartRecord>();
+        protected HashSet<BodyPartRecord> allRecords = new();
         public IReadOnlyCollection<BodyPartRecord> AllRecords => this.allRecords;
 
         protected LimbConfiguration ()
@@ -92,7 +92,7 @@ namespace MSE2
         private List<(BodyPartDef, int)> cachedAllSegments;
 
         public List<(BodyPartDef, int)> AllSegments =>
-            this.cachedAllSegments ?? (this.cachedAllSegments = this.CalculateAllSegments.ToList());
+this.cachedAllSegments ??= this.CalculateAllSegments.ToList();
 
         public IEnumerable<LimbConfiguration> ChildLimbs
         {
@@ -110,8 +110,8 @@ namespace MSE2
             }
         }
 
-        protected static Dictionary<BodyPartRecord, LimbConfiguration> recordToLimb = new Dictionary<BodyPartRecord, LimbConfiguration>();
-        protected static List<LimbConfiguration> allLimbConfigs = new List<LimbConfiguration>();
+        protected static Dictionary<BodyPartRecord, LimbConfiguration> recordToLimb = new();
+        protected static List<LimbConfiguration> allLimbConfigs = new();
 
         public static LimbConfiguration LimbConfigForBodyPartRecord ( BodyPartRecord bodyPartRecord )
         {

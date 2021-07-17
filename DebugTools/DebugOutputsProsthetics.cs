@@ -73,11 +73,11 @@ namespace MSE2.DebugTools
 
         private static IEnumerable<ThingDef> AllProstheticsAndChildren ()
         {
-            HashSet<ThingDef> allThings = new HashSet<ThingDef>( from d in DefDatabase<ThingDef>.AllDefs
+            HashSet<ThingDef> allThings = new( from d in DefDatabase<ThingDef>.AllDefs
                                                                  where d.isTechHediff && !d.costList.NullOrEmpty()
                                                                     && d.GetCompProperties<CompProperties_IncludedChildParts>() != null
                                                                  select d );
-            Queue<ThingDef> Q = new Queue<ThingDef>( allThings );
+            Queue<ThingDef> Q = new( allThings );
 
             while ( Q.Any() )
             {

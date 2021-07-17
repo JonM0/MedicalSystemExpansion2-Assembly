@@ -16,7 +16,7 @@ namespace MSE2.HarmonyPatches
 
         public static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
-            List<CodeInstruction> instructionList = new List<CodeInstruction>( instructions );
+            List<CodeInstruction> instructionList = new( instructions );
 
             // extract base call
 

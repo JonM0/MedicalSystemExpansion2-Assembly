@@ -27,7 +27,7 @@ namespace MSE2
         public override void ProcessInput ( Event ev )
         {
             base.ProcessInput( ev );
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            List<FloatMenuOption> options = new();
 
             foreach ( ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Except( this.comp.TargetVersion ) )
             {

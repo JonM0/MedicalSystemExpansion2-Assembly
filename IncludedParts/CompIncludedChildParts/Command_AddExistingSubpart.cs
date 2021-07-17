@@ -33,7 +33,7 @@ namespace MSE2
         {
             base.ProcessInput( ev );
 
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            List<FloatMenuOption> options = new();
 
             foreach ( (Thing thingCandidate, CompIncludedChildParts compDestination) in this.PossibleThings )
             {
@@ -86,8 +86,8 @@ namespace MSE2
             // add plus sign in the top right of the gizmo texture
             if ( Assets.WidgetPlusSign != null )
             {
-                Rect rect = new Rect( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
-                Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
+                Rect rect = new( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
+                Rect position = new( rect.x + rect.width - 24f, rect.y, 24f, 24f );
                 GUI.DrawTexture( position, Assets.WidgetPlusSign );
             }
 

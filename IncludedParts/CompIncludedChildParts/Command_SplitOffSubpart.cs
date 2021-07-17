@@ -30,7 +30,7 @@ namespace MSE2
         {
             base.ProcessInput( ev );
 
-            List<FloatMenuOption> list = new List<FloatMenuOption>();
+            List<FloatMenuOption> list = new();
 
             foreach ( (Thing lthing, CompIncludedChildParts lcomp) in this.comp.AllIncludedParts )
             {
@@ -57,8 +57,8 @@ namespace MSE2
             // add minus sign in the top right of the gizmo texture
             if ( Assets.WidgetMinusSign != null )
             {
-                Rect rect = new Rect( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
-                Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
+                Rect rect = new( loc.x, loc.y, this.GetWidth( maxWidth ), 75f );
+                Rect position = new( rect.x + rect.width - 24f, rect.y, 24f, 24f );
                 GUI.DrawTexture( position, Assets.WidgetMinusSign );
             }
 

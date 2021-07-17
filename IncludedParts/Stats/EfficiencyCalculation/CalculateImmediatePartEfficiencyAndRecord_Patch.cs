@@ -19,7 +19,7 @@ namespace MSE2.HarmonyPatches
         [HarmonyTranspiler]
         internal static IEnumerable<CodeInstruction> Transpiler ( IEnumerable<CodeInstruction> instructions )
         {
-            List<CodeInstruction> l = new List<CodeInstruction>( instructions );
+            List<CodeInstruction> l = new( instructions );
 
             return instructions.Skip( l.FindLastIndex( ( CodeInstruction i ) => i.opcode == OpCodes.Ldarg_0 ) ); // skip instructions before last loadarg0
         }

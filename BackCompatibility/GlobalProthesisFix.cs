@@ -50,7 +50,7 @@ namespace MSE2.BackCompatibility
         {
             int countFixedParts = 0, tries = 0;
 
-            HashSet<Hediff> unfixables = new HashSet<Hediff>();
+            HashSet<Hediff> unfixables = new();
             (HediffDef, BodyPartRecord) lastTried = (null, null);
 
             Hediff hediff = null;

@@ -34,7 +34,7 @@ namespace MSE2
                 if ( comp != null )
                 {
                     var list = comp.IncludedParts;
-                    StringBuilder builder = new StringBuilder();
+                    StringBuilder builder = new();
 
                     for ( int i = 0; i < list.Count; i++ )
                     {

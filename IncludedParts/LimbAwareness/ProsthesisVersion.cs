@@ -25,11 +25,11 @@ namespace MSE2
         }
 
         private string lazyLabel;
-        public virtual string Label => this.lazyLabel ?? (this.lazyLabel = this.GenerateLabel().CapitalizeFirst());
+        public virtual string Label => this.lazyLabel ??= this.GenerateLabel().CapitalizeFirst();
 
         private List<(ThingDef, int)> VersionDifference ()
         {
-            List<(ThingDef, int)> difference = new List<(ThingDef, int)>();
+            List<(ThingDef, int)> difference = new();
 
             for ( int i = 0; i < this.AllPartsCount.Count; i++ )
             {
@@ -128,7 +128,7 @@ namespace MSE2
 
         private List<(ThingDef part, int count)> lazyAllPartsCount;
         private List<(ThingDef part, int count)> AllPartsCount =>
-            this.lazyAllPartsCount ?? (this.lazyAllPartsCount = this.AllParts.GroupBy( p => p ).Select( g => (g.Key, g.Count()) ).ToList());
+this.lazyAllPartsCount ??= this.AllParts.GroupBy( p => p ).Select( g => (g.Key, g.Count()) ).ToList();
 
         public IEnumerable<BodyDef> BodyDefs => this.LimbConfigurations.SelectMany( l => l.Bodies ).Where( this.compProp.CompatibleBodyDefs.Contains );
     }

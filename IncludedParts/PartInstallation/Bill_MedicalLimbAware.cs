@@ -30,7 +30,7 @@ namespace MSE2
         {
             base.DoConfigInterface( rect, baseColor );
 
-            Rect newRect = new Rect( rect.xMax - 51f, rect.yMax - 24f, 24f, 24f );
+            Rect newRect = new( rect.xMax - 51f, rect.yMax - 24f, 24f, 24f );
 
             TooltipHandler.TipRegion( newRect, this.AllowIncomplete ? "Bill_MedicalLimbAware_AllowIncomplete".Translate() : "Bill_MedicalLimbAware_OnlyComplete".Translate() );
             if ( Widgets.ButtonImage( newRect, this.AllowIncomplete ? Assets.WidgetPartial : Assets.WidgetComplete ) )

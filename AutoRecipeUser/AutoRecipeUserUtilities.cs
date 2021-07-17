@@ -29,7 +29,7 @@ namespace MSE2
                                                                         where d.HasModExtension<AutoRecipeUsers>()
                                                                         select (d, d.GetModExtension<AutoRecipeUsers>()) )
                 {
-                    recipedef.recipeUsers = recipedef.recipeUsers ?? new List<ThingDef>();
+                    recipedef.recipeUsers ??= new List<ThingDef>();
 
                     for ( int i = 0; i < pawndefs.Count; i++ )
                     {
