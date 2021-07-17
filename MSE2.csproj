@@ -84,6 +84,7 @@
     <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
     <Compile Include="IncludedParts\PartInstallation\Bill_MedicalLimbAware.cs" />
     <Compile Include="IncludedParts\PartInstallation\MakeSurgeryBillLimbAware.cs" />
+    <Compile Include="MakeshiftRepair\Surgey_MakeShiftRepair.cs" />
     <Compile Include="ModPatches\Empire\EmpireTitheGeneration.cs" />
     <Compile Include="UI\AddSpecialDisplayStatsForHediffComps.cs" />
     <Compile Include="HediffSubEffect\HediffCompProperties_ExtraDiffCreator.cs" />
