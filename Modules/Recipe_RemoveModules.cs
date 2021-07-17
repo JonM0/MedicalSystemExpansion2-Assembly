@@ -7,7 +7,7 @@ using Verse;
 
 namespace MSE2
 {
-    public class Recipe_RemoveModules : Recipe_Surgery
+    public class Recipe_RemoveModules : RecipeWorker
     {
         public override IEnumerable<BodyPartRecord> GetPartsToApplyOn ( Pawn pawn, RecipeDef recipe )
         {
@@ -18,8 +18,6 @@ namespace MSE2
 
         public override void ApplyOnPawn ( Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill )
         {
-            bool isViolation = this.IsViolationOnPawn( pawn, part, Faction.OfPlayer );
-
             if ( billDoer != null )
             {
                 TaleRecorder.RecordTale( TaleDefOf.DidSurgery, new object[]
@@ -27,7 +25,7 @@ namespace MSE2
                     billDoer,
                     pawn
                 } );
-                if ( isViolation )
+                if ( this.IsViolationOnPawn( pawn, part, Faction.OfPlayer ) )
                 {
                     base.ReportViolation( pawn, billDoer, pawn.FactionOrExtraMiniOrHomeFaction, -70, "GoodwillChangedReason_RemovedMSE2Module".Translate() );
                 }

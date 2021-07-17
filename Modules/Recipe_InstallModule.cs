@@ -7,7 +7,7 @@ using Verse;
 
 namespace MSE2
 {
-    public class Recipe_InstallModule : Recipe_Surgery
+    public class Recipe_InstallModule : RecipeWorker
     {
         public override IEnumerable<BodyPartRecord> GetPartsToApplyOn ( Pawn pawn, RecipeDef recipe )
         {
