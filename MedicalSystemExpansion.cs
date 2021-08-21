@@ -70,13 +70,18 @@ namespace MSE2
                 HediffHideMode.Clean, null,
                 "HediffHideModeSetting_" );
 
+            this.hideModuleSlotsSetting = Settings.GetHandle( "hideModuleSlots",
+                "HideModuleSlotsSetting_Title".Translate(),
+                "HideModuleSlotsSetting_Description".Translate(),
+                defaultValue: false );
+
             this.removeAllFromSegmentSetting = Settings.GetHandle( "removeAllFromSegment",
                 "RemoveAllFromSegmentSetting_Title".Translate(),
                 "RemoveAllFromSegmentSetting_Description".Translate(),
-                false );
+                defaultValue: false );
         }
 
-        public enum HediffHideMode { Always, Never, Clean }
+        public enum HediffHideMode { Always, Never, Clean, CleanOrModules }
         private SettingHandle<HediffHideMode> hediffHideModeSetting;
         public HediffHideMode HediffHideModeSetting => this.hediffHideModeSetting;
 
@@ -85,6 +90,8 @@ namespace MSE2
         public bool RemoveAllFromSegmentSetting { get => this.removeAllFromSegmentSetting; }
 
 
+        private SettingHandle<bool> hideModuleSlotsSetting;
+        public bool HideModuleSlotsSetting { get => this.hideModuleSlotsSetting; }
 
     }
 }

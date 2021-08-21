@@ -26,13 +26,19 @@ namespace MSE2.HarmonyPatches
         {
             if ( !___showAllHediffs && MedicalSystemExpansion.Instance.HediffHideModeSetting != MedicalSystemExpansion.HediffHideMode.Never )
             {
-                __result = from h in __result
-                           where
+                __result = __result.Where( h =>
                             h is not Hediff_AddedPart
                             || !h.IsParentStandard()
-                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.Clean 
+                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.Clean
                                 && pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible ).Except( h ).Any())
-                           select h;
+                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.CleanOrModules
+                                && pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible && x is not Hediff_ModuleAbstract ).Except( h ).Any())
+                           );
+            }
+
+            if ( !___showAllHediffs && MedicalSystemExpansion.Instance.HideModuleSlotsSetting )
+            {
+                __result = __result.Where( h => h is not Hediff_ModuleSlot );
             }
         }
     }

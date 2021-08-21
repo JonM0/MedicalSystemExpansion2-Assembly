@@ -149,5 +149,16 @@ namespace MSE2
         {
             return this.parent + "_ModuleHolder";
         }
+
+        public override string CompLabelInBracketsExtra
+        {
+            get
+            {
+                if ( MedicalSystemExpansion.Instance.HideModuleSlotsSetting )
+                    return string.Format( "Modules: {0}/{1}", this.CurrentModules, this.MaxModules );
+                else
+                    return null;
+            }
+        }
     }
 }
