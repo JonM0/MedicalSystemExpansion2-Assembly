@@ -50,7 +50,7 @@ namespace MSE2
             Find.WindowStack.Add( new FloatMenu( list ) );
         }
 
-        protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
+        public override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
         {
             base.DrawIcon( rect, buttonMat, parms );
 

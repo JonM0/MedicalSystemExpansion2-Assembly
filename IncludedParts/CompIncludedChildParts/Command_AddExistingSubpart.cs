@@ -79,7 +79,7 @@ namespace MSE2
                                                                                where u.thingDef == t.def
                                                                                select (t, u.ownerComp);
 
-        protected override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
+        public override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
         {
             base.DrawIcon( rect, buttonMat, parms );
 
