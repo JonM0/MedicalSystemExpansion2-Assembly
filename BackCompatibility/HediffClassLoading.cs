@@ -29,7 +29,7 @@ namespace MSE2.BackCompatibility
                     var brokenHediffs = __instance.hediffs.FindAll( h => h.GetType() != h.def.hediffClass && h.def.hediffClass.GetConstructors().Any( c => c.GetParameters().EnumerableNullOrEmpty() ) );
                     if ( brokenHediffs.Count > 0 )
                     {
-                        Log.Warning( "[MSE2] Reinstalling Hediffs with wrong type: " + string.Join( ", ", brokenHediffs ) ); 
+                        Log.Warning( "[MSE2] Reinstalling Hediffs with wrong type: " + string.Join( ", ", brokenHediffs.Select( h => string.Format( "{{0}, current={1}, def={2}}", h, h.GetType().FullName, h.def.hediffClass.FullName ) ) ) );
                         __instance.hediffs.RemoveAll( brokenHediffs.Contains );
 
                         __instance.DirtyCache();
@@ -52,7 +52,7 @@ namespace MSE2.BackCompatibility
                 }
                 catch ( Exception ex )
                 {
-                    Log.Error( "[MSE2] Exception reinstalling wrongly typed hediffs: {0}" + ex );
+                    Log.Error( "[MSE2] Exception reinstalling wrongly typed hediffs." + ex );
                 }
             }
         }
