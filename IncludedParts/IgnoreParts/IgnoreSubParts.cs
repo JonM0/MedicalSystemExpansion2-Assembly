@@ -9,7 +9,7 @@ namespace MSE2
     /// </summary>
     internal class IgnoreSubParts : DefModExtension
     {
-        public List<BodyPartDef> ignoredSubParts;
+        public List<BodyPartDef> ignoredSubParts = new();
 
         public bool ignoreAll = false;
 
@@ -17,7 +17,7 @@ namespace MSE2
         {
             foreach ( string ce in base.ConfigErrors() ) yield return ce;
 
-            if ( this.ignoredSubParts == null && !this.ignoreAll )
+            if ( this.ignoredSubParts.Count == 0 && !this.ignoreAll )
             {
                 yield return "[MSE2] ignoredSubPart is null and ignoreAll is false, this will do nothing";
             }
