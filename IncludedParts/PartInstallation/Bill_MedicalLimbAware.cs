@@ -18,8 +18,8 @@ namespace MSE2
         {
         }
 
-        public Bill_MedicalLimbAware ( RecipeDef recipe )
-            : base( recipe )
+        public Bill_MedicalLimbAware ( RecipeDef recipe, List<Thing> uniqueIngredients)
+            : base( recipe, uniqueIngredients )
         {
         }
 

@@ -11,7 +11,8 @@ namespace MSE2
     {
         public override IEnumerable<BodyPartRecord> GetPartsToApplyOn ( Pawn pawn, RecipeDef recipe )
         {
-            return from m in pawn.health.hediffSet.GetHediffs<Hediff_ModuleAdded>()
+            return from m in pawn.health.hediffSet.hediffs
+                   where m is Hediff_ModuleAdded
                    group m by m.Part into g
                    select g.Key;
         }
@@ -31,8 +32,8 @@ namespace MSE2
                 }
             }
 
-            foreach ( Hediff_ModuleAdded module in from x in pawn.health.hediffSet.GetHediffs<Hediff_ModuleAdded>()
-                                                   where x.Part == part
+            foreach ( Hediff_ModuleAdded module in from x in pawn.health.hediffSet.hediffs
+                                                   where x is Hediff_ModuleAdded && x.Part == part
                                                    select x )
             {
                 // spawn thing if possible

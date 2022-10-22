@@ -12,44 +12,44 @@ namespace MSE2
     {
         internal static bool AutoRecipeUsersApplied { get; private set; } = false;
 
-        internal static void ApplyAutoRecipeUsers ()
+        internal static void ApplyAutoRecipeUsers()
         {
             try
             {
                 List<ThingDef> pawndefs = (from t in DefDatabase<ThingDef>.AllDefs
-                                           where t.race != null
+                                           where t.race?.body is not null
                                            select t).ToList();
 
-                if ( pawndefs.NullOrEmpty() || pawndefs.Exists( pawn => pawn.race.body.AllParts.NullOrEmpty() ) )
+                if (pawndefs.NullOrEmpty() || pawndefs.Exists(pawn => pawn.race.body.AllParts.NullOrEmpty()))
                 {
-                    throw new ApplicationException( "Pawn defs and bodies are not loaded" );
+                    throw new ApplicationException("Pawn defs and bodies are not loaded");
                 }
 
-                foreach ( (RecipeDef recipedef, AutoRecipeUsers aru) in from d in DefDatabase<RecipeDef>.AllDefs
-                                                                        where d.HasModExtension<AutoRecipeUsers>()
-                                                                        select (d, d.GetModExtension<AutoRecipeUsers>()) )
+                foreach ((RecipeDef recipedef, AutoRecipeUsers aru) in from d in DefDatabase<RecipeDef>.AllDefs
+                                                                       where d.HasModExtension<AutoRecipeUsers>()
+                                                                       select (d, d.GetModExtension<AutoRecipeUsers>()))
                 {
                     recipedef.recipeUsers ??= new List<ThingDef>();
 
-                    for ( int i = 0; i < pawndefs.Count; i++ )
+                    for (int i = 0; i < pawndefs.Count; i++)
                     {
                         ThingDef pawndef = pawndefs[i];
-                        if ( !recipedef.recipeUsers.Contains( pawndef ) && // is not already present
-                            aru.IsValidRace( pawndef ) && // AutoRecipeUsers allows the race
+                        if (!recipedef.recipeUsers.Contains(pawndef) && // is not already present
+                            aru.IsValidRace(pawndef) && // AutoRecipeUsers allows the race
                             ((recipedef.appliedOnFixedBodyParts.NullOrEmpty() && recipedef.appliedOnFixedBodyPartGroups.NullOrEmpty()) // can be installed on any part
-                            || recipedef.appliedOnFixedBodyParts.Exists( part => pawndef.race.body.AllParts.Exists( p => p.def == part ) ) // has a part of a compatible def
-                            || recipedef.appliedOnFixedBodyPartGroups.Exists( group => pawndef.race.body.AllParts.Exists( p => p.IsInGroup( group ) ) )) )
+                            || recipedef.appliedOnFixedBodyParts.Exists(part => pawndef.race.body.AllParts.Exists(p => p.def == part)) // has a part of a compatible def
+                            || recipedef.appliedOnFixedBodyPartGroups.Exists(group => pawndef.race.body.AllParts.Exists(p => p.IsInGroup(group)))))
                         {
-                            recipedef.recipeUsers.Add( pawndef );
+                            recipedef.recipeUsers.Add(pawndef);
                         }
                     }
                 }
 
                 AutoRecipeUsersApplied = true;
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                Log.Error( "[MSE2] Exception applying AutoRecipeUsers: " + ex );
+                Log.Error("[MSE2] Exception applying AutoRecipeUsers: " + ex);
             }
         }
     }

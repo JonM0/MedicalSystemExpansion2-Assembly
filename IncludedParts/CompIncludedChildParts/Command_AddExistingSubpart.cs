@@ -14,7 +14,7 @@ namespace MSE2
     {
         private readonly CompIncludedChildParts comp;
 
-        public Command_AddExistingSubpart ( CompIncludedChildParts comp )
+        public Command_AddExistingSubpart(CompIncludedChildParts comp)
         {
             this.comp = comp;
 
@@ -29,45 +29,45 @@ namespace MSE2
 
         public override bool Visible => this.comp.AllMissingParts.Any();
 
-        public override void ProcessInput ( Event ev )
+        public override void ProcessInput(Event ev)
         {
-            base.ProcessInput( ev );
+            base.ProcessInput(ev);
 
             List<FloatMenuOption> options = new();
 
-                foreach ( (Thing thingCandidate, CompIncludedChildParts compDestination) in this.PossibleThings )
-                {
-                    options.Add( new FloatMenuOption(
-                        // name
-                        compDestination != this.comp ?  // if added to other subpart specify it
-                            "CommandAddExistingSubpart_AddTo".Translate( thingCandidate.Label.CapitalizeFirst(), compDestination.parent.Label ).ToString()
-                            : thingCandidate.Label.CapitalizeFirst(),
-                        () => // click action
+            foreach ((Thing thingCandidate, CompIncludedChildParts compDestination) in this.PossibleThings)
+            {
+                options.Add(new FloatMenuOption(
+                    // name
+                    compDestination != this.comp ?  // if added to other subpart specify it
+                        "CommandAddExistingSubpart_AddTo".Translate(thingCandidate.Label.CapitalizeFirst(), compDestination.parent.Label).ToString()
+                        : thingCandidate.Label.CapitalizeFirst(),
+                    () => // click action
+                    {
+                        compDestination.AddPart(thingCandidate);
+                    },
+                    // icon
+                    thingCandidate.def, null, false,
+                    MenuOptionPriority.DisabledOption,
+                    (_) => // mouse over action
+                    {
+                        if (Current.ProgramState == ProgramState.Playing)
                         {
-                            compDestination.AddPart( thingCandidate );
-                        },
-                        // icon
-                        thingCandidate.def,
-                        MenuOptionPriority.DisabledOption,
-                        (_) => // mouse over action
-                        {
-                            if ( Current.ProgramState == ProgramState.Playing )
-                            {
-                                // draw arrow pointing to item
-                                TargetHighlighter.Highlight( new GlobalTargetInfo( thingCandidate ) );
+                            // draw arrow pointing to item
+                            TargetHighlighter.Highlight(new GlobalTargetInfo(thingCandidate));
                         }
                     }
-                ) );
+            ));
             }
 
             // only draw the menu if there are things it can add
-            if ( options.Any() )
+            if (options.Any())
             {
-                Find.WindowStack.Add( new FloatMenu( options ) );
+                Find.WindowStack.Add(new FloatMenu(options));
             }
             else
             {
-                Messages.Message( "CommandAddExistingSubpart_CouldNotFindPart".Translate(), MessageTypeDefOf.RejectInput );
+                Messages.Message("CommandAddExistingSubpart_CouldNotFindPart".Translate(), MessageTypeDefOf.RejectInput);
             }
         }
 
@@ -79,16 +79,16 @@ namespace MSE2
                                                                                where u.thingDef == t.def
                                                                                select (t, u.ownerComp);
 
-        public override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
+        public override void DrawIcon(Rect rect, Material buttonMat, GizmoRenderParms parms)
         {
-            base.DrawIcon( rect, buttonMat, parms );
+            base.DrawIcon(rect, buttonMat, parms);
 
             // add plus sign in the top right of the gizmo texture
-            if ( Assets.WidgetPlusSign != null )
+            if (Assets.WidgetPlusSign != null)
             {
-                Rect position = new Rect( rect.x + rect.width - 24f, rect.y, 24f, 24f );
-                GUI.DrawTexture( position, Assets.WidgetPlusSign );
+                Rect position = new Rect(rect.x + rect.width - 24f, rect.y, 24f, 24f);
+                GUI.DrawTexture(position, Assets.WidgetPlusSign);
             }
-        }        
+        }
     }
 }
