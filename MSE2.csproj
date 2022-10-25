@@ -54,6 +54,7 @@
     </Reference>
     <Reference Include="HugsLib">
       <HintPath>..\..\..\..\..\..\workshop\content\294100\818773962\v1.4\Assemblies\HugsLib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="JPatchOperation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
