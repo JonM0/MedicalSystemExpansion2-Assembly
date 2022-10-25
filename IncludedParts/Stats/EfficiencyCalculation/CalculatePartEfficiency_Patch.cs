@@ -19,29 +19,21 @@ namespace MSE2.HarmonyPatches
 		{
             // ========== REMOVE FROM HERE
 
-		    BodyPartRecord rec;
-		    Func<Hediff_AddedPart, bool> <>9__0;
-		    for (rec = part.parent; rec != null; rec = rec.parent)
-		    {
-			    if (diffSet.HasDirectlyAddedPartFor(rec))
-			    {
-				    IEnumerable<Hediff_AddedPart> hediffs = diffSet.GetHediffs<Hediff_AddedPart>();
-				    Func<Hediff_AddedPart, bool> predicate;
-				    if ((predicate = <>9__0) == null)
-				    {
-					    predicate = (<>9__0 = ((Hediff_AddedPart x) => x.Part == rec));
-				    }
-				    Hediff_AddedPart hediffAddedPart = hediffs.Where(predicate).First<Hediff_AddedPart>();
-				    if (impactors != null)
-				    {
-					    impactors.Add(new PawnCapacityUtility.CapacityImpactorHediff
-					    {
-						    hediff = hediffAddedPart
-					    });
-				    }
-				    return hediffAddedPart.def.addedPartProps.partEfficiency;
-			    }
-		    }
+		    for (BodyPartRecord parent = part.parent; parent != null; parent = parent.parent)
+			{
+				if (diffSet.HasDirectlyAddedPartFor(parent))
+				{
+					Hediff_AddedPart firstHediffMatchingPart = diffSet.GetFirstHediffMatchingPart<Hediff_AddedPart>(parent);
+					if (impactors != null)
+					{
+						impactors.Add(new PawnCapacityUtility.CapacityImpactorHediff
+						{
+							hediff = firstHediffMatchingPart
+						});
+					}
+					return firstHediffMatchingPart.def.addedPartProps.partEfficiency;
+				}
+			}
         
             // ========== REMOVE TO HERE
 
@@ -64,7 +56,7 @@ namespace MSE2.HarmonyPatches
             Label l = (Label)instructions.FirstOrDefault( ( CodeInstruction i ) => i.opcode == OpCodes.Br_S ).operand; // target of the first branch in the first for loop
 
             int firstBranchJump = instructions.FirstIndexOf( ( CodeInstruction i ) => i.labels.Contains( l ) ); // the location of that instruction
-            firstBranchJump += 3; // the for ends 3 instructions later
+            firstBranchJump += 2; // the for ends 3 instructions later
 
             // skip them
             return instructions.Skip( firstBranchJump );
