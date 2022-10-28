@@ -49,7 +49,8 @@ namespace MSE2
 
             // insert if/else before constructor call
             instructionList.InsertRange(constrIndex, new CodeInstruction[]{
-                new CodeInstruction(OpCodes.Dup), // duplicate the RecipeDef on top of the stack
+                new CodeInstruction(instructionList[constrIndex - 3]),
+                new CodeInstruction(instructionList[constrIndex - 2]), // duplicate the RecipeDef on top of the stack
                 new CodeInstruction(OpCodes.Call, typeof(MakeSurgeryBillLimbAware) // replace topmost RecipeDef with bool that determines which type should be used
                 .GetMethod(nameof(RecipeShouldBeLimbAware), BindingFlags.NonPublic | BindingFlags.Static)),
                 new CodeInstruction(OpCodes.Brfalse, oldConstructor), // if recipe should not be limb aware, go to else brach that instantiates Bill_Medical
