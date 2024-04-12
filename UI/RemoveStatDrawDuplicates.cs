@@ -24,7 +24,7 @@ namespace MSE2
             {
                 if(___cachedDrawEntries[i].LabelCap == ___cachedDrawEntries[i-1].LabelCap
                     && ___cachedDrawEntries[i].ValueString == ___cachedDrawEntries[i-1].ValueString
-                    && ___cachedDrawEntries[i-1].ShouldDisplay
+                    && ___cachedDrawEntries[i-1].ShouldDisplay()
                     && ___cachedDrawEntries[i].stat == ___cachedDrawEntries[i-1].stat)
                 {
                     ___cachedDrawEntries.RemoveAt( i );
