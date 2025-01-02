@@ -1,156 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{388A1BEE-0754-4E91-96F8-37723CC0CEC4}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MSE2</RootNamespace>
-    <AssemblyName>MSE2-Core</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <LangVersion>9.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\1.5\Assemblies\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>CS0649</NoWarn>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <OutputPath>..\..\1.2\Assemblies\</OutputPath>
-    <NoWarn>CS0649</NoWarn>
-    <ErrorReport>prompt</ErrorReport>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\..\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HugsLib">
-      <HintPath>..\..\..\..\..\..\workshop\content\294100\818773962\v1.4\Assemblies\HugsLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="JPatchOperation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Coding\Rimworld\JPatchOperation\bin\Release\JPatchOperation.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Assets.cs" />
-    <Compile Include="AutoRecipeUser\AutoRecipeUsers.cs" />
-    <Compile Include="AutoRecipeUser\AutoRecipeUserUtilities.cs" />
-    <Compile Include="BackCompatibility\ConvertDefNames.cs" />
-    <Compile Include="BackCompatibility\HediffClassLoading.cs" />
-    <Compile Include="BackCompatibility\PostLoad.cs" />
-    <Compile Include="BackCompatibility\GlobalProthesisFix.cs" />
-    <Compile Include="DebugTools\DebugOutputsProsthetics.cs" />
-    <Compile Include="IncludedParts\PartInstallation\Bill_MedicalLimbAware.cs" />
-    <Compile Include="IncludedParts\PartInstallation\MakeSurgeryBillLimbAware.cs" />
-    <Compile Include="MakeshiftRepair\Surgey_MakeShiftRepair.cs" />
-    <Compile Include="ModPatches\Empire\EmpireTitheGeneration.cs" />
-    <Compile Include="UI\AddSpecialDisplayStatsForHediffComps.cs" />
-    <Compile Include="HediffSubEffect\HediffCompProperties_ExtraDiffCreator.cs" />
-    <Compile Include="HediffSubEffect\HediffComp_ExtraDiffCreator.cs" />
-    <Compile Include="HediffSubEffect\HediffExtraDiff.cs" />
-    <Compile Include="HediffSubEffect\PastAddHediffCheckForEffectors.cs" />
-    <Compile Include="UI\IHediffCompWithStats.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\Command_SetTargetLimb.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\Command_SplitOffSubpart.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\CompProperties_IncludedChildParts.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\Command_AddExistingSubpart.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\ProsthesisVersion.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\ProsthesisVersionSegment.cs" />
-    <Compile Include="IncludedParts\FixBulkCraftingValue.cs" />
-    <Compile Include="IncludedParts\IncludedPartsUtilities.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterUpgrading.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\DebugOutputsPatches\LimbValueFix.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\LimbConfiguration.cs" />
-    <Compile Include="IncludedParts\HediffHiding\MSE_cachedStandardParents.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Scribe_LimbConfiguration.cs" />
-    <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGenerationLambda.cs" />
-    <Compile Include="IncludedParts\Stats\PawnGeneration\CorrectHediffCostOnGeneration.cs" />
-    <Compile Include="IncludedParts\Stats\RewardGeneration\TSPWQMakeThing.cs" />
-    <Compile Include="IncludedParts\Stats\RewardGeneration\TSPWQGetValue.cs" />
-    <Compile Include="IncludedParts\Stats\StockGeneration\RandomInitializeOnStockGeneration.cs" />
-    <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisComplete.cs" />
-    <Compile Include="IncludedParts\Stats\StatParts\StatsReport_ValueOfSubParts.cs" />
-    <Compile Include="DebugTools\ApplySurgery.cs" />
-    <Compile Include="DebugTools\GlobalProthesisFixAction.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculateImmediatePartEfficiencyAndRecord_Patch.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CacheMissingPartsCommonAncestors_Patch.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\LimbEfficiencyFix.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\CalculatePartEfficiency_Patch.cs" />
-    <Compile Include="IncludedParts\IgnoreParts\IgnoreSubParts.cs" />
-    <Compile Include="IncludedParts\IgnoreParts\IgnoreSubPartsUtilities.cs" />
-    <Compile Include="IncludedParts\HediffHiding\VisibleHediffs_patch.cs" />
-    <Compile Include="IncludedParts\Stats\StatParts\StatsReport_MassOfSubParts.cs" />
-    <Compile Include="Modules\Recipe_RemoveModules.cs" />
-    <Compile Include="Modules\Hediff_ModuleAbstract.cs" />
-    <Compile Include="Modules\HediffComp_ModuleHolder.cs" />
-    <Compile Include="Modules\HediffCompProperties_ModuleHolder.cs" />
-    <Compile Include="IncludedParts\PartInstallation\AddedPart_PostAdd.cs" />
-    <Compile Include="IncludedParts\PartInstallation\Hediff_AddDirect.cs" />
-    <Compile Include="IncludedParts\PartInstallation\InstallationRestrictions.cs" />
-    <Compile Include="IncludedParts\PartRemoval\IsClean_Patch.cs" />
-    <Compile Include="IncludedParts\PartInstallation\InstallationUtilities.cs" />
-    <Compile Include="IncludedParts\PartRemoval\SpawnThingsFromHediffs.cs" />
-    <Compile Include="MedicalSystemExpansion.cs" />
-    <Compile Include="DefOf.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\Crafting\AddSubpartsAfterCreation.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\LimbRecipeDefGenerator.cs" />
-    <Compile Include="Modules\Hediff_ModuleAdded.cs" />
-    <Compile Include="Modules\Hediff_ModuleSlot.cs" />
-    <Compile Include="IncludedParts\PartInstallation\Recipe_InstallArtificialBodyPartWithChildren.cs" />
-    <Compile Include="IncludedParts\CompIncludedChildParts\CompIncludedChildParts.cs" />
-    <Compile Include="IncludedParts\Stats\EfficiencyCalculation\MultiplyByParent.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\Recipe_InstallModule.cs" />
-    <Compile Include="IncludedParts\PartInstallation\BillCheckLimb.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\TargetLimb.cs" />
-    <Compile Include="IncludedParts\LimbAwareness\SortThingDefAllRecipes.cs" />
-    <Compile Include="IncludedParts\ThingFilters\SpecialThingFilterWorker_ProsthesisIncomplete.cs" />
-    <Compile Include="UI\RemoveStatDrawDuplicates.cs" />
-    <Compile Include="UI\SortAndGroupPawnCapacityTip.cs" />
-    <Compile Include="ThoughtFixCountParts.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<LangVersion>9.0</LangVersion>
+		<!--<Nullable>enable</Nullable>-->
+		<Optimize>true</Optimize>
+		<NoWarn>CS0649</NoWarn>
+	  <IsPublishable>False</IsPublishable>
+		
+		<OutputPath>..\..\1.5\Assemblies\</OutputPath>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.4297" ExcludeAssets="runtime" />
+		<PackageReference Include="Lib.Harmony.Thin" Version="2.3.3" ExcludeAssets="runtime" />
+		<PackageReference Include="UnlimitedHugs.Rimworld.HugsLib" Version="11.0.3" ExcludeAssets="runtime" />
+		<PackageReference Include="RimWorld.MultiplayerAPI" Version="0.5.0" />
+	</ItemGroup>
+
 </Project>
