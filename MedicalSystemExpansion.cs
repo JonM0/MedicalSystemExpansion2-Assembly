@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 
 using HugsLib;
 using HugsLib.Settings;
+
+using Multiplayer.API;
 
 using Verse;
 
@@ -9,13 +12,14 @@ namespace MSE2
 {
     public class MedicalSystemExpansion : ModBase
     {
-        public override void Initialize ()
+        public override void Initialize()
         {
-            base.Initialize();
             Instance = this;
+
+            if (MP.enabled) MP.RegisterAll();
         }
 
-        public override void DefsLoaded ()
+        public override void DefsLoaded()
         {
 #if DEBUG
             Stopwatch stopwatch = new Stopwatch();
@@ -23,8 +27,6 @@ namespace MSE2
 #endif
             try
             {
-                base.DefsLoaded();
-
                 AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
 
                 IncludedPartsUtilities.CacheAllStandardParents();
@@ -39,9 +41,9 @@ namespace MSE2
 
                 this.SetupSettingHandles();
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                Log.Error( "[MSE2] Exception caught running DefsLoaded(): " + ex );
+                Log.Error("[MSE2] Exception caught running DefsLoaded(): " + ex);
             }
 #if DEBUG
             finally
@@ -62,23 +64,23 @@ namespace MSE2
 
         // settings
 
-        private void SetupSettingHandles ()
+        private void SetupSettingHandles()
         {
-            this.hediffHideModeSetting = Settings.GetHandle( "hediffHideMode",
+            this.hediffHideModeSetting = Settings.GetHandle("hediffHideMode",
                 "HediffHideModeSetting_Title".Translate(),
                 "HediffHideModeSetting_Description".Translate(),
                 HediffHideMode.Clean, null,
-                "HediffHideModeSetting_" );
+                "HediffHideModeSetting_");
 
-            this.hideModuleSlotsSetting = Settings.GetHandle( "hideModuleSlots",
+            this.hideModuleSlotsSetting = Settings.GetHandle("hideModuleSlots",
                 "HideModuleSlotsSetting_Title".Translate(),
                 "HideModuleSlotsSetting_Description".Translate(),
-                defaultValue: false );
+                defaultValue: false);
 
-            this.removeAllFromSegmentSetting = Settings.GetHandle( "removeAllFromSegment",
+            this.removeAllFromSegmentSetting = Settings.GetHandle("removeAllFromSegment",
                 "RemoveAllFromSegmentSetting_Title".Translate(),
                 "RemoveAllFromSegmentSetting_Description".Translate(),
-                defaultValue: false );
+                defaultValue: false);
         }
 
         public enum HediffHideMode { Always, Never, Clean, CleanOrModules }

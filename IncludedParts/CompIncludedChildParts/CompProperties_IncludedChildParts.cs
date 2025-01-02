@@ -232,7 +232,7 @@ namespace MSE2
         private float cachedAverageValue = -1;
 
         [Unsaved]
-        private ThingDef parentDef;
+        public ThingDef parentDef;
 
         public HashSet<BodyDef> CompatibleBodyDefs => lazyCompatibleBodyDefs ??= (from s in IncludedPartsUtilities.SurgeryToInstall( parentDef )
                                                                                   from u in s.AllRecipeUsers

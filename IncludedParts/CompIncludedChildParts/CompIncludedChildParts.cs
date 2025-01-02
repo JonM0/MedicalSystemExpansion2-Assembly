@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
+using Multiplayer.API;
+
 using RimWorld;
 
 using UnityEngine;
@@ -431,6 +433,7 @@ namespace MSE2
             }
         }
 
+        [SyncMethod]
         public void InitializeForVersion ( ProsthesisVersion version )
         {
             this.TargetVersion = version;

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using Multiplayer.API;
+
 using RimWorld;
 using RimWorld.Planet;
 
@@ -42,10 +44,7 @@ namespace MSE2
                     compDestination != this.comp ?  // if added to other subpart specify it
                         "CommandAddExistingSubpart_AddTo".Translate(thingCandidate.Label.CapitalizeFirst(), compDestination.parent.Label).ToString()
                         : thingCandidate.Label.CapitalizeFirst(),
-                    () => // click action
-                    {
-                        compDestination.AddPart(thingCandidate);
-                    },
+                    () => Action(thingCandidate, compDestination), // click action
                     // icon
                     thingCandidate.def, null, false,
                     MenuOptionPriority.DisabledOption,
@@ -69,6 +68,12 @@ namespace MSE2
             {
                 Messages.Message("CommandAddExistingSubpart_CouldNotFindPart".Translate(), MessageTypeDefOf.RejectInput);
             }
+        }
+
+        [SyncMethod]
+        private static void Action(Thing thing, CompIncludedChildParts comp)
+        {
+            comp.AddPart(thing);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Multiplayer.API;
+
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -39,16 +41,19 @@ namespace MSE2
                     lcomp != this.comp ?  // if added to other subpart specify it
                         "CommandSplitOffSubpart_RemoveFrom".Translate( lthing.Label.CapitalizeFirst(), lcomp.parent.Label ).ToString()
                         : lthing.Label.CapitalizeFirst(),
-                    () => // click action
-                    {
-                        lcomp.RemoveAndSpawnPart( lthing );
-                    },
-                    // icon
-                    lthing.def ) );
+                    () => Action(lthing, lcomp), // click action                                                 
+                    lthing.def ) ); // icon
             }
 
             Find.WindowStack.Add( new FloatMenu( list ) );
         }
+
+        [SyncMethod]
+        private static void Action(Thing thing, CompIncludedChildParts comp)
+        {
+            comp.RemoveAndSpawnPart(thing);
+        }
+
 
         public override void DrawIcon ( Rect rect, Material buttonMat, GizmoRenderParms parms )
         {

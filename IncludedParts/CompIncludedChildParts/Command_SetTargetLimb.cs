@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Multiplayer.API;
+
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -11,7 +13,7 @@ namespace MSE2
     {
         private readonly CompIncludedChildParts comp;
 
-        public Command_SetTargetLimb ( CompIncludedChildParts comp )
+        public Command_SetTargetLimb(CompIncludedChildParts comp)
         {
             this.comp = comp;
 
@@ -24,23 +26,25 @@ namespace MSE2
             this.defaultDesc = "Command_SetTargetLimb_Description".Translate();
         }
 
-        public override void ProcessInput ( Event ev )
+        public override void ProcessInput(Event ev)
         {
-            base.ProcessInput( ev );
+            base.ProcessInput(ev);
             List<FloatMenuOption> options = new();
 
-            foreach ( ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Except( this.comp.TargetVersion ) )
+            foreach (ProsthesisVersion possibleTarget in this.comp.Props.SupportedVersions.Except(this.comp.TargetVersion))
             {
-                options.Add( new FloatMenuOption(
+                options.Add(new FloatMenuOption(
                     possibleTarget.Label,
-                    () => // click action
-                    {
-                        this.comp.TargetVersion = possibleTarget;
-                    }
-                    ) );
+                    () => Action(possibleTarget, this.comp))); // click action
             }
 
-            Find.WindowStack.Add( new FloatMenu( options ) );
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        [SyncMethod]
+        private static void Action(ProsthesisVersion target, CompIncludedChildParts comp)
+        {
+            comp.TargetVersion = target;
         }
     }
 }

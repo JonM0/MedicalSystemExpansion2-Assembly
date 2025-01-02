@@ -13,6 +13,7 @@ namespace MSE2
     public class ProsthesisVersion
     {
         private readonly CompProperties_IncludedChildParts compProp;
+        public CompProperties_IncludedChildParts CompProp => this.compProp;
 
         public ProsthesisVersion ( CompProperties_IncludedChildParts compProp )
         {
