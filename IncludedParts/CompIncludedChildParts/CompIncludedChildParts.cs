@@ -155,16 +155,19 @@ namespace MSE2
                 yield return new Command_Action
                 {
                     defaultLabel = "DEBUG: Make complete",
-                    action = delegate ()
-                    {
-                        this.InitializeForVersion( this.TargetVersion );
-                    }
+                    action = () => ActionMakeComplete(),
                 };
             }
 
             foreach ( Gizmo g in base.CompGetGizmosExtra() ) yield return g;
 
             yield break;
+        }
+
+        [SyncMethod]
+        private void ActionMakeComplete()
+        {
+            this.InitializeForVersion(this.TargetVersion);
         }
 
         #endregion Gizmos
@@ -433,7 +436,6 @@ namespace MSE2
             }
         }
 
-        [SyncMethod]
         public void InitializeForVersion ( ProsthesisVersion version )
         {
             this.TargetVersion = version;
