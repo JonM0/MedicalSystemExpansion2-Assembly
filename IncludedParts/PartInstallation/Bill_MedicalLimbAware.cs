@@ -8,6 +8,7 @@ using Verse;
 using RimWorld;
 using UnityEngine;
 using Verse.Sound;
+using Multiplayer.API;
 
 namespace MSE2
 {
@@ -35,9 +36,15 @@ namespace MSE2
             TooltipHandler.TipRegion( newRect, this.AllowIncomplete ? "Bill_MedicalLimbAware_AllowIncomplete".Translate() : "Bill_MedicalLimbAware_OnlyComplete".Translate() );
             if ( Widgets.ButtonImage( newRect, this.AllowIncomplete ? Assets.WidgetPartial : Assets.WidgetComplete ) )
             {
-                this.AllowIncomplete = !this.AllowIncomplete;
+                ToggleAllowIncomplete();
                 SoundDefOf.Click.PlayOneShotOnCamera();
             }
+        }
+
+        [SyncMethod]
+        private void ToggleAllowIncomplete()
+        {
+            this.AllowIncomplete = !this.AllowIncomplete;
         }
 
         public override void ExposeData ()

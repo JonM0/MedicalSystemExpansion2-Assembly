@@ -24,7 +24,6 @@ namespace MSE2.Multiplayer
             {
                 comp = sync.Read<ThingWithComps>().GetComp<CompIncludedChildParts>();
             }
-
         }
 
 
@@ -38,7 +37,9 @@ namespace MSE2.Multiplayer
             }
             else
             {
-                version = sync.Read<CompProperties_IncludedChildParts>().SupportedVersions[sync.Read<int>()];
+                var compProp = sync.Read<CompProperties_IncludedChildParts>();
+                var index = sync.Read<int>();
+                version = compProp.SupportedVersions[index];
             }
         }
 
