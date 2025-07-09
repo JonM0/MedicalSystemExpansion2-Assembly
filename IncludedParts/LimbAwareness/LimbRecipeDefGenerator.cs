@@ -27,7 +27,7 @@ namespace MSE2
                 {
                     def.ResolveReferences();
                     DefGenerator.AddImpliedDef(def);
-                    HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef(def, typeof(RecipeDef));
+                    //HugsLib.Utils.InjectedDefHasher.GiveShortHashToDef(def, typeof(RecipeDef));
                     defsToCheck.Add(def);
                 }
             }

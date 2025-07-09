@@ -22,9 +22,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4494-beta" ExcludeAssets="runtime" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4515-beta" ExcludeAssets="runtime" />
 		<PackageReference Include="Lib.Harmony.Thin" Version="2.3.6" ExcludeAssets="runtime" />
-		<PackageReference Include="UnlimitedHugs.Rimworld.HugsLib" Version="11.0.5" ExcludeAssets="runtime" />
 		<PackageReference Include="RimWorld.MultiplayerAPI" Version="0.5.0" />
 	</ItemGroup>
 

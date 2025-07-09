@@ -24,14 +24,14 @@ namespace MSE2.HarmonyPatches
         [HarmonyPostfix]
         private static void Postfix ( ref IEnumerable<Hediff> __result, Pawn pawn, bool ___showAllHediffs )
         {
-            if ( !___showAllHediffs && MedicalSystemExpansion.Instance.HediffHideModeSetting != MedicalSystemExpansion.HediffHideMode.Never )
+            if ( !___showAllHediffs && MedicalSystemExpansion.Instance.HediffHideModeSetting != Settings.HediffHideMode.Never )
             {
                 __result = __result.Where( h =>
                             h is not Hediff_AddedPart
                             || !h.IsParentStandard()
-                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.Clean
+                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == Settings.HediffHideMode.Clean
                                 && pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible ).Except( h ).Any())
-                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == MedicalSystemExpansion.HediffHideMode.CleanOrModules
+                            || (MedicalSystemExpansion.Instance.HediffHideModeSetting == Settings.HediffHideMode.CleanOrModules
                                 && pawn.health.hediffSet.hediffs.Where( x => x.Part == h.Part && x.Visible && x is not Hediff_ModuleAbstract ).Except( h ).Any())
                            );
             }

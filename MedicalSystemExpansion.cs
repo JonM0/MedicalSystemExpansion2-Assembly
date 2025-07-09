@@ -1,99 +1,64 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 
-using HugsLib;
-using HugsLib.Settings;
+using HarmonyLib;
 
 using Multiplayer.API;
+
+using UnityEngine;
 
 using Verse;
 
 namespace MSE2
 {
-    public class MedicalSystemExpansion : ModBase
+    public class MedicalSystemExpansion : Mod
     {
-        public override void Initialize()
+
+        public MedicalSystemExpansion(ModContentPack content) : base(content)
         {
             Instance = this;
+            this.settings = GetSettings<Settings>();
+            this.harmony = new Harmony("MSE2.Harmony");
+
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             if (MP.enabled) MP.RegisterAll();
+
+            LongEventHandler.QueueLongEvent(this.Initialize, "MSE2_LongEvent_Initialize", false, null);
         }
 
-        public override void DefsLoaded()
+        private void Initialize()
         {
-#if DEBUG
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-#endif
-            try
-            {
-                AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
-
-                IncludedPartsUtilities.CacheAllStandardParents();
-
-                IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
-
-                IgnoreSubPartsUtilities.IgnoreUnsupportedSubparts();
-
-                LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
-
-                IncludedPartsUtilities.PrintIncompatibleVersionsReport();
-
-                this.SetupSettingHandles();
-            }
-            catch (Exception ex)
-            {
-                Log.Error("[MSE2] Exception caught running DefsLoaded(): " + ex);
-            }
-#if DEBUG
-            finally
-            {
-                stopwatch.Stop();
-                Log.Message( "[MSE2] DefsLoaded completed in " + stopwatch.Elapsed );
-            }
-#endif
+            AutoRecipeUserUtilities.ApplyAutoRecipeUsers();
+            IncludedPartsUtilities.CacheAllStandardParents();
+            IgnoreSubPartsUtilities.IgnoreAllNonCompedSubparts();
+            IgnoreSubPartsUtilities.IgnoreUnsupportedSubparts();
+            LimbRecipeDefGenerator.AddExtraRecipesToDefDatabase();
+            IncludedPartsUtilities.PrintIncompatibleVersionsReport();
         }
 
+        public override void DoSettingsWindowContents(Rect inRect)
+        {
+            var list = new Listing_Standard();
+            list.Begin(inRect);
+            settings.DoWindowContents(list);
+            list.End();
+        }
 
-
-
-        public override string ModIdentifier => "MSE2";
+        public override string SettingsCategory() => "MSE2";
 
         public static MedicalSystemExpansion Instance { get; private set; }
 
+        private readonly Settings settings;
+        private readonly Harmony harmony;
 
         // settings
+        public Settings.HediffHideMode HediffHideModeSetting => settings.hediffHideMode;
 
-        private void SetupSettingHandles()
-        {
-            this.hediffHideModeSetting = Settings.GetHandle("hediffHideMode",
-                "HediffHideModeSetting_Title".Translate(),
-                "HediffHideModeSetting_Description".Translate(),
-                HediffHideMode.Clean, null,
-                "HediffHideModeSetting_");
+        public bool RemoveAllFromSegmentSetting => settings.removeAllFromSegment;
 
-            this.hideModuleSlotsSetting = Settings.GetHandle("hideModuleSlots",
-                "HideModuleSlotsSetting_Title".Translate(),
-                "HideModuleSlotsSetting_Description".Translate(),
-                defaultValue: false);
-
-            this.removeAllFromSegmentSetting = Settings.GetHandle("removeAllFromSegment",
-                "RemoveAllFromSegmentSetting_Title".Translate(),
-                "RemoveAllFromSegmentSetting_Description".Translate(),
-                defaultValue: false);
-        }
-
-        public enum HediffHideMode { Always, Never, Clean, CleanOrModules }
-        private SettingHandle<HediffHideMode> hediffHideModeSetting;
-        public HediffHideMode HediffHideModeSetting => this.hediffHideModeSetting;
-
-
-        private SettingHandle<bool> removeAllFromSegmentSetting;
-        public bool RemoveAllFromSegmentSetting { get => this.removeAllFromSegmentSetting; }
-
-
-        private SettingHandle<bool> hideModuleSlotsSetting;
-        public bool HideModuleSlotsSetting { get => this.hideModuleSlotsSetting; }
+        public bool HideModuleSlotsSetting => settings.hideModuleSlots;
 
     }
 }
