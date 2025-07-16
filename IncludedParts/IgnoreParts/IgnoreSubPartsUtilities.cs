@@ -15,13 +15,24 @@ namespace MSE2
         {
             if (bodyPart != null && bodyPart.parent != null)
             {
-                IgnoreSubParts modExt = set.hediffs
-                    .Find(h => h != null && h.Part == bodyPart.parent && (h.def?.HasModExtension<IgnoreSubParts>() ?? false))// added part on parent bodypartrecord
-                    ?.def.GetModExtension<IgnoreSubParts>();
+                // Find an IgnoreSubParts modext in the closest ancestor
+                IgnoreSubParts modExt = null;
+                var parent = bodyPart.parent;
+                while (parent != null && modExt == null)
+                {
+                    var hediff = set.GetDirectlyAddedPartFor(parent);
+                    if (hediff != null) modExt = hediff.def?.GetModExtension<IgnoreSubParts>();
+                    parent = parent.parent;
+                }
 
-                return
-                    (modExt != null && modExt.ignoredSubParts.Contains(bodyPart.def))
-                    || set.PartShouldBeIgnored(bodyPart.parent);
+                // If it exists, check if any ancestor is ignored
+                if (modExt != null)
+                {
+                    for (var part = bodyPart; part != parent; part = part.parent)
+                    {
+                        if (modExt.ignoredSubParts.Contains(part.def)) return true;
+                    }
+                }
             }
             return false;
         }
