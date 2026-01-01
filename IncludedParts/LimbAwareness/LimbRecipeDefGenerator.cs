@@ -194,8 +194,7 @@ namespace MSE2
                     (recipeDef.ingredients, recipeDef.workAmount) = AllIngredientsWorkForVersion(prosthesisDef, version);
 
                     // add specific limb modextension
-                    if (recipeDef.modExtensions == null) recipeDef.modExtensions = new List<DefModExtension>();
-                    recipeDef.modExtensions.Add(new TargetLimb(version));
+                    (recipeDef.modExtensions ??= new()).Add(new TargetLimb(version));
 
                 }
                 catch (Exception ex)
