@@ -24,7 +24,8 @@ namespace MSE2.HarmonyPatches
         internal static MethodInfo TargetMethod ()
         {
             return AccessTools.FindIncludingInnerTypes<MethodInfo>( typeof( PawnTechHediffsGenerator ),
-                t => t.HasAttribute<CompilerGeneratedAttribute>() // in the compiler generated subclasses
+                t => t.HasAttribute<CompilerGeneratedAttribute>() && // in the compiler generated subclasses
+                    t.GetField("pawn") is not null
                 ? t.GetMethods( BindingFlags.NonPublic | BindingFlags.Instance ).SingleOrDefault( IsTargetMethod ) // take the method that matches what i want
                 : null );
         }
